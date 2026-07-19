@@ -7,7 +7,7 @@ function App() {
       <section id="center">
         <h1>Basic Online Skills Manager</h1>
         <p>
-          This is a simple CDM application .
+          This is a simple CRM application .
         </p>
       </section>
     </>
