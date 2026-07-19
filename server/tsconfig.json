@@ -9,7 +9,7 @@
     ],
     "types": [
       "node",
-      "jest"
+      "vitest/globals"
     ],
     "sourceMap": true,
     "declaration": false,
@@ -23,7 +23,8 @@
     "skipLibCheck": true
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "src/api"
   ],
   "exclude": [
     "node_modules",
