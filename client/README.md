@@ -17,11 +17,13 @@ React + TypeScript + Vite frontend for the Basic Online Skills Manager.
 
 - Node.js 20+
 - npm
+- nvm
 
 ## Getting started
 
 ```bash
 cd client
+nvm use
 npm install
 npm run dev
 ```

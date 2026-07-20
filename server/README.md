@@ -16,12 +16,14 @@ Node + Express + TypeScript backend for the Basic Online Skills Manager.
 
 - Node.js 20+
 - npm
+- nvm
 <!-- - PostgreSQL not yet implemented --> 
 
 ## Getting started
 
 ```bash
 cd server
+nvm use
 npm install
 npm run dev
 ```
