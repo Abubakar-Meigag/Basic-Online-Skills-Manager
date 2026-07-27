@@ -49,6 +49,9 @@ const Sidebar = () => {
               </NavLink>
             </>
           )}
+          <NavLink to="/login">
+            <li>Logout</li>
+          </NavLink>
         </ul>
       </nav>
     </div>
