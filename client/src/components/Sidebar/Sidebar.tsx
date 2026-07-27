@@ -1,5 +1,9 @@
+import { NavLink } from "react-router";
+import "./Sidebar.css";
+
 const Sidebar = () => {
-  const userType: string = "";
+  const userType: string = "commercial";
+  //  /dashboard/commercial-partner
 
   return (
     <div className="sidebar">
@@ -8,25 +12,39 @@ const Sidebar = () => {
       {userType === "commercial" && (
         <nav>
           <ul>
-            <li>Courses</li>
-            <li>Request New Course</li>
+            <NavLink to="/dashboard/commercial-partner/courses">
+              <li>Courses</li>
+            </NavLink>
+            <NavLink to="/dashboard/commercial-partner/new-course">
+              <li>Request New Course</li>
+            </NavLink>
           </ul>
         </nav>
       )}
       {userType === "outreach" && (
         <nav>
           <ul>
-            <li>Find Opportunities</li>
-            <li>Requested Courses</li>
+            <NavLink to="/dashboard/outreach-partner/find-opportunities">
+              <li>Find Opportunities</li>
+            </NavLink>
+            <NavLink to="/dashboard/outreach-partner/requested-courses">
+              <li>Requested Courses</li>
+            </NavLink>
           </ul>
         </nav>
       )}
       {userType === "cyf-staff" && (
         <nav>
           <ul>
-            <li>Request Pipeline</li>
-            <li>Manage Partners</li>
-            <li>Audit Log</li>
+            <NavLink to="/dashboard/cyf-staff/requestd-pipelines">
+              <li>Request Pipeline</li>
+            </NavLink>
+            <NavLink to="/dashboard/cyf-staff/manage-partners">
+              <li>Manage Partners</li>
+            </NavLink>
+            <NavLink to="/dashboard/cyf-staff/audit-log">
+              <li>Audit Log</li>
+            </NavLink>
           </ul>
         </nav>
       )}
