@@ -6,7 +6,7 @@ const Sidebar = () => {
   //  /dashboard/commercial-partner
 
   return (
-    <div className="sidebar p-5">
+    <div className="sidebar p-5 shrink-0 sticky top-0 self-start h-screen">
       <img
         className="mb-5"
         src="/src/assets/CYF-logo.png"
