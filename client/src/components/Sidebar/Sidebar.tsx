@@ -6,8 +6,13 @@ const Sidebar = () => {
   //  /dashboard/commercial-partner
 
   return (
-    <div className="sidebar">
-      <img src="/src/assets/CYF-logo.png" width="256" height="256" />
+    <div className="sidebar p-5">
+      <img
+        className="mb-5"
+        src="/src/assets/CYF-logo.png"
+        width="256"
+        height="256"
+      />
 
       {userType === "commercial" && (
         <nav>
