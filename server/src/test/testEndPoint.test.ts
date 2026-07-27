@@ -2,11 +2,11 @@ import request from 'supertest';
 import app from '../app';
 
 describe('GET /test', () => {
-      it('returns the "no messages found" message when db is empty', async () => {
+      it('returns "No users found" when db is empty', async () => {
             const response = await request(app).get('/test');
 
             expect(response.status).toBe(200);
-            expect(response.body).toEqual([{ message: 'Hello, World!' }]);
+            expect(response.body).toEqual({ message: 'No users found' });
       });
 
       it('returns JSON content-type', async () => {
