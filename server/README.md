@@ -17,7 +17,8 @@ Node + Express + TypeScript backend for the Basic Online Skills Manager.
 - Node.js 20+
 - npm
 - nvm
-<!-- - PostgreSQL not yet implemented --> 
+
+<!-- - PostgreSQL not yet implemented -->
 
 ## Getting started
 
@@ -41,6 +42,7 @@ cp .env.example .env
 ```
 
 Required variables:
+
 - `PORT` — port to run on (default 3000)
 - `DATABASE_URL` — Postgres connection string
 - `JWT_SECRET` — secret for signing tokens
@@ -48,11 +50,13 @@ Required variables:
 ## Running tests
 
 Watch mode (while coding):
+
 ```bash
 npm run test
 ```
 
 Single run (CI-style):
+
 ```bash
 npm run test:run
 ```
