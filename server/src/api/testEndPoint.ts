@@ -1,16 +1,20 @@
-import type { Request, Response } from "express";
-import db from "../data/db";
+import type { Request, Response } from 'express';
+import  pool  from '../data/connection';
 
-const testEndPoint = (req: Request, res: Response) => {
-  try {
-    if (db.length === 0) {
-      res.json({ message: "No messages found" });
-      return;
-    }
-    res.json(db);
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
-  }
+const testEndPoint = async (_req: Request, res: Response): Promise<void> => {
+      try {
+            const query = await pool.query('SELECT * FROM users ORDER BY created_at DESC');
+
+            if (query.rows.length === 0) {
+                  res.json({ message: 'No users found' });
+                  return;
+            }
+
+            res.json(query.rows);
+      } catch (error) {
+            console.error('Database error:', error);
+            res.status(500).json({ message: 'Internal server error' });
+      }
 };
 
 export default testEndPoint;
