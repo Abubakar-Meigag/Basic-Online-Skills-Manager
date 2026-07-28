@@ -1,8 +1,8 @@
 import { NavLink } from "react-router";
 import "./Sidebar.css";
 
-const Sidebar = () => {
-  const userType: string = "commercial"; // Change to see view from a different user. Accepts strings "commercial", "outreach" & "cyf-staff"
+const Sidebar = ({ userType = "commercial" }) => {
+  // Change userType prop above to see view for a different user. Accepts strings "commercial", "outreach" & "cyf-staff"
 
   return (
     <div className="sidebar p-5 shrink-0 sticky top-0 self-start h-screen">
