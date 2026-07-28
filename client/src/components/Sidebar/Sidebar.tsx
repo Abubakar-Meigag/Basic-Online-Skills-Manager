@@ -1,4 +1,5 @@
 import { NavLink } from "react-router";
+import CYFLogo from "../../assets/CYF-logo.png";
 import "./Sidebar.css";
 
 const Sidebar = ({ userType = "commercial" }) => {
@@ -6,12 +7,7 @@ const Sidebar = ({ userType = "commercial" }) => {
 
   return (
     <div className="sidebar p-5 shrink-0 sticky top-0 self-start h-screen">
-      <img
-        className="mb-5"
-        src="/src/assets/CYF-logo.png"
-        width="256"
-        height="256"
-      />
+      <img className="mb-5" src={CYFLogo} width="256" height="256" />
 
       <nav>
         <ul>
