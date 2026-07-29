@@ -1,12 +1,15 @@
 import express from "express";
 import type { Request, Response } from "express";
 import cors from "cors";
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './lib/swagger';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get("/", (_req: Request, res: Response) => {
   res.send("Welcome to Basic Online Skills Manager");
@@ -19,7 +22,12 @@ app.get("/health", (_req: Request, res: Response) => {
 
 // Import your endpoint handlers here and define your routes after
 
+// Example endpoint handler import and route definition
 import testEndPoint from "./api/testEndPoint";
 app.get("/test", testEndPoint);
+import testSwagger from "./api/testSwagger";
+app.post("/api/testSwagger", testSwagger);
+
+// add BOSM API endpoints here in below
 
 export default app;
