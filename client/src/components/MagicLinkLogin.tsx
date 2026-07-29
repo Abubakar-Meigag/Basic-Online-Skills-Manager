@@ -8,8 +8,6 @@ const styles = {
 
   cyfBadge:
     "bg-gray-100 font-extrabold text-xs px-3.5 py-1.5 rounded-md mb-6 tracking-wide uppercase select-none inline-flex items-center",
-  badgeRed: "text-[#EE2A24]",
-  badgePurple: "text-[#2D2D68]",
 
   // Headings & Branding
   headerWrapper: "w-full",
@@ -93,8 +91,11 @@ export default function MagicLinkLogin() {
         <div className={styles.card}>
           {/* CYF Badge */}
           <div className={styles.cyfBadge}>
-            <span className={styles.badgeRed}>C</span>
-            <span className={styles.badgePurple}>YF</span>
+            <img
+              src="https://codeyourfuture.io/wp-content/uploads/2019/03/cyf_brand.png"
+              alt="Code Your Future"
+              className={styles.logoImage}
+            />
           </div>
 
           <h1 className={styles.heading}>Basic Online Skills Manager</h1>
