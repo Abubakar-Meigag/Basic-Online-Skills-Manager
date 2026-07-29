@@ -28,6 +28,6 @@ app.get("/test", testEndPoint);
 import testSwagger from "./api/testSwagger";
 app.post("/api/testSwagger", testSwagger);
 
-// add BOSM API endpoints here in below
+// add BOSM API endpoints here below
 
 export default app;
