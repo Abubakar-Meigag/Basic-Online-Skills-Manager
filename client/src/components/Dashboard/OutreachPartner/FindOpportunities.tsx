@@ -32,7 +32,9 @@ const FindOpportunities = () => {
             <td>3 weeks</td>
             <td>15 Aug 2026</td>
             <td>Open</td>
-            <td>View Opportunity Details</td>
+            <td>
+              <a href="">View Opportunity Details</a>
+            </td>
           </tr>
         </tbody>
       </table>
