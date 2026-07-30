@@ -1,7 +1,7 @@
 # Swagger / API Docs Guide
 
 This folder (`/lib/swagger.ts`) holds the base config for our API documentation.
-Docs are viewable at: `http://localhost:3000/api-docs`
+Docs are viewable at: `http://localhost:3000/docs`
 
 Every teammate adding a new endpoint needs to do **two things**:
 1. Add a schema (if it's a new entity/table) to `components.schemas` in `swagger.ts`
