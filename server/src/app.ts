@@ -22,12 +22,6 @@ app.get("/health", (_req: Request, res: Response) => {
 import testEndPoint from "./api/testEndPoint";
 app.get("/test", testEndPoint);
 
-
-
-
-
-
-
 // add BOSM API endpoints here below
 
 import getCoursePipeline from "./api/coursePipeline";

@@ -81,24 +81,23 @@ const getCoursePipeline = async (
             `);
 
     /**
-      * Maps each course status to an array of its courses.
-      * Every status in ACTIVE_STATUS is seeded with an empty array first,
-      * so statuses with no courses still appear in the response as [] rather
-      * than being omitted - letting the frontend render all sections consistently.
+     * Maps each course status to an array of its courses.
+     * Every status in ACTIVE_STATUS is seeded with an empty array first,
+     * so statuses with no courses still appear in the response as [] rather
+     * than being omitted - letting the frontend render all sections consistently.
      */
     const courses: Record<string, unknown[]> = {};
     for (const status of ACTIVE_STATUS) {
       courses[status] = [];
     }
 
-    
     for (const row of query.rows) {
-    /**
-     * Look up the pre-seeded array for this row's status, then push the row into it.
-     * Stored in a variable first so TypeScript can confirm it's defined (not undefined)
-     * before calling .push a direct courses[row.status].push() would trigger 
-     * a "possibly undefined" error under strict index checking.
-     */
+      /**
+       * Look up the pre-seeded array for this row's status, then push the row into it.
+       * Stored in a variable first so TypeScript can confirm it's defined (not undefined)
+       * before calling .push a direct courses[row.status].push() would trigger
+       * a "possibly undefined" error under strict index checking.
+       */
       const statusGroup = courses[row.status];
       if (statusGroup) {
         statusGroup.push(row);
