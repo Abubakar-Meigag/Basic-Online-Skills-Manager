@@ -1,14 +1,15 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import MagicLinkLogin from "./components/MagicLinkLogin";
+import { Navigate, Route, Routes } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import RoleDashboardView from "./views/RoleDashboardView";
+
 function App() {
   return (
-    <BrowserRouter>
-      <main>
-        <Routes>
-          <Route path="/login" element={<MagicLinkLogin />} />
-        </Routes>
-      </main>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/login" element={<MagicLinkLogin />} />
+      <Route path="/dashboard/:role" element={<RoleDashboardView />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
