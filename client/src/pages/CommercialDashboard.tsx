@@ -76,7 +76,7 @@ export default function CommercialDashboard() {
                   key={header}
                   className={`
             py-5 
-            text-[#333333]       
+            text-[#A9A9A9]       
             text-xs font-bold uppercase tracking-wider
             ${isFirst ? "pl-10" : "px-4"} 
           `}
