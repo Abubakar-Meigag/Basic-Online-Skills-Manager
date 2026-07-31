@@ -67,12 +67,24 @@ export default function CommercialDashboard() {
       {/* The Table Skeleton */}
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="border-b border-slate-200 text-slate-500 text-sm uppercase">
-            {tableHeaders.map((header) => (
-              <th key={header} className="pb-3 font-semibold">
-                {header}
-              </th>
-            ))}
+          <tr className="bg-[#F3F3F3]">
+            {tableHeaders.map((header, index) => {
+              const isFirst = index === 0;
+
+              return (
+                <th
+                  key={header}
+                  className={`
+            py-5 
+            text-[#333333]       
+            text-xs font-bold uppercase tracking-wider
+            ${isFirst ? "pl-10" : "px-4"} 
+          `}
+                >
+                  {header}
+                </th>
+              );
+            })}
           </tr>
         </thead>
         <tbody>
