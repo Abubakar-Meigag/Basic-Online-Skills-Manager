@@ -75,6 +75,75 @@ export default function CommercialDashboard() {
             ))}
           </tr>
         </thead>
+        <tbody>
+          {capgeminiCourses.map((course) => {
+            // Figure out the status color
+            let statusStyle = statusStyles[course.status];
+            if (!statusStyle) {
+              statusStyle = "bg-slate-100 text-slate-700"; // Fallback to grey
+            }
+
+            // Remove underscores from status text (e.g. "request_open" -> "request open")
+            const statusText = course.status.replace("_", " ");
+
+            // Figure out the Outreach Partner name
+            let partnerName = "-";
+            if (course.outreach_org_id) {
+              partnerName = outreachPartnerById[course.outreach_org_id] || "-";
+            }
+
+            // Check if editing is allowed
+            const canEdit = course.status === "request_pending";
+
+            return (
+              <tr
+                key={course.id}
+                className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
+              >
+                <td className="py-4 text-sm text-slate-500">{course.id}</td>
+                <td className="py-4 text-sm font-bold text-slate-900">
+                  {course.contract_name}
+                </td>
+                <td className="py-4 text-sm text-slate-600">{course.city}</td>
+                <td className="py-4 text-sm text-slate-600">
+                  {course.trainee_target}
+                </td>
+                <td className="py-4 text-sm text-slate-600">
+                  {course.deadline}
+                </td>
+
+                <td className="py-4">
+                  <span
+                    className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${statusStyle}`}
+                  >
+                    {statusText}
+                  </span>
+                </td>
+
+                <td className="py-4 text-sm text-slate-600">{partnerName}</td>
+
+                <td className="py-4 text-sm">
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      className="text-blue-600 hover:text-blue-800 font-medium"
+                    >
+                      View Details
+                    </button>
+                    {canEdit ? (
+                      <button
+                        type="button"
+                        className="text-slate-600 hover:text-slate-900 font-medium"
+                      >
+                        Edit
+                      </button>
+                    ) : null}
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
       </table>
     </section>
   );
