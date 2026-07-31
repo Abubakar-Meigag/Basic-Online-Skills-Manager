@@ -110,17 +110,17 @@ export default function CommercialDashboard() {
             return (
               <tr
                 key={course.id}
-                className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
+                className="border-b border-[#E3E3E3] hover:bg-[#F3F3F3] transition-colors"
               >
-                <td className="py-4 text-sm text-slate-500">{course.id}</td>
-                <td className="py-4 text-sm font-bold text-slate-900">
+                <td className="py-4 text-sm text-slate-500 pl-5">{course.id}</td>
+                <td className="py-4 text-sm font-bold text-slate-900 px-4">
                   {course.contract_name}
                 </td>
-                <td className="py-4 text-sm text-slate-600">{course.city}</td>
-                <td className="py-4 text-sm text-slate-600">
+                <td className="py-4 text-sm text-slate-600 px-4">{course.city}</td>
+                <td className="py-4 text-sm text-slate-600 px-14">
                   {course.trainee_target}
                 </td>
-                <td className="py-4 text-sm text-slate-600">
+                <td className="py-4 text-sm text-slate-600 px-4">
                   {course.deadline}
                 </td>
 
@@ -132,9 +132,9 @@ export default function CommercialDashboard() {
                   </span>
                 </td>
 
-                <td className="py-4 text-sm text-slate-600">{partnerName}</td>
+                <td className="py-4 text-sm text-slate-600 px-4">{partnerName}</td>
 
-                <td className="py-4 text-sm">
+                <td className="py-4 text-sm px-4">
                   <div className="flex gap-3">
                     <button
                       type="button"
