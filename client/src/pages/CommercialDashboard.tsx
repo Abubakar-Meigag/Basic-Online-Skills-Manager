@@ -22,3 +22,21 @@ const statusStyles: Record<string, string> = {
   course_running: "bg-red-100 text-red-800",
   request_cancelled: "bg-red-100 text-red-800",
 };
+
+let capgeminiOrgId: string | undefined;
+
+for (let i = 0; i < organisations.length; i++) {
+  const currentOrg = organisations[i];
+  if (currentOrg.organisation_name === LOGGED_IN_ORG_NAME) {
+    capgeminiOrgId = currentOrg.id;
+    break;
+  }
+}
+
+const outreachPartnerById: Record<string, string> = {};
+
+for (let i = 0; i < organisations.length; i++) {
+  const org = organisations[i];
+
+  outreachPartnerById[org.id] = org.organisation_name;
+}
