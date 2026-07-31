@@ -53,14 +53,14 @@ export default function CommercialDashboard() {
       <header className="flex justify-between items-start pb-3 mb-8 border-b border-[#E3E3E3]">
         {/* Left Side: User Info */}
         <div>
-          <p className="text-xs text-[#A9A9A9] mb-1">Logged in as</p>
+          <p className="text-xs text-[#333333] mb-1">Logged in as</p>
           <h2 className="text-xl font-bold text-[#333333]">Capgemini</h2>
         </div>
 
         {/* Right Side: Red Button */}
         <button
           type="button"
-          className="bg-[#EE4434] hover:bg-[#B4001B] text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+          className="bg-[#B4001B] text-white px-6 py-2 rounded-lg font-semibold transition-colors"
         >
           Request New Course
         </button>
@@ -70,7 +70,7 @@ export default function CommercialDashboard() {
         <h1 className="text-3xl font-bold text-[#333333]">Dashboard</h1>
 
         {/* The Subtitle */}
-        <p className="text-[#A9A9A9] text-sm mt-2">
+        <p className="text-[#333333] text-sm mt-2">
           All course requests submitted by your organisation.
         </p>
       </div>
@@ -87,7 +87,7 @@ export default function CommercialDashboard() {
                     key={header}
                     className={`
 				py-5 
-				text-[#A9A9A9]       
+				text-[#333333]       
 				text-xs font-bold uppercase tracking-wider
 				${isFirst ? "pl-10" : "px-4"} 
 			`}
