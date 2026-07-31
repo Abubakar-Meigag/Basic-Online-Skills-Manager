@@ -63,7 +63,15 @@ export default function CommercialDashboard() {
           Request New Course
         </button>
       </header>
+      <div className="mb-8">
+        {/* The Page Title */}
+        <h1 className="text-3xl font-bold text-[#333333]">Dashboard</h1>
 
+        {/* The Subtitle */}
+        <p className="text-[#A9A9A9] text-sm mt-2">
+          All course requests submitted by your organisation.
+        </p>
+      </div>
       {/* The Table Skeleton */}
       <table className="w-full text-left border-collapse">
         <thead>
@@ -112,11 +120,15 @@ export default function CommercialDashboard() {
                 key={course.id}
                 className="border-b border-[#E3E3E3] hover:bg-[#F3F3F3] transition-colors"
               >
-                <td className="py-4 text-sm text-slate-500 pl-5">{course.id}</td>
+                <td className="py-4 text-sm text-slate-500 pl-5">
+                  {course.id}
+                </td>
                 <td className="py-4 text-sm font-bold text-slate-900 px-4">
                   {course.contract_name}
                 </td>
-                <td className="py-4 text-sm text-slate-600 px-4">{course.city}</td>
+                <td className="py-4 text-sm text-slate-600 px-4">
+                  {course.city}
+                </td>
                 <td className="py-4 text-sm text-slate-600 px-14">
                   {course.trainee_target}
                 </td>
@@ -132,7 +144,9 @@ export default function CommercialDashboard() {
                   </span>
                 </td>
 
-                <td className="py-4 text-sm text-slate-600 px-4">{partnerName}</td>
+                <td className="py-4 text-sm text-slate-600 px-4">
+                  {partnerName}
+                </td>
 
                 <td className="py-4 text-sm px-4">
                   <div className="flex gap-3">
