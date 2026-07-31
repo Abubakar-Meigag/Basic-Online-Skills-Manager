@@ -41,11 +41,13 @@ cp .env.example .env
 ## Running tests
 
 Watch mode (while coding):
+
 ```bash
 npm run test
 ```
 
 Single run (CI-style):
+
 ```bash
 npm run test:run
 ```

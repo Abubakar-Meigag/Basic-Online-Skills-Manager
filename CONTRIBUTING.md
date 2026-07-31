@@ -13,6 +13,8 @@
 
 ## Pull requests
 
+Before you make a PR, please run `npm run format` to keep code style consisitent
+
 Every PR must include:
 
 1. **A clear description** of what changed and why.
