@@ -7,11 +7,11 @@ export default function RoleDashboardView() {
   const { role } = useParams();
 
   switch (role) {
-    case "cyf_staff":
+    case "cyf-staff":
       return <CYFStaffDashboard />;
-    case "commercial_partner":
+    case "commercial-partner":
       return <CommercialPartnerDashboard />;
-    case "outreach_partner":
+    case "outreach-partner":
       return <OutreachPartnerDashboard />;
     default:
       return <Navigate to="/" replace />;

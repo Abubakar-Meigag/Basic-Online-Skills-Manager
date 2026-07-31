@@ -15,19 +15,19 @@ export default function HomePage() {
         </p>
         <div className="flex flex-col gap-3">
           <Link
-            to="/dashboard/cyf_staff"
+            to="/dashboard/cyf-staff"
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
             CYF Staff Dashboard
           </Link>
           <Link
-            to="/dashboard/commercial_partner"
+            to="/dashboard/commercial-partner"
             className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
           >
             Commercial Partner Dashboard
           </Link>
           <Link
-            to="/dashboard/outreach_partner"
+            to="/dashboard/outreach-partner"
             className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
           >
             Outreach Partner Dashboard
