@@ -58,7 +58,7 @@ export default function CommercialDashboard() {
         </div>
         <button
           type="button"
-          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+          className="bg-[#EE4434] hover:bg-[#B4001B] text-white px-4 py-2 rounded-lg font-semibold transition-colors"
         >
           Request New Course
         </button>
@@ -133,7 +133,7 @@ export default function CommercialDashboard() {
                     {canEdit ? (
                       <button
                         type="button"
-                        className="text-slate-600 hover:text-slate-900 font-medium"
+                        className="text-blue-600 hover:text-blue-800 font-medium"
                       >
                         Edit
                       </button>
