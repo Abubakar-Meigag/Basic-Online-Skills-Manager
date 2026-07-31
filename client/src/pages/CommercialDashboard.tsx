@@ -75,104 +75,107 @@ export default function CommercialDashboard() {
         </p>
       </div>
       {/* The Table Skeleton */}
-      <table className="w-full text-left border-collapse">
-        <thead>
-          <tr className="bg-[#F3F3F3]">
-            {tableHeaders.map((header, index) => {
-              const isFirst = index === 0;
+      <div className="border border-[#E3E3E3]">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-[#F3F3F3]">
+              {tableHeaders.map((header, index) => {
+                const isFirst = index === 0;
+
+                return (
+                  <th
+                    key={header}
+                    className={`
+				py-5 
+				text-[#A9A9A9]       
+				text-xs font-bold uppercase tracking-wider
+				${isFirst ? "pl-10" : "px-4"} 
+			`}
+                  >
+                    {header}
+                  </th>
+                );
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {capgeminiCourses.map((course) => {
+              // Figure out the status color
+              let statusStyle = statusStyles[course.status];
+              if (!statusStyle) {
+                statusStyle = "bg-slate-100 text-slate-700"; // Fallback to grey
+              }
+
+              // Remove underscores from status text (e.g. "request_open" -> "request open")
+              const statusText = course.status.replace("_", " ");
+
+              // Figure out the Outreach Partner name
+              let partnerName = "-";
+              if (course.outreach_org_id) {
+                partnerName =
+                  outreachPartnerById[course.outreach_org_id] || "-";
+              }
+
+              // Check if editing is allowed
+              const canEdit = course.status === "request_pending";
 
               return (
-                <th
-                  key={header}
-                  className={`
-            py-5 
-            text-[#A9A9A9]       
-            text-xs font-bold uppercase tracking-wider
-            ${isFirst ? "pl-10" : "px-4"} 
-          `}
+                <tr
+                  key={course.id}
+                  className="border-b border-[#F3F3F3] hover:bg-[#F3F3F3] transition-colors"
                 >
-                  {header}
-                </th>
-              );
-            })}
-          </tr>
-        </thead>
-        <tbody>
-          {capgeminiCourses.map((course) => {
-            // Figure out the status color
-            let statusStyle = statusStyles[course.status];
-            if (!statusStyle) {
-              statusStyle = "bg-slate-100 text-slate-700"; // Fallback to grey
-            }
+                  <td className="py-4 text-sm text-slate-500 pl-5">
+                    {course.id}
+                  </td>
+                  <td className="py-4 text-sm font-bold text-slate-900 px-4">
+                    {course.contract_name}
+                  </td>
+                  <td className="py-4 text-sm text-slate-600 px-4">
+                    {course.city}
+                  </td>
+                  <td className="py-4 text-sm text-slate-600 px-14">
+                    {course.trainee_target}
+                  </td>
+                  <td className="py-4 text-sm text-slate-600 px-4">
+                    {course.deadline}
+                  </td>
 
-            // Remove underscores from status text (e.g. "request_open" -> "request open")
-            const statusText = course.status.replace("_", " ");
-
-            // Figure out the Outreach Partner name
-            let partnerName = "-";
-            if (course.outreach_org_id) {
-              partnerName = outreachPartnerById[course.outreach_org_id] || "-";
-            }
-
-            // Check if editing is allowed
-            const canEdit = course.status === "request_pending";
-
-            return (
-              <tr
-                key={course.id}
-                className="border-b border-[#E3E3E3] hover:bg-[#F3F3F3] transition-colors"
-              >
-                <td className="py-4 text-sm text-slate-500 pl-5">
-                  {course.id}
-                </td>
-                <td className="py-4 text-sm font-bold text-slate-900 px-4">
-                  {course.contract_name}
-                </td>
-                <td className="py-4 text-sm text-slate-600 px-4">
-                  {course.city}
-                </td>
-                <td className="py-4 text-sm text-slate-600 px-14">
-                  {course.trainee_target}
-                </td>
-                <td className="py-4 text-sm text-slate-600 px-4">
-                  {course.deadline}
-                </td>
-
-                <td className="py-4">
-                  <span
-                    className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${statusStyle}`}
-                  >
-                    {statusText}
-                  </span>
-                </td>
-
-                <td className="py-4 text-sm text-slate-600 px-4">
-                  {partnerName}
-                </td>
-
-                <td className="py-4 text-sm px-4">
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      className="text-blue-600 hover:text-blue-800 font-medium"
+                  <td className="py-4">
+                    <span
+                      className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${statusStyle}`}
                     >
-                      View Details
-                    </button>
-                    {canEdit ? (
+                      {statusText}
+                    </span>
+                  </td>
+
+                  <td className="py-4 text-sm text-slate-600 px-4">
+                    {partnerName}
+                  </td>
+
+                  <td className="py-4 text-sm px-4">
+                    <div className="flex gap-3">
                       <button
                         type="button"
                         className="text-blue-600 hover:text-blue-800 font-medium"
                       >
-                        Edit
+                        View Details
                       </button>
-                    ) : null}
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                      {canEdit ? (
+                        <button
+                          type="button"
+                          className="text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                          Edit
+                        </button>
+                      ) : null}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }
