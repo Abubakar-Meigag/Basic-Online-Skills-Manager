@@ -10,51 +10,6 @@ const ACTIVE_STATUS = [
   "course_completed",
 ] as const;
 
-/**
- * @swagger
- * /api/courses:
- *   get:
- *     summary: Get all active courses grouped by status (CYF Staff dashboard)
- *     description: >
- *       Returns all courses except cancelled ones, grouped into the six active
- *       status buckets. Every status key is always present, even when empty ([]).
- *     tags: [Courses]
- *     responses:
- *       200:
- *         description: Courses grouped by status
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 request_pending:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Course'
- *                 request_open:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Course'
- *                 request_claimed:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Course'
- *                 request_confirmed:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Course'
- *                 course_running:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Course'
- *                 course_completed:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Course'
- *       500:
- *         description: Internal server error
- */
-
 const getCoursePipeline = async (
   req: Request,
   res: Response,
