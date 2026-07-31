@@ -50,15 +50,17 @@ export default function CommercialDashboard() {
   return (
     <section className="p-6">
       {/* The Header: Flexbox layout to push items to opposite sides */}
-      <header className="flex justify-between items-center mb-6">
+      <header className="flex justify-between items-start pb-3 mb-8 border-b border-[#E3E3E3]">
+        {/* Left Side: User Info */}
         <div>
-          <p className="text-slate-600 text-sm">
-            Logged in as {LOGGED_IN_ORG_NAME}
-          </p>
+          <p className="text-xs text-[#A9A9A9] mb-1">Logged in as</p>
+          <h2 className="text-xl font-bold text-[#333333]">Capgemini</h2>
         </div>
+
+        {/* Right Side: Red Button */}
         <button
           type="button"
-          className="bg-[#EE4434] hover:bg-[#B4001B] text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+          className="bg-[#EE4434] hover:bg-[#B4001B] text-white px-6 py-2 rounded-lg font-semibold transition-colors"
         >
           Request New Course
         </button>
