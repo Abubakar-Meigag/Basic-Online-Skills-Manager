@@ -14,13 +14,13 @@ const tableHeaders = [
 ];
 
 const statusStyles: Record<string, string> = {
-  request_pending: "bg-yellow-100 text-yellow-800",
-  request_open: "bg-yellow-100 text-yellow-800",
-  request_claimed: "bg-yellow-100 text-yellow-800",
-  request_confirmed: "bg-green-100 text-green-800",
-  course_completed: "bg-green-100 text-green-800",
-  course_running: "bg-red-100 text-red-800",
-  request_cancelled: "bg-red-100 text-red-800",
+  request_pending: "bg-yellow-50 text-yellow-700 border border-yellow-200",
+  request_open: "bg-yellow-50 text-yellow-700 border border-yellow-200",
+  request_claimed: "bg-yellow-50 text-yellow-700 border border-yellow-200",
+  request_confirmed: "bg-green-50 text-green-700 border border-green-200",
+  course_completed: "bg-green-50 text-green-700 border border-green-200",
+  course_running: "bg-blue-50 text-blue-700 border border-blue-200",
+  request_cancelled: "bg-red-50 text-red-700 border border-red-200",
 };
 
 let capgeminiOrgId: string | undefined;
