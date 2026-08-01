@@ -17,6 +17,7 @@ We used Figma to define our user journeys and dashboard designs for all three ro
 
 - [`client/`](./client/README.md) — React + TypeScript + Vite frontend
 - [`server/`](./server/README.md) — Node + Express + TypeScript backend
+- [Project structure guide](./STRUCTURE.md)
 
 ## Contributing
 
