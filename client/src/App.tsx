@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import MagicLinkLogin from "./components/MagicLinkLogin";
-import RoleDashboardView from "./views/RoleDashboardView";
+import RoleDashboardView from "./pages/RoleDashboardView";
 import Layout from "./components/Layout/Layout";
 
 const App = () => {
@@ -12,7 +12,6 @@ const App = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/dashboard/:role" element={<RoleDashboardView />} />
       </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };
