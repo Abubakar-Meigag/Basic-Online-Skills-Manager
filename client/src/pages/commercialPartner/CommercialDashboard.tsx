@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { courses, organisations } from "../data/db.ts";
-import { statusStyles } from "../lib/constants/statusStyles";
+import { courses, organisations } from "../../data/db.ts";
+import { statusStyles } from "../../lib/constants/statusStyles";
 
 const LOGGED_IN_ORG_NAME = "Capgemini";
 

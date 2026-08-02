@@ -8,8 +8,8 @@ const App = () => {
   return (
     <Routes>
       <Route path="/login" element={<MagicLinkLogin />} />
+      <Route path="/" element={<HomePage />} />
       <Route element={<Layout />}>
-        <Route path="/" element={<HomePage />} />
         <Route path="/dashboard/:role" element={<RoleDashboardView />} />
       </Route>
     </Routes>

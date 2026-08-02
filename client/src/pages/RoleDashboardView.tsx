@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
-import CYFStaffDashboard from "../components/Dashboard/CYFStaffDashboard";
-import CommercialPartnerDashboard from "../components/Dashboard/CommercialPartnerDashboard";
-import OutreachPartnerDashboard from "../components/Dashboard/OutreachPartnerDashboard";
+import CYFStaffDashboard from "./cyfstaff/CYFStaffDashboard.tsx";
+import CommercialDashboard from "./commercialPartner/CommercialDashboard.tsx";
+import OutreachPartnerDashboard from "./outreachpartner/OutreachDashboard.tsx";
 
 export default function RoleDashboardView() {
   const { role } = useParams();
@@ -10,7 +10,7 @@ export default function RoleDashboardView() {
     case "cyf-staff":
       return <CYFStaffDashboard />;
     case "commercial-partner":
-      return <CommercialPartnerDashboard />;
+      return <CommercialDashboard />;
     case "outreach-partner":
       return <OutreachPartnerDashboard />;
   }
