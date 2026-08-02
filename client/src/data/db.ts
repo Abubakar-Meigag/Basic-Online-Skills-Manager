@@ -1,7 +1,7 @@
 // Mock data for local development.
 // Structure mirrors the agreed schema — swap for real Postgres later.
 
-import {
+import type {
   Organisation,
   User,
   Course,
