@@ -31,13 +31,18 @@ export default function CommercialDashboard() {
     return foundId;
   }, [organisations]);
 
-  const outreachPartnerById: Record<string, string> = {};
+  const outreachPartnerById = useMemo(() => {
+    const foundOutreachPartners: Record<string, string> = {};
 
-  for (let i = 0; i < organisations.length; i++) {
-    const org = organisations[i];
+    for (let i = 0; i < organisations.length; i++) {
+      const org = organisations[i];
 
-    outreachPartnerById[org.id] = org.organisation_name;
-  }
+      foundOutreachPartners[org.id] = org.organisation_name;
+    }
+
+    return foundOutreachPartners;
+  }, [organisations]);
+
   const capgeminiCourses = courses.filter(
     (course) => course.commercial_org_id === capgeminiOrgId,
   );
