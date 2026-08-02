@@ -43,9 +43,13 @@ export default function CommercialDashboard() {
     return foundOutreachPartners;
   }, [organisations]);
 
-  const capgeminiCourses = courses.filter(
-    (course) => course.commercial_org_id === capgeminiOrgId,
-  );
+  const capgeminiCourses = useMemo(() => {
+    const filteredCourses = courses.filter(
+      (course) => course.commercial_org_id === capgeminiOrgId,
+    );
+
+    return filteredCourses;
+  }, [courses, capgeminiOrgId]);
 
   return (
     <section className="p-6">
