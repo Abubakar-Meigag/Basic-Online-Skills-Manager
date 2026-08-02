@@ -56,6 +56,10 @@ const getCoursePipeline = async (
       const statusGroup = courses[row.status];
       if (statusGroup) {
         statusGroup.push(row);
+      } else {
+        console.warn(
+          `Unexpected course status "${row.status}" found in database for course ID ${row.id}`,
+        );
       }
     }
 
