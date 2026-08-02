@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { courses, organisations } from "../data/db.ts";
 import { statusStyles } from "../lib/constants/statusStyles";
 
@@ -14,26 +15,25 @@ const tableHeaders = [
   "ACTIONS",
 ];
 
-let capgeminiOrgId: string | undefined;
-
-for (let i = 0; i < organisations.length; i++) {
-  const currentOrg = organisations[i];
-  if (currentOrg.organisation_name === LOGGED_IN_ORG_NAME) {
-    capgeminiOrgId = currentOrg.id;
-    break;
-  }
-}
-
-const outreachPartnerById: Record<string, string> = {};
-
-for (let i = 0; i < organisations.length; i++) {
-  const org = organisations[i];
-
-  outreachPartnerById[org.id] = org.organisation_name;
-}
-
 export default function CommercialDashboard() {
   // Logic: Create a scoped list containing only this partner's courses.
+  let capgeminiOrgId: string | undefined;
+
+  for (let i = 0; i < organisations.length; i++) {
+    const currentOrg = organisations[i];
+    if (currentOrg.organisation_name === LOGGED_IN_ORG_NAME) {
+      capgeminiOrgId = currentOrg.id;
+      break;
+    }
+  }
+
+  const outreachPartnerById: Record<string, string> = {};
+
+  for (let i = 0; i < organisations.length; i++) {
+    const org = organisations[i];
+
+    outreachPartnerById[org.id] = org.organisation_name;
+  }
   const capgeminiCourses = courses.filter(
     (course) => course.commercial_org_id === capgeminiOrgId,
   );
