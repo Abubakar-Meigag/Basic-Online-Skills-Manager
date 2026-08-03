@@ -30,4 +30,15 @@ app.post("/api/testSwagger", testSwagger);
 
 // add BOSM API endpoints here below
 
+
+
+
+
+
+
+// add BOSM API endpoints here below
+
+import getCoursePipeline from "./api/coursePipeline";
+app.get("/course-pipeline", getCoursePipeline);
+
 export default app;
