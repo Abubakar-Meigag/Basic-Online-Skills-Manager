@@ -30,7 +30,7 @@ const getCommercialDashboard = async (req: Request, res: Response) => {
       });
     }
 
-    const result = await pool.query(
+    const commercialTableData = await pool.query(
       `SELECT
             c.id,
             c.course_name,
@@ -50,7 +50,7 @@ const getCommercialDashboard = async (req: Request, res: Response) => {
       [organisationId],
     );
 
-    return res.json({ data: result.rows });
+    return res.json({ data: commercialTableData.rows });
   } catch (err) {
     console.error("Error fetching commercial partner courses:", err);
     return res.status(500).json({ error: "Internal server error" });
