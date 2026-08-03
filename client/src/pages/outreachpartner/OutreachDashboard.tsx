@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { differenceInWeeks } from "date-fns";
+import { statusStyles } from "../../lib/constants/statusStyles";
 import { courses as dbCourses } from "../../data/db";
 import type { Course } from "../../data/dataType";
 
@@ -48,6 +49,14 @@ const OutreachDashboard = ({
         </thead>
         <tbody>
           {courses.map((course) => {
+            // Figure out the status color
+            let statusStyle = statusStyles[course.status];
+            if (!statusStyle) {
+              statusStyle = "bg-slate-100 text-slate-700"; // Fallback to grey
+            }
+
+            // Remove underscores from status text (e.g. "request_open" -> "request open")
+            const statusText = course.status.replace("_", " ");
             return (
               <tr
                 key={course.id}
@@ -73,7 +82,13 @@ const OutreachDashboard = ({
                 <td className="py-4 text-sm text-slate-600 px-4">
                   {course.deadline}
                 </td>
-                <td className="py-4">{course.status}</td>
+                <td className="py-4">
+                  <span
+                    className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${statusStyle}`}
+                  >
+                    {statusText}
+                  </span>
+                </td>
                 <td className="py-4 text-sm px-4">
                   <button
                     type="button"
