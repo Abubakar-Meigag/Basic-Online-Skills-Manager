@@ -10,12 +10,11 @@ import pool from "../data/connection";
 
 const getCommercialDashboard = async (req: Request, res: Response) => {
   try {
-
-        // const user = req.user;
-        // if (!user || user.type !== "commercial") {
-        //   return res.status(403).json({ error: "Forbidden" });
-        // }
-        // const organisationId = user.organisationId;
+    // const user = req.user;
+    // if (!user || user.type !== "commercial") {
+    //   return res.status(403).json({ error: "Forbidden" });
+    // }
+    // const organisationId = user.organisationId;
 
     /**
      * TEMPORARY: until auth is connected, take org id from the query
