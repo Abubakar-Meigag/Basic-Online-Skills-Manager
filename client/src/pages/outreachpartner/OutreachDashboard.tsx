@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { differenceInWeeks } from "date-fns";
-import { statusStyles } from "../../lib/constants/statusStyles";
+import statusLabel from "../../utils/statusLabel";
 import { courses as dbCourses } from "../../data/db";
 import type { Course } from "../../data/dataType";
 
@@ -51,14 +51,8 @@ const OutreachDashboard = ({
         </thead>
         <tbody>
           {courses.map((course) => {
-            // Figure out the status color
-            let statusStyle = statusStyles[course.status];
-            if (!statusStyle) {
-              statusStyle = "bg-slate-100 text-slate-700"; // Fallback to grey
-            }
-
-            // Remove underscores from status text (e.g. "request_open" -> "request open")
-            const statusText = course.status.replace("_", " ");
+            const { statusStyle, statusText } = statusLabel(course.status);
+            
             return (
               <tr
                 key={course.id}
