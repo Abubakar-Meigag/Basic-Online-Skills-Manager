@@ -9,14 +9,18 @@ const tableHeaderStyle =
 const courseLengthInWeeks = (startDate: string, endDate: string) =>
   differenceInWeeks(new Date(endDate), new Date(startDate));
 
-const OutreachDashboard = (partnerName: string = "DWP") => {
+const OutreachDashboard = ({
+  partnerName = "DWP",
+}: {
+  partnerName?: string;
+}) => {
   const [courses, setCourses] = useState<Course[]>([]);
 
   useEffect(() => {
     setCourses(
       dbCourses.filter((course: Course) => course.account_name === partnerName),
     );
-  }, []);
+  }, [partnerName]);
 
   return (
     <div className="find-opportunities">
