@@ -63,7 +63,7 @@ _Located in the `client/` directory. This is everything the user sees in their b
 - **Why we need it:** When you run `npm run build`, the final, tiny version of your website is created and placed in this folder.
 - **The Result:** This is the only folder that actually gets sent to the CYF hosting environment (Coolify).
 
-#### 13. `src/utils/`
+### 13. `src/utils/`
 
 - **What goes here:** Pure "Helper Functions." These are small pieces of logic that take an input and return an output.
 - **Example:**
