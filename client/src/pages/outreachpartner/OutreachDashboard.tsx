@@ -14,7 +14,7 @@ const OutreachDashboard = (partnerName: string = "DWP") => {
 
   useEffect(() => {
     setCourses(
-      dbCourses.filter((course: Course) => course.account_name === "DWP"),
+      dbCourses.filter((course: Course) => course.account_name === partnerName),
     );
   }, []);
 
