@@ -38,18 +38,6 @@ const OutreachDashboard = (partnerName: string = "DWP") => {
           </tr>
         </thead>
         <tbody>
-          {/* <tr>
-            <td>REQ-0051</td>
-            <td>Capgemini</td>
-            <td>London</td>
-            <td>24</td>
-            <td>3 weeks</td>
-            <td>15 Aug 2026</td>
-            <td>Open</td>
-            <td>
-              <a href="">View Opportunity Details</a>
-            </td>
-          </tr> */}
           {courses.map((course, index) => {
             return (
               <tr key={index}>
