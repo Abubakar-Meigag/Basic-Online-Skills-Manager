@@ -30,4 +30,8 @@ app.post("/api/testSwagger", testSwagger);
 
 // add BOSM API endpoints here below
 
+
+
+import getCommercialDashboard from "./api/commercialDashboard";
+app.get("/commercial-dashboard", getCommercialDashboard);
 export default app;
