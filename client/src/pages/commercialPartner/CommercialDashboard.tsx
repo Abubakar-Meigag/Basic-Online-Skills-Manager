@@ -121,7 +121,8 @@ export default function CommercialDashboard() {
               }
 
               // Check if editing is allowed
-              const isEditableByCommercial = course.status === "request_pending";
+              const isEditableByCommercial =
+                course.status === "request_pending";
 
               return (
                 <tr
