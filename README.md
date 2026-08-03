@@ -7,7 +7,7 @@ commercial partners, outreach partners, and CYF staff.
 
 ## Design & Prototypes
 
-We used Figma to define our user journeys and dashboard designs for all three roles (Commercial Partner, Outreach Partner, and CYF Staff). 
+We used Figma to define our user journeys and dashboard designs for all three roles (Commercial Partner, Outreach Partner, and CYF Staff).
 
 - [View Commercial Partner Figma Prototype](https://www.figma.com/make/du3He66GOp6V2KLF6NAtUQ/Commercial-Partner-User-Journey?t=jp4eBfJFVN9VCzVd-1)
 - [View Outreach Partner Figma Prototype](https://www.figma.com/make/sJdd1T9QqUjHXSs4NWwQjS/Outreach-Partner-User-Journey?t=xcCGIw2Y7PiqTumD-1)
