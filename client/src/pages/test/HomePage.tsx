@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 export default function HomePage() {
   return (
@@ -11,9 +11,16 @@ export default function HomePage() {
       <section className="text-center">
         <h2 className="text-2xl font-semibold mb-4">Test Dashboard Links</h2>
         <p className="text-gray-600 mb-6">
-          (Temporary testing - Click a link to go to the corresponding dashboard)
+          (Temporary testing - Click a link to go to the corresponding
+          dashboard)
         </p>
         <div className="flex flex-col gap-3">
+          <Link
+            to="/login"
+            className="px-6 py-3 bg-pink-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            Login Page
+          </Link>
           <Link
             to="/dashboard/cyf-staff"
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
