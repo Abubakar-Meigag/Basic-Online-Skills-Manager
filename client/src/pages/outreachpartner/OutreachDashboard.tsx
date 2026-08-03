@@ -26,7 +26,9 @@ const OutreachDashboard = ({
   return (
     <div className="find-opportunities">
       <div className="discovery-header flex justify-between mt-10 mb-20 mx-12">
-        <p>Available Opportunities</p>
+        <h2 className="text-xl font-bold text-[#333333]">
+          Available Opporunities
+        </h2>
         <select name="filter by city" id="filter-by-city">
           <option value="select-a-city">Select a city...</option>
           {/* This should be filled dynamically based on the data available */}
