@@ -1,7 +1,17 @@
 // Mock data for local development.
 // Structure mirrors the agreed schema — swap for real Postgres later.
 
+<<<<<<< HEAD
 import type { Organisation, User, Course, AuditLogEntry } from "./dataType";
+=======
+import type {
+  Organisation,
+  User,
+  Course,
+  AuditLogEntry,
+  CourseStatus,
+} from "./dataType";
+>>>>>>> 2e86ede (West Midlands | 26 July Launch | Iswat Bello | Basic Online Skills Manager | 26 UI commercial partner dashboard (#41))
 
 // Organisations
 export const organisations: Organisation[] = [
@@ -289,6 +299,7 @@ export const courses: Course[] = [
     note: "Cancelled — funding pulled back",
     created_at: "2026-07-01T09:00:00Z",
   },
+<<<<<<< HEAD
 
   // Additional requests and courses for richer local development data
   {
@@ -532,6 +543,8 @@ export const courses: Course[] = [
     note: "Second cohort this quarter",
     created_at: "2026-07-14T14:40:00Z",
   },
+=======
+>>>>>>> 2e86ede (West Midlands | 26 July Launch | Iswat Bello | Basic Online Skills Manager | 26 UI commercial partner dashboard (#41))
 ];
 
 // Audit log

@@ -22,19 +22,31 @@ export default function HomePage() {
             Login Page
           </Link>
           <Link
+<<<<<<< HEAD
             to="/cyf-staff/request-pipeline"
+=======
+            to="/dashboard/cyf-staff"
+>>>>>>> 2e86ede (West Midlands | 26 July Launch | Iswat Bello | Basic Online Skills Manager | 26 UI commercial partner dashboard (#41))
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
             CYF Staff Dashboard
           </Link>
           <Link
+<<<<<<< HEAD
             to="/commercial-partner/requested-courses"
+=======
+            to="/dashboard/commercial-partner"
+>>>>>>> 2e86ede (West Midlands | 26 July Launch | Iswat Bello | Basic Online Skills Manager | 26 UI commercial partner dashboard (#41))
             className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
           >
             Commercial Partner Dashboard
           </Link>
           <Link
+<<<<<<< HEAD
             to="/outreach-partner/find-opportunities"
+=======
+            to="/dashboard/outreach-partner"
+>>>>>>> 2e86ede (West Midlands | 26 July Launch | Iswat Bello | Basic Online Skills Manager | 26 UI commercial partner dashboard (#41))
             className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
           >
             Outreach Partner Dashboard
