@@ -4,34 +4,34 @@ This guide explains the purpose of each folder and file in the Basic Online Skil
 
 ## 🏢 The Client (The Frontend)
 
-_Located in the `/client/src` directory. This is everything the user sees in their browser._
+_Located in the `client/` directory. This is everything the user sees in their browser._
 
-### **1. `assets/`**
+### **1. `src/assets/`**
 
 - **What goes here:** Static files like the CYF logo, background images, or icons.
 - **Example:** `logo.png`.
 
-### **2. `auth/`**
+### **2. `src/auth/`**
 
 - **What goes here:** The logic that handles the **Magic Link**.
 - **Example:** `authProvider.tsx`.
 
-### **3. `components/`**
+### **3. `src/components/`**
 
 - **What goes here:** Reusable UI pieces. If a piece of code appears on more than one page (like the sidebar), it belongs here.
 - **Example:** `Sidebar.tsx`, `Layout.tsx`.
 
-### **4. `lib/`**
+### **4. `src/lib/`**
 
 - **What goes here:** Shared rules and data dictionaries that don't draw anything themselves but tell the components what to do.
 - **Example:** `statusStyles.ts` (colors), `navLinks.ts` (navigation lists).
 
-### **5. `pages/`**
+### **5. `src/pages/`**
 
 - **What goes here:** The specific destinations. These files assemble components and logic to make a full screen.
 - **Example:** `CommercialDashboard.tsx`, `OutreachDashboard.tsx`.
 
-### **6. `test/`**
+### **6. `src/test/`**
 
 - **What goes here:** Automated scripts that check if the buttons and tables work correctly.
 
@@ -51,53 +51,50 @@ _Located in the `/client/src` directory. This is everything the user sees in the
 
 - **What it does:** This is the actual physical building. It is the only HTML file that the browser loads. It contains a single empty "slot" (usually a `div` with the ID `root`) where our entire React application is injected. Without this shell, there is no space for our code to appear.
 
-### **11. `eslint.config.js`**
-
-- **What it is:** A set of rules for how your code should be written.
-- **Why we need it:** It acts like a spell-checker for programming. It will highlight a line of code if you forget a semicolon or create a variable you never use.
-- **The Benefit:** It keeps the whole team's code looking like it was written by one person.
-
-### **12.`vite.config.ts`**
-
-- **What it is:** Instructions for **Vite** (your build tool).
-- **Why we need it:** It tells the computer how to take all your React and TypeScript files and "squash" them into a fast website that a browser can understand.
-
-### **13. `public/`**
+### **11. `public/`**
 
 - **What it is:** A folder for files that don't need any processing.
 - **Why we need it:** If you have an image or a file that you want to be reachable by a direct link (like `yoursite.com/favicon.svg`), you put it here.
 - **The Logic:** Unlike the `src` folder, Vite doesn't change anything in here; it just copies it exactly as it is to the final website.
 
-### **14. `dist/`**
+### **12. `dist/`**
 
 - **What it is:** Short for "Distribution."
 - **Why we need it:** When you run `npm run build`, the final, tiny version of your website is created and placed in this folder.
 - **The Result:** This is the only folder that actually gets sent to the CYF hosting environment (Coolify).
 
+#### 13. `src/utils/`
+
+- **What goes here:** Pure "Helper Functions." These are small pieces of logic that take an input and return an output.
+- **Example:**
+  - `formatDate.ts`: A function that turns `2026-09-15` into `15 Sept 2026`.
+  - `calculateEndDate.ts`: The specific logic that adds 21 days to a start date.
+- **Why we need it:** It keeps our components clean. Instead of writing complex math inside a table row, we "borrow" the tool from the toolbox.
+
 ---
 
 ## ⚙️ The Server (The Backend)
 
-Located in the `/server/src` directory. This is the behind-the-scenes part that does all the work with your data.
+Located in the `server/` directory. This is the behind-the-scenes part that does all the work with your data.
 
-### 1. `api/`
+### 1. `src/api/`
 
 - **What goes here:** The "Endpoints." When the Frontend asks for data, these files process the request and send the response.
 
-### 2. `auth/`
+### 2. `src/auth/`
 
 - **What goes here:** Security logic that verifies if a Magic Link token is real or expired.
 
-### 3. `data/`
+### 3. `src/data/`
 
 - **What goes here:** Everything related to the **PostgreSQL Database**.
 - **Example:** `data-schema.sql` (the blueprint), `connection.ts` (the pipes).
 
-### 4. `lib/`
+### 4. `src/lib/`
 
 - **What goes here:** Helper functions used only by the server (e.g., date formatting).
 
-### 5. `test/`
+### 5. `src/test/`
 
 - **What goes here:** Automated scripts that check if the **behind-the-scenes part** is working correctly.
 - **Example:** `app.test.ts` (checks if the server starts correctly), `api.test.ts` (checks if the data "Pipes" are working).
@@ -111,18 +108,6 @@ Located in the `/server/src` directory. This is the behind-the-scenes part that 
 ### 7. `index.ts`
 
 - **What it does:** This is the power switch for the server. Its only job is to start the Express app and tell it which **Port** (e.g., 3000) to listen to for incoming requests.
-
-### 10. `public/`
-
-- **What it is:** A folder for files that don't need any processing.
-- **Why we need it:** If you have an image or a file that you want to be reachable by a direct link (like `yoursite.com/favicon.svg`), you put it here.
-- **The Logic:** Unlike the `src` folder, Vite doesn't change anything in here; it just copies it exactly as it is to the final website.
-
-### 11. `dist/`
-
-- **What it is:** Short for "Distribution."
-- **Why we need it:** When you run `npm run build`, the final, tiny version of your website is created and placed in this folder.
-- **The Result:** This is the only folder that actually gets sent to the CYF hosting environment (Coolify).
 
 ---
 
