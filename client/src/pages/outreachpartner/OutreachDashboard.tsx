@@ -39,18 +39,36 @@ const OutreachDashboard = (partnerName: string = "DWP") => {
           </tr>
         </thead>
         <tbody>
-          {courses.map((course, index) => {
+          {courses.map((course) => {
             return (
-              <tr key={index}>
-                <td>{course.id}</td>
-                <td>{course.commercial_org_id}</td>
-                <td>{course.city}</td>
-                <td>{course.trainee_target}</td>
+              <tr
+                key={course.id}
+                className="border-b border-[#F3F3F3] hover:bg-[#F3F3F3] transition-colors"
+              >
+                <td className="py-4 text-sm text-slate-500 pl-5">
+                  {course.id}
+                </td>
+                <td className="py-4 text-sm font-bold text-slate-900 px-4">
+                  {course.commercial_org_id}
+                </td>
+                <td className="py-4 text-sm text-slate-600 px-4">
+                  {course.city}
+                </td>
+                <td className="py-4 text-sm text-slate-600 px-14">
+                  {course.trainee_target}
+                </td>
                 <td>{course.end_date - course.start_date}</td>
-                <td>{course.deadline}</td>
-                <td>{course.status}</td>
-                <td>
-                  <a href="">View Opportunity Details</a>
+                <td className="py-4 text-sm text-slate-600 px-4">
+                  {course.deadline}
+                </td>
+                <td className="py-4">{course.status}</td>
+                <td className="py-4 text-sm px-4">
+                  <button
+                    type="button"
+                    className="text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    View Details
+                  </button>
                 </td>
               </tr>
             );
