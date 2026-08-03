@@ -6,7 +6,6 @@ import type {
   User,
   Course,
   AuditLogEntry,
-  CourseStatus,
 } from "./dataType";
 
 // Organisations
