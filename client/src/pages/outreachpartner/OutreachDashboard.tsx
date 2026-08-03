@@ -27,7 +27,7 @@ const OutreachDashboard = ({
     <div className="find-opportunities">
       <div className="discovery-header flex justify-between mt-10 mb-20 mx-12">
         <h2 className="text-xl font-bold text-[#333333]">
-          Available Opporunities
+          Available Opportunities
         </h2>
         <select name="filter by city" id="filter-by-city">
           <option value="select-a-city">Select a city...</option>
@@ -52,7 +52,7 @@ const OutreachDashboard = ({
         <tbody>
           {courses.map((course) => {
             const { statusStyle, statusText } = statusLabel(course.status);
-            
+
             return (
               <tr
                 key={course.id}
