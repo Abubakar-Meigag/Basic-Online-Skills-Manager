@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { courses as dbCourses } from "../../data/db";
 import type { Course } from "../../data/dataType";
 
+const tableHeaderStyle =
+  "py-5 text-[#333333] text-xs font-bold uppercase tracking-wider";
+
 const OutreachDashboard = (partnerName: string = "DWP") => {
   const [courses, setCourses] = useState<Course[]>([]);
 
@@ -10,8 +13,6 @@ const OutreachDashboard = (partnerName: string = "DWP") => {
       dbCourses.filter((course: Course) => course.account_name === "DWP"),
     );
   }, []);
-
-  console.log(courses);
 
   return (
     <div className="find-opportunities">
@@ -26,15 +27,15 @@ const OutreachDashboard = (partnerName: string = "DWP") => {
       </div>
       <table className="find-opportunities-table w-full text-left border border-[#E3E3E3] border-collapse">
         <thead>
-          <tr>
-            <th>ID</th>
-            <th>Commercial Partner</th>
-            <th>Location</th>
-            <th>Trainee Target</th>
-            <th>Duration</th>
-            <th>Deadline</th>
-            <th>Status</th>
-            <th>Actions</th>
+          <tr className="bg-[#F3F3F3]">
+            <th className={`${tableHeaderStyle} pl-10`}>ID</th>
+            <th className={`${tableHeaderStyle} px-4`}>Commercial Partner</th>
+            <th className={`${tableHeaderStyle} px-4`}>Location</th>
+            <th className={`${tableHeaderStyle} px-4`}>Trainee Target</th>
+            <th className={`${tableHeaderStyle} px-4`}>Duration</th>
+            <th className={`${tableHeaderStyle} px-4`}>Deadline</th>
+            <th className={`${tableHeaderStyle} px-4`}>Status</th>
+            <th className={`${tableHeaderStyle} px-4`}>Actions</th>
           </tr>
         </thead>
         <tbody>
