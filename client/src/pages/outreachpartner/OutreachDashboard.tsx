@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
+import { differenceInWeeks } from "date-fns";
 import { courses as dbCourses } from "../../data/db";
 import type { Course } from "../../data/dataType";
 
 const tableHeaderStyle =
   "py-5 text-[#333333] text-xs font-bold uppercase tracking-wider";
+
+const courseLengthInWeeks = (startDate: string, endDate: string) =>
+  differenceInWeeks(new Date(endDate), new Date(startDate));
 
 const OutreachDashboard = (partnerName: string = "DWP") => {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -57,7 +61,11 @@ const OutreachDashboard = (partnerName: string = "DWP") => {
                 <td className="py-4 text-sm text-slate-600 px-14">
                   {course.trainee_target}
                 </td>
-                <td>{course.end_date - course.start_date}</td>
+                <td>
+                  {course.start_date && course.end_date
+                    ? courseLengthInWeeks(course.start_date, course.end_date)
+                    : "N/A"}
+                </td>
                 <td className="py-4 text-sm text-slate-600 px-4">
                   {course.deadline}
                 </td>
