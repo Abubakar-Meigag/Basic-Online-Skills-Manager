@@ -1,4 +1,6 @@
-export const statusStyles: Record<string, string> = {
+import type { CourseStatus } from "../../data/dataType";
+
+export const statusStyles: Record<CourseStatus, string> = {
   request_pending: "bg-yellow-50 text-yellow-700 border border-yellow-200",
   request_open: "bg-yellow-50 text-yellow-700 border border-yellow-200",
   request_claimed: "bg-yellow-50 text-yellow-700 border border-yellow-200",

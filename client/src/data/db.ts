@@ -1,13 +1,7 @@
 // Mock data for local development.
 // Structure mirrors the agreed schema — swap for real Postgres later.
 
-import type {
-  Organisation,
-  User,
-  Course,
-  AuditLogEntry,
-  CourseStatus,
-} from "./dataType";
+import type { Organisation, User, Course, AuditLogEntry } from "./dataType";
 
 // Organisations
 export const organisations: Organisation[] = [

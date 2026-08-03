@@ -114,7 +114,8 @@ export default function CommercialDashboard() {
               }
 
               // Check if editing is allowed
-              const canEdit = course.status === "request_pending";
+              const isEditableByCommercial =
+                course.status === "request_pending";
 
               return (
                 <tr
@@ -157,7 +158,7 @@ export default function CommercialDashboard() {
                       >
                         View Details
                       </button>
-                      {canEdit ? (
+                      {isEditableByCommercial ? (
                         <button
                           type="button"
                           className="text-blue-600 hover:text-blue-800 font-medium"
