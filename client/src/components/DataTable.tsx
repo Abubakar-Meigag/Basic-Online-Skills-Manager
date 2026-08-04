@@ -27,7 +27,7 @@ export default function DataTable<T extends Record<string, unknown>>({
             return (
               <th
                 key={column.header}
-                className={`py-5 text-xs font-bold uppercase tracking-wider text-[#333333] ${
+                className={`sticky top-[120px] z-10 bg-[#F3F3F3] py-5 text-xs font-bold uppercase tracking-wider text-[#333333] ${
                   isFirstColumn ? "pl-10" : "px-4"
                 } ${column.headerClassName ?? ""}`}
               >

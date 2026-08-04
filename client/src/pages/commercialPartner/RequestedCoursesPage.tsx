@@ -150,10 +150,12 @@ export default function RequestedCoursesPage() {
 
   return (
     <section className="p-6">
-      <PageHeader
-        title={pageTitle}
-        description="All course requests submitted by your organisation."
-      />
+      <div className="sticky top-0 z-20 bg-white pt-6">
+        <PageHeader
+          title={pageTitle}
+          description="All course requests submitted by your organisation."
+        />
+      </div>
 
       {/* The Table Skeleton */}
       <div className="border border-[#E3E3E3]">
