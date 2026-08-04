@@ -1,21 +1,100 @@
 import { useMemo } from "react";
 import { useLocation } from "react-router-dom";
+import DataTable, { type TableColumn } from "../../components/DataTable.tsx";
 import PageHeader from "../../components/PageHeader";
 import { courses, organisations } from "../../data/db.ts";
+import type { Course } from "../../data/dataType.ts";
 import { statusStyles } from "../../lib/constants/statusStyles.ts";
 import { navLinks } from "../../lib/constants/navLinks.ts";
 
 const LOGGED_IN_ORG_NAME = "Capgemini";
 
-const tableHeaders = [
-  "ID",
-  "CONTRACT NAME",
-  "LOCATION",
-  "TRAINEE TARGET",
-  "DEADLINE",
-  "STATUS",
-  "OUTREACH PARTNER",
-  "ACTIONS",
+const getCourseColumns = (
+  outreachPartnerById: Record<string, string>,
+): TableColumn<Course>[] => [
+  {
+    header: "ID",
+    accessor: "id",
+    cellClassName: "text-slate-500",
+  },
+  {
+    header: "CONTRACT NAME",
+    accessor: "contract_name",
+    cellClassName: "font-bold text-slate-900",
+  },
+  {
+    header: "LOCATION",
+    accessor: "city",
+    cellClassName: "text-slate-600",
+  },
+  {
+    header: "TRAINEE TARGET",
+    accessor: "trainee_target",
+    cellClassName: "text-slate-600",
+  },
+  {
+    header: "DEADLINE",
+    accessor: "deadline",
+    cellClassName: "text-slate-600",
+  },
+  {
+    header: "STATUS",
+    accessor: "status",
+    render: (value) => {
+      const statusKey = String(value) as keyof typeof statusStyles;
+      const statusStyle =
+        statusStyles[statusKey] ?? "bg-slate-100 text-slate-700";
+      const statusText = String(value).replace(/_/g, " ");
+
+      return (
+        <span
+          className={`inline-flex rounded-sm px-2 py-1 text-xs font-semibold ${statusStyle}`}
+        >
+          {statusText}
+        </span>
+      );
+    },
+    cellClassName: "text-slate-600",
+  },
+  {
+    header: "OUTREACH PARTNER",
+    accessor: "outreach_org_id",
+    render: (value) => {
+      if (!value) {
+        return "-";
+      }
+
+      return outreachPartnerById[value] ?? value;
+    },
+    cellClassName: "text-slate-600",
+  },
+  {
+    header: "ACTIONS",
+    accessor: "id",
+    render: (_value, row) => {
+      const isEditableByCommercial = row.status === "request_pending";
+
+      return (
+        <div className="flex gap-6">
+          <button
+            type="button"
+            className="font-medium text-[#EE2A24] underline"
+          >
+            View Details
+          </button>
+          {isEditableByCommercial ? (
+            <button
+              type="button"
+              className="font-medium text-blue-600 underline hover:text-blue-800"
+            >
+              Edit
+            </button>
+          ) : null}
+        </div>
+      );
+    },
+    cellClassName: "text-slate-600",
+  },
 ];
 
 export default function RequestedCoursesPage() {
@@ -48,6 +127,11 @@ export default function RequestedCoursesPage() {
     return foundOutreachPartners;
   }, [organisations]);
 
+  const courseColumns = useMemo(
+    () => getCourseColumns(outreachPartnerById),
+    [outreachPartnerById],
+  );
+
   const capgeminiCourses = useMemo(() => {
     const filteredCourses = courses.filter(
       (course) => course.commercial_org_id === capgeminiOrgId,
@@ -73,106 +157,7 @@ export default function RequestedCoursesPage() {
 
       {/* The Table Skeleton */}
       <div className="border border-[#E3E3E3]">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-[#F3F3F3]">
-              {tableHeaders.map((header, index) => {
-                const isFirst = index === 0;
-
-                return (
-                  <th
-                    key={header}
-                    className={`
-				py-5 
-				text-[#333333]       
-				text-xs font-bold uppercase tracking-wider
-				${isFirst ? "pl-10" : "px-4"} 
-			`}
-                  >
-                    {header}
-                  </th>
-                );
-              })}
-            </tr>
-          </thead>
-          <tbody>
-            {capgeminiCourses.map((course) => {
-              // Figure out the status color
-              let statusStyle = statusStyles[course.status];
-              if (!statusStyle) {
-                statusStyle = "bg-slate-100 text-slate-700"; // Fallback to grey
-              }
-
-              // Remove underscores from status text (e.g. "request_open" -> "request open")
-              const statusText = course.status.replace("_", " ");
-
-              // Figure out the Outreach Partner name
-              let partnerName = "-";
-              if (course.outreach_org_id) {
-                partnerName =
-                  outreachPartnerById[course.outreach_org_id] || "-";
-              }
-
-              // Check if editing is allowed
-              const isEditableByCommercial =
-                course.status === "request_pending";
-
-              return (
-                <tr
-                  key={course.id}
-                  className="border-b border-[#F3F3F3] hover:bg-[#F3F3F3] transition-colors"
-                >
-                  <td className="py-4 text-sm text-slate-500 pl-5">
-                    {course.id}
-                  </td>
-                  <td className="py-4 text-sm font-bold text-slate-900 px-4">
-                    {course.contract_name}
-                  </td>
-                  <td className="py-4 text-sm text-slate-600 px-4">
-                    {course.city}
-                  </td>
-                  <td className="py-4 text-sm text-slate-600 px-14">
-                    {course.trainee_target}
-                  </td>
-                  <td className="py-4 text-sm text-slate-600 px-4">
-                    {course.deadline}
-                  </td>
-
-                  <td className="py-4">
-                    <span
-                      className={`inline-flex rounded-sm px-2 py-1 text-xs font-semibold ${statusStyle}`}
-                    >
-                      {statusText}
-                    </span>
-                  </td>
-
-                  <td className="py-4 text-sm text-slate-600 px-4">
-                    {partnerName}
-                  </td>
-
-                  <td className="py-4 text-sm px-4">
-                    <div className="flex gap-6">
-                      <button
-                        type="button"
-                        className="text-[#EE2A24] underline font-medium"
-                      >
-                        View Details
-                      </button>
-                      {isEditableByCommercial ? (
-                        <button
-                          type="button"
-                          className="text-blue-600 hover:text-blue-800 underline font-medium"
-                        >
-                          Edit
-                        </button>
-                      ) : null}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <DataTable data={capgeminiCourses} columns={courseColumns} />
       </div>
     </section>
   );
