@@ -65,23 +65,13 @@ export default function RequestedCoursesPage() {
 
   return (
     <section className="p-6">
-      {/* The Header: Flexbox layout to push items to opposite sides */}
-      <header className="flex justify-between items-start pb-3 mb-8 border-b border-[#E3E3E3]">
-        {/* Left Side: User Info */}
-        <div>
-          <p className="text-xs text-[#333333] mb-1">Logged in as</p>
-          <h2 className="text-xl font-bold text-[#333333]">Capgemini</h2>
-        </div>
-      </header>
-      <div className="mb-8">
-        {/* The Page Title */}
+      <header className="pb-10">
         <h1 className="text-3xl font-bold text-[#333333]">{pageTitle}</h1>
-
-        {/* The Subtitle */}
         <p className="text-[#333333] text-sm mt-2">
           All course requests submitted by your organisation.
         </p>
-      </div>
+      </header>
+
       {/* The Table Skeleton */}
       <div className="border border-[#E3E3E3]">
         <table className="w-full text-left border-collapse">
