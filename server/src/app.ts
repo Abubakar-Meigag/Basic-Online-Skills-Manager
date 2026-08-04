@@ -1,6 +1,7 @@
 import express from "express";
 import type { Request, Response } from "express";
 import cors from "cors";
+import authRouter from "./auth/auth.router";
 
 const app = express();
 
@@ -18,7 +19,7 @@ app.get("/health", (_req: Request, res: Response) => {
 //don't change anything above this line, you can add your endpoints below this line
 
 // Import your endpoint handlers here and define your routes after
-
+app.use("/api/auth", authRouter);
 import testEndPoint from "./api/testEndPoint";
 app.get("/test", testEndPoint);
 
