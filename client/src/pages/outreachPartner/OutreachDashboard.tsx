@@ -102,7 +102,7 @@ const OutreachDashboard = ({
                 <td>
                   {course.start_date && course.end_date
                     ? courseLengthInWeeks(course.start_date, course.end_date)
-                    : "N/A"}
+                    : "-"}
                 </td>
                 <td className="py-4 text-sm text-slate-600 px-4">
                   {course.deadline}
