@@ -1,15 +1,13 @@
-import type { ReactNode } from "react";
+import { Outlet } from "react-router-dom";
 import Sidebar from "../Sidebar/Sidebar";
 
-interface LayoutProps {
-  children: ReactNode;
-}
-
-const Layout = ({ children }: LayoutProps) => {
+const Layout = () => {
   return (
     <div className="layout flex h-screen overflow-hidden">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main className="flex-1 overflow-y-auto">
+        <Outlet />
+      </main>
     </div>
   );
 };
