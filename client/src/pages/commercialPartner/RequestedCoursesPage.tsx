@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useLocation } from "react-router-dom";
+import PageHeader from "../../components/PageHeader";
 import { courses, organisations } from "../../data/db.ts";
 import { statusStyles } from "../../lib/constants/statusStyles.ts";
 import { navLinks } from "../../lib/constants/navLinks.ts";
@@ -65,12 +66,10 @@ export default function RequestedCoursesPage() {
 
   return (
     <section className="p-6">
-      <header className="pb-8">
-        <h1 className="text-3xl font-bold text-[#333333]">{pageTitle}</h1>
-        <p className="text-[#333333] text-sm mt-2">
-          All course requests submitted by your organisation.
-        </p>
-      </header>
+      <PageHeader
+        title={pageTitle}
+        description="All course requests submitted by your organisation."
+      />
 
       {/* The Table Skeleton */}
       <div className="border border-[#E3E3E3]">
