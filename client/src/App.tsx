@@ -2,7 +2,8 @@ import { Route, Routes } from "react-router-dom";
 import HomePage from "./pages/test/HomePage.tsx";
 import MagicLinkLogin from "./pages/login/MagicLinkLogin.tsx";
 import Layout from "./components/Layout/Layout";
-import CommercialDashboard from "./pages/commercialPartner/CommercialDashboard.tsx";
+import RequestedCoursesPage from "./pages/commercialPartner/RequestedCoursesPage.tsx";
+import RequestNewCoursePage from "./pages/commercialPartner/RequestNewCoursePage.tsx";
 import OutreachPartnerDashboard from "./pages/outreachpartner/OutreachDashboard.tsx";
 import CYFStaffDashboard from "./pages/cyfstaff/CYFStaffDashboard.tsx";
 
@@ -13,7 +14,8 @@ const App = () => {
       <Route path="/" element={<HomePage />} />
       <Route element={<Layout />}>
         <Route path="/dashboard/commercial-partner">
-          <Route path="requested-courses" element={<CommercialDashboard />} />
+          <Route path="requested-courses" element={<RequestedCoursesPage />} />
+          <Route path="request-new-course" element={<RequestNewCoursePage/>} />
         </Route>
         <Route path="/dashboard/outreach-partner">
           <Route

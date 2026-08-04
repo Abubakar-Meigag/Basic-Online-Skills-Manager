@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { courses, organisations } from "../../data/db.ts";
-import { statusStyles } from "../../lib/constants/statusStyles";
-import { navLinks } from "../../lib/constants/navLinks";
+import { statusStyles } from "../../lib/constants/statusStyles.ts";
+import { navLinks } from "../../lib/constants/navLinks.ts";
 
 const LOGGED_IN_ORG_NAME = "Capgemini";
 
@@ -17,7 +17,7 @@ const tableHeaders = [
   "ACTIONS",
 ];
 
-export default function CommercialDashboard() {
+export default function RequestedCoursesPage() {
   const location = useLocation();
 
   // Logic: Create a scoped list containing only this partner's courses.
