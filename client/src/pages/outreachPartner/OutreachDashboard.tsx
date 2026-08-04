@@ -18,8 +18,43 @@ const OutreachDashboard = ({
   const [courses, setCourses] = useState<Course[]>([]);
 
   useEffect(() => {
+    const request_pending = dbCourses.filter(
+      (course) => course.status === "request_pending",
+    );
+    const request_open = dbCourses.filter(
+      (course) => course.status === "request_open",
+    );
+    const request_claimed = dbCourses.filter(
+      (course) => course.status === "request_claimed",
+    );
+    const request_confirmed = dbCourses.filter(
+      (course) => course.status === "request_confirmed",
+    );
+    const course_running = dbCourses.filter(
+      (course) => course.status === "course_running",
+    );
+    const course_completed = dbCourses.filter(
+      (course) => course.status === "course_completed",
+    );
+    const request_cancelled = dbCourses.filter(
+      (course) => course.status === "request_cancelled",
+    );
+
+    // Sorts courses by label
+    const courseByStatus = [
+      ...request_pending,
+      ...request_open,
+      ...request_claimed,
+      ...request_confirmed,
+      ...course_completed,
+      ...course_running,
+      ...request_cancelled,
+    ];
+
     setCourses(
-      dbCourses.filter((course: Course) => course.account_name === partnerName),
+      courseByStatus.filter(
+        (course: Course) => course.account_name === partnerName,
+      ),
     );
   }, [partnerName]);
 
