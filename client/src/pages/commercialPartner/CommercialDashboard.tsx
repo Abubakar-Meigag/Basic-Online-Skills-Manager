@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { courses, organisations } from "../../data/db.ts";
-import { statusStyles } from "../../lib/constants/statusStyles";
+import statusLabel from "../../utils/statusLabel";
 
 const LOGGED_IN_ORG_NAME = "Capgemini";
 
@@ -104,14 +104,7 @@ export default function CommercialDashboard() {
           </thead>
           <tbody>
             {capgeminiCourses.map((course) => {
-              // Figure out the status color
-              let statusStyle = statusStyles[course.status];
-              if (!statusStyle) {
-                statusStyle = "bg-slate-100 text-slate-700"; // Fallback to grey
-              }
-
-              // Remove underscores from status text (e.g. "request_open" -> "request open")
-              const statusText = course.status.replace("_", " ");
+              const { statusStyle, statusText } = statusLabel(course.status);
 
               // Figure out the Outreach Partner name
               let partnerName = "-";
