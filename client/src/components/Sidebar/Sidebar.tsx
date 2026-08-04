@@ -14,10 +14,12 @@ const Sidebar = ({ userType = "commercial-partner" }) => {
   const userInitial = userEmail ? userEmail[0].toUpperCase() : "U";
 
   return (
-    <div className="sidebar flex flex-col h-screen p-5 shrink-0 sticky top-0 self-start border-r border-[#E3E3E3]">
-      <img className="mb-5" src={CYFLogo} width="256" height="256" />
+    <div className="sidebar flex flex-col h-screen shrink-0 sticky top-0 self-start border-r border-[#E3E3E3]">
+      <div className="p-5">
+        <img className="mb-5" src={CYFLogo} width="120" height="120" />
+      </div>
 
-      <nav>
+      <nav className="px-5">
         <ul>
           {navLinks
             .filter((link) => link.path.startsWith(`/dashboard/${userType}/`))
@@ -38,7 +40,7 @@ const Sidebar = ({ userType = "commercial-partner" }) => {
         </ul>
       </nav>
 
-      <div className="mt-auto pt-5 border-t border-[#E3E3E3]">
+      <div className="mt-auto p-5 border-t border-[#E3E3E3]">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-sm font-semibold text-red-700">
             {userInitial}
