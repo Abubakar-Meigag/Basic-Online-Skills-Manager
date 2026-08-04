@@ -152,17 +152,17 @@ export default function RequestedCoursesPage() {
                   </td>
 
                   <td className="py-4 text-sm px-4">
-                    <div className="flex gap-3">
+                    <div className="flex gap-6">
                       <button
                         type="button"
-                        className="text-blue-600 hover:text-blue-800 font-medium"
+                        className="text-[#EE2A24] underline font-medium"
                       >
                         View Details
                       </button>
                       {isEditableByCommercial ? (
                         <button
                           type="button"
-                          className="text-blue-600 hover:text-blue-800 font-medium"
+                          className="text-blue-600 hover:text-blue-800 underline font-medium"
                         >
                           Edit
                         </button>
