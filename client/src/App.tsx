@@ -15,7 +15,7 @@ const App = () => {
       <Route element={<Layout />}>
         <Route path="/dashboard/commercial-partner">
           <Route path="requested-courses" element={<RequestedCoursesPage />} />
-          <Route path="request-new-course" element={<RequestNewCoursePage/>} />
+          <Route path="request-new-course" element={<RequestNewCoursePage />} />
         </Route>
         <Route path="/dashboard/outreach-partner">
           <Route
