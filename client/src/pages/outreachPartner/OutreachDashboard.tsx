@@ -64,12 +64,6 @@ const OutreachDashboard = ({
         <h2 className="text-xl font-bold text-[#333333]">
           Available Opportunities
         </h2>
-        <select name="filter by city" id="filter-by-city">
-          <option value="select-a-city">Select a city...</option>
-          {/* This should be filled dynamically based on the data available */}
-          <option value="london">London</option>
-          <option value="manchester">Manchester</option>
-        </select>
       </div>
       <table className="find-opportunities-table w-full text-left border border-[#E3E3E3] border-collapse">
         <thead>
