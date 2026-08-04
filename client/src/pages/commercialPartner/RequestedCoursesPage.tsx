@@ -151,7 +151,7 @@ export default function RequestedCoursesPage() {
 
                   <td className="py-4">
                     <span
-                      className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${statusStyle}`}
+                      className={`inline-flex rounded-sm px-2 py-1 text-xs font-semibold ${statusStyle}`}
                     >
                       {statusText}
                     </span>
