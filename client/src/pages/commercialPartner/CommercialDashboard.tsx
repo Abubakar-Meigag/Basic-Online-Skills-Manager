@@ -1,6 +1,8 @@
 import { useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import { courses, organisations } from "../../data/db.ts";
 import { statusStyles } from "../../lib/constants/statusStyles";
+import { navLinks } from "../../lib/constants/navLinks";
 
 const LOGGED_IN_ORG_NAME = "Capgemini";
 
@@ -16,6 +18,8 @@ const tableHeaders = [
 ];
 
 export default function CommercialDashboard() {
+  const location = useLocation();
+
   // Logic: Create a scoped list containing only this partner's courses.
   const capgeminiOrgId = useMemo(() => {
     let foundId: string | undefined;
@@ -51,6 +55,14 @@ export default function CommercialDashboard() {
     return filteredCourses;
   }, [courses, capgeminiOrgId]);
 
+  const currentPage = navLinks.find((link) => link.path === location.pathname);
+  let pageTitle = "Dashboard";
+
+  // If we found a matching page in our navLinks, use its label instead
+  if (currentPage) {
+    pageTitle = currentPage.label;
+  }
+
   return (
     <section className="p-6">
       {/* The Header: Flexbox layout to push items to opposite sides */}
@@ -63,7 +75,7 @@ export default function CommercialDashboard() {
       </header>
       <div className="mb-8">
         {/* The Page Title */}
-        <h1 className="text-3xl font-bold text-[#333333]">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-[#333333]">{pageTitle}</h1>
 
         {/* The Subtitle */}
         <p className="text-[#333333] text-sm mt-2">
