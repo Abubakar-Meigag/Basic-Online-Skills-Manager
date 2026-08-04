@@ -32,8 +32,4 @@ export const navLinks: NavLinkItem[] = [
     label: "Audit Log",
     path: "/dashboard/cyf-staff/audit-log",
   },
-  {
-    label: "Logout",
-    path: "/login",
-  },
 ];
