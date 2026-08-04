@@ -22,9 +22,18 @@ const Sidebar = ({ userType = "commercial-partner" }) => {
           {navLinks
             .filter((link) => link.path.startsWith(`/dashboard/${userType}/`))
             .map((link) => (
-              <NavLink key={link.path} to={link.path}>
-                <li>{link.label}</li>
-              </NavLink>
+              <li key={link.path}>
+                <NavLink
+                  to={link.path}
+                  className={({ isActive }) =>
+                    isActive
+                      ? "flex items-center p-3 bg-red-50 text-[#EE2A24] border-l-4 border-[#EE2A24] rounded-r-lg"
+                      : "flex items-center p-3 text-gray-700"
+                  }
+                >
+                  {link.label}
+                </NavLink>
+              </li>
             ))}
         </ul>
       </nav>
