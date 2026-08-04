@@ -14,7 +14,7 @@ const Sidebar = ({ userType = "commercial-partner" }) => {
   const userInitial = userEmail ? userEmail[0].toUpperCase() : "U";
 
   return (
-    <div className="sidebar flex flex-col h-screen p-5 shrink-0 sticky top-0 self-start">
+    <div className="sidebar flex flex-col h-screen p-5 shrink-0 sticky top-0 self-start border-r border-[#E3E3E3]">
       <img className="mb-5" src={CYFLogo} width="256" height="256" />
 
       <nav>

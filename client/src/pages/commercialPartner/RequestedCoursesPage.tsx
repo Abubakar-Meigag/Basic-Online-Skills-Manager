@@ -65,7 +65,7 @@ export default function RequestedCoursesPage() {
 
   return (
     <section className="p-6">
-      <header className="pb-10">
+      <header className="pb-8">
         <h1 className="text-3xl font-bold text-[#333333]">{pageTitle}</h1>
         <p className="text-[#333333] text-sm mt-2">
           All course requests submitted by your organisation.
