@@ -20,10 +20,10 @@ const Sidebar = ({ userType = "commercial" }) => {
         <ul>
           {userType === "commercial" && (
             <>
-              <NavLink to="/dashboard/commercial-partner/courses">
-                <li>Courses</li>
+              <NavLink to="/dashboard/commercial-partner/requested-courses">
+                <li>Requested Courses</li>
               </NavLink>
-              <NavLink to="/dashboard/commercial-partner/new-course">
+              <NavLink to="/dashboard/commercial-partner/request-new-course">
                 <li>Request New Course</li>
               </NavLink>
             </>
@@ -33,14 +33,14 @@ const Sidebar = ({ userType = "commercial" }) => {
               <NavLink to="/dashboard/outreach-partner/find-opportunities">
                 <li>Find Opportunities</li>
               </NavLink>
-              <NavLink to="/dashboard/outreach-partner/requested-courses">
-                <li>Requested Courses</li>
+              <NavLink to="/dashboard/outreach-partner/hosted-courses">
+                <li>My Hosted Courses</li>
               </NavLink>
             </>
           )}
           {userType === "cyf-staff" && (
             <>
-              <NavLink to="/dashboard/cyf-staff/requestd-pipelines">
+              <NavLink to="/dashboard/cyf-staff/request-pipeline">
                 <li>Request Pipeline</li>
               </NavLink>
               <NavLink to="/dashboard/cyf-staff/manage-partners">
