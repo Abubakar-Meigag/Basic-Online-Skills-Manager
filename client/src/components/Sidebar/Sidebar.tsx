@@ -1,10 +1,11 @@
 import { NavLink } from "react-router";
 import CYFLogo from "../../assets/CYF-logo.png";
 import { users } from "../../data/db";
+import { navLinks } from "../../lib/constants/navLinks";
 import "./Sidebar.css";
 
-const Sidebar = ({ userType = "commercial" }) => {
-  // Change userType prop above to see view for a different user. Accepts strings "commercial", "outreach" & "cyf-staff"
+const Sidebar = ({ userType = "commercial-partner" }) => {
+  // Change userType prop above to see view for a different user. Accepts strings "commercial-partner", "outreach-partner" & "cyf-staff"
 
   const firstUser = users[0];
 
@@ -18,39 +19,13 @@ const Sidebar = ({ userType = "commercial" }) => {
 
       <nav>
         <ul>
-          {userType === "commercial" && (
-            <>
-              <NavLink to="/dashboard/commercial-partner/requested-courses">
-                <li>Requested Courses</li>
+          {navLinks
+            .filter((link) => link.path.startsWith(`/dashboard/${userType}/`))
+            .map((link) => (
+              <NavLink key={link.path} to={link.path}>
+                <li>{link.label}</li>
               </NavLink>
-              <NavLink to="/dashboard/commercial-partner/request-new-course">
-                <li>Request New Course</li>
-              </NavLink>
-            </>
-          )}
-          {userType === "outreach" && (
-            <>
-              <NavLink to="/dashboard/outreach-partner/find-opportunities">
-                <li>Find Opportunities</li>
-              </NavLink>
-              <NavLink to="/dashboard/outreach-partner/hosted-courses">
-                <li>My Hosted Courses</li>
-              </NavLink>
-            </>
-          )}
-          {userType === "cyf-staff" && (
-            <>
-              <NavLink to="/dashboard/cyf-staff/request-pipeline">
-                <li>Request Pipeline</li>
-              </NavLink>
-              <NavLink to="/dashboard/cyf-staff/manage-partners">
-                <li>Manage Partners</li>
-              </NavLink>
-              <NavLink to="/dashboard/cyf-staff/audit-log">
-                <li>Audit Log</li>
-              </NavLink>
-            </>
-          )}
+            ))}
         </ul>
       </nav>
 
