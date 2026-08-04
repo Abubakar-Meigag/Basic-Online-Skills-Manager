@@ -60,14 +60,6 @@ export default function CommercialDashboard() {
           <p className="text-xs text-[#333333] mb-1">Logged in as</p>
           <h2 className="text-xl font-bold text-[#333333]">Capgemini</h2>
         </div>
-
-        {/* Right Side: Red Button */}
-        <button
-          type="button"
-          className="bg-[#B4001B] text-white px-6 py-2 rounded-lg font-semibold transition-colors"
-        >
-          Request New Course
-        </button>
       </header>
       <div className="mb-8">
         {/* The Page Title */}
