@@ -1,12 +1,11 @@
 import type { Request, Response } from "express";
 import pool from "../data/connection";
 
-
 /**
  * TODO(auth): uncomment once magic-link login is built req.user comes from session middleware.
  * req.user is populated by auth middleware after magic-link verification.
  * Note - wire to real session once auth is built.
-*/
+ */
 
 /**
  * @swagger
@@ -46,22 +45,24 @@ import pool from "../data/connection";
  *       500:
  *         description: Internal server error
  */
-const getAvailableOpportunities = async (req: Request, res: Response): Promise<void> => {
+const getAvailableOpportunities = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
+    //     const user = (req as any).user;
 
-//     const user = (req as any).user;
+    //     if (!user) {
+    //       res.status(401).json({ error: "Not authenticated" });
+    //       return;
+    //     }
 
-//     if (!user) {
-//       res.status(401).json({ error: "Not authenticated" });
-//       return;
-//     }
-
-//     if (user.organisation_type !== "outreach") {
-//       res
-//         .status(403)
-//         .json({ error: "Only outreach partners can view opportunities" });
-//       return;
-//     }
+    //     if (user.organisation_type !== "outreach") {
+    //       res
+    //         .status(403)
+    //         .json({ error: "Only outreach partners can view opportunities" });
+    //       return;
+    //     }
 
     const query = await pool.query(`
       SELECT
