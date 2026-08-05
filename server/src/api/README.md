@@ -4,6 +4,7 @@ This folder (`/lib/swagger.ts`) holds the base config for our API documentation.
 Docs are viewable at: `http://localhost:3000/docs`
 
 Every teammate adding a new endpoint needs to do **two things**:
+
 1. Add a schema (if it's a new entity/table) to `components.schemas` in `swagger.ts`
 2. Add a `@swagger` comment block above their route handler in `src/api/*.ts`
 
@@ -39,6 +40,7 @@ components: {
 ```
 
 **Rules of thumb:**
+
 - One schema per table, matching the actual Postgres columns.
 - Field types should match Postgres types (`UUID` → `string, format: uuid`, `TIMESTAMPTZ` → `string, format: date-time`, `BOOLEAN` → `boolean`, etc.).
 - Nullable Postgres columns → add `nullable: true`.
