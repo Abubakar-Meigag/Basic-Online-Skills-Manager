@@ -4,13 +4,15 @@ import cors from "cors";
 import authRouter from "./auth/auth.router";
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './lib/swagger';
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./lib/swagger";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get("/", (_req: Request, res: Response) => {
   res.send("Welcome to Basic Online Skills Manager");
@@ -32,15 +34,13 @@ app.post("/api/testSwagger", testSwagger);
 
 // add BOSM API endpoints here below
 
-
-
-
-
-
-
-// add BOSM API endpoints here below
-
 import getCoursePipeline from "./api/coursePipeline";
 app.get("/course-pipeline", getCoursePipeline);
+
+import getCommercialDashboard from "./api/commercialDashboard";
+app.get("/commercial-dashboard", getCommercialDashboard);
+
+import getAvailableOpportunities from "./api/availableOpportunities"
+app.get("/opportunities", getAvailableOpportunities);
 
 export default app;

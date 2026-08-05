@@ -1,54 +1,59 @@
 import { NavLink } from "react-router";
 import CYFLogo from "../../assets/CYF-logo.png";
+import { users } from "../../data/db";
+import { navLinks } from "../../lib/constants/navLinks";
 import "./Sidebar.css";
 
-const Sidebar = ({ userType = "commercial" }) => {
-  // Change userType prop above to see view for a different user. Accepts strings "commercial", "outreach" & "cyf-staff"
+const Sidebar = ({ userType = "commercial-partner" }) => {
+  // Change userType prop above to see view for a different user. Accepts strings "commercial-partner", "outreach-partner" & "cyf-staff"
+
+  const firstUser = users[0];
+
+  // Use their email, or a backup if they don't exist
+  const userEmail = firstUser ? firstUser.email : "user@email.com";
+  const userInitial = userEmail ? userEmail[0].toUpperCase() : "U";
 
   return (
-    <div className="sidebar p-5 shrink-0 sticky top-0 self-start h-screen">
-      <img className="mb-5" src={CYFLogo} width="256" height="256" />
+    <div className="sidebar flex flex-col h-screen shrink-0 sticky top-0 self-start border-r border-[#E3E3E3]">
+      <div className="p-5">
+        <img className="mb-5" src={CYFLogo} width="120" height="120" />
+      </div>
 
-      <nav>
+      <nav className="px-5">
         <ul>
-          {userType === "commercial" && (
-            <>
-              <NavLink to="/dashboard/commercial-partner/courses">
-                <li>Courses</li>
-              </NavLink>
-              <NavLink to="/dashboard/commercial-partner/new-course">
-                <li>Request New Course</li>
-              </NavLink>
-            </>
-          )}
-          {userType === "outreach" && (
-            <>
-              <NavLink to="/dashboard/outreach-partner/find-opportunities">
-                <li>Find Opportunities</li>
-              </NavLink>
-              <NavLink to="/dashboard/outreach-partner/requested-courses">
-                <li>Requested Courses</li>
-              </NavLink>
-            </>
-          )}
-          {userType === "cyf-staff" && (
-            <>
-              <NavLink to="/dashboard/cyf-staff/requestd-pipelines">
-                <li>Request Pipeline</li>
-              </NavLink>
-              <NavLink to="/dashboard/cyf-staff/manage-partners">
-                <li>Manage Partners</li>
-              </NavLink>
-              <NavLink to="/dashboard/cyf-staff/audit-log">
-                <li>Audit Log</li>
-              </NavLink>
-            </>
-          )}
-          <NavLink to="/login">
-            <li>Logout</li>
-          </NavLink>
+          {navLinks
+            .filter((link) => link.path.startsWith(`/${userType}/`))
+            .map((link) => (
+              <li key={link.path}>
+                <NavLink
+                  to={link.path}
+                  className={({ isActive }) =>
+                    isActive
+                      ? "flex items-center p-3 bg-red-50 text-[#EE2A24] border-l-4 border-[#EE2A24] rounded-r-lg"
+                      : "flex items-center p-3 text-gray-700"
+                  }
+                >
+                  {link.label}
+                </NavLink>
+              </li>
+            ))}
         </ul>
       </nav>
+
+      <div className="mt-auto p-5 border-t border-[#E3E3E3]">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-sm font-semibold text-red-700">
+            {userInitial}
+          </div>
+
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold">{userEmail}</span>
+            <NavLink to="/login" className="text-xs text-gray-500">
+              Logout
+            </NavLink>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
