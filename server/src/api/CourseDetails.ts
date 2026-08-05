@@ -144,7 +144,7 @@ const getCourseDetails = async (req: Request, res: Response): Promise<void> => {
     /**
      * todo (auth): enable role-based scoping once magic-link login is built.
      * req.user comes from session middleware and carries { organisation_id, type }.
-     * this will enforced server-side from the authenticated session
+     * this will enforce server-side security from the authenticated session
      */
 
     // const user = (req as any).user;
