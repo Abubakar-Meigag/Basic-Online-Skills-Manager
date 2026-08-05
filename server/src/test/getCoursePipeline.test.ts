@@ -117,4 +117,3 @@ describe("GET /course-pipeline", () => {
     expect(response.body).toHaveProperty("error");
   });
 });
-

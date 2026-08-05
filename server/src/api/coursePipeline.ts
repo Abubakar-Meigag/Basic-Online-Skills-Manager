@@ -21,7 +21,6 @@ const getCoursePipeline = async (
   res: Response,
 ): Promise<void> => {
   try {
-
     // const user = req.user;
     // if (!user || user.type !== "cyf_staff") {
     //   res.status(403).json({ error: "Forbidden" });

@@ -4,6 +4,7 @@ This folder (`/lib/swagger.ts`) holds the base config for our API documentation.
 Docs are viewable at: `http://localhost:3000/docs`
 
 Every teammate adding a new endpoint needs to do **two things**:
+
 1. Add a schema (if it's a new entity/table) to `components.schemas` in `swagger.ts`
 2. Add a `@swagger` comment block above their route handler in `src/api/*.ts`
 
@@ -39,6 +40,7 @@ components: {
 ```
 
 **Rules of thumb:**
+
 - One schema per table, matching the actual Postgres columns.
 - Field types should match Postgres types (`UUID` → `string, format: uuid`, `TIMESTAMPTZ` → `string, format: date-time`, `BOOLEAN` → `boolean`, etc.).
 - Nullable Postgres columns → add `nullable: true`.
@@ -139,4 +141,4 @@ export default function yourHandler(req: Request, res: Response) {
 
 - **Route not showing up at all** → almost always the file isn't inside `src/api/` (the folder `swagger.ts`'s `apis` glob scans), or the server wasn't restarted after adding the comment.
 - **Broken/empty `$ref`** → schema name in the comment doesn't match the schema name in `components.schemas` exactly (case-sensitive).
-- **Docs and code disagree** → someone changed the route path or fields in code but forgot to update the comment. The comment is *not* auto-synced with your code — you have to keep it updated manually.
+- **Docs and code disagree** → someone changed the route path or fields in code but forgot to update the comment. The comment is _not_ auto-synced with your code — you have to keep it updated manually.
