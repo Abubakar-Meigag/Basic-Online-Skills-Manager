@@ -11,9 +11,12 @@ export async function handleRequestMagicLink(
 ): Promise<Response> {
   try {
     const { email } = req.body;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!email || typeof email !== "string") {
-      return res.status(400).json({ error: "A valid email is required." });
+    if (!email || typeof email !== "string" || !emailRegex.test(email.trim())) {
+      return res.status(400).json({
+        message: "Please provide a valid email address.",
+      });
     }
 
     // Call service layer to query user, store hashed token, and dispatch email/log

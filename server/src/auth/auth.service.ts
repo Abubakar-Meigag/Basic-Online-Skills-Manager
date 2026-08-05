@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import pool from "../data/connection";
 import jwt from "jsonwebtoken";
+import { OrganizationType } from "../data/dataType";
 import { sendMagicLinkEmail } from "../lib/email";
 
 // Helper to hash tokens before database saves
@@ -13,7 +14,6 @@ export async function requestMagicLink(email: string): Promise<void> {
   const query = `
     SELECT u.id, u.is_active, o.type as org_type
     FROM users u
-    LEFT JOIN organisations o ON u.organisation_id = o.id
     WHERE u.email = $1
   `;
   const result = await pool.query(query, [email]);
@@ -92,21 +92,21 @@ export async function verifyMagicLinkToken(rawToken: string) {
   // Determine redirect route based on organisation type
   let redirectRoute = "/dashboard/cyf-staff"; // default fallback
 
-  if (
-    record.org_type === "commercial_partner" ||
-    record.org_type === "commercial"
-  ) {
-    redirectRoute = "/dashboard/commercial-partner";
-  } else if (
-    record.org_type === "outreach_partner" ||
-    record.org_type === "outreach"
-  ) {
-    redirectRoute = "/dashboard/outreach-partner";
-  } else if (
-    record.org_type === "cyf_staff" ||
-    record.org_type === "cyf-staff"
-  ) {
-    redirectRoute = "/dashboard/cyf-staff";
+  switch (record.org_type) {
+    case OrganizationType.COMMERCIAL_PARTNER:
+      redirectRoute = "/dashboard/commercial-partner";
+      break;
+    case OrganizationType.OUTREACH_PARTNER:
+      redirectRoute = "/dashboard/outreach-partner";
+      break;
+    case OrganizationType.CYF_STAFF:
+      redirectRoute = "/dashboard/cyf-staff";
+      break;
+  }
+  const jwtSecret = process.env.JWT_SECRET;
+
+  if (!jwtSecret) {
+    throw new Error("JWT_SECRET is not defined in environment variables.");
   }
   // Generate JWT Session Token exp 24h
   const sessionToken = jwt.sign(
@@ -115,7 +115,7 @@ export async function verifyMagicLinkToken(rawToken: string) {
       email: record.email,
       orgType: record.org_type,
     },
-    process.env.JWT_SECRET || "your-fallback-secret-key",
+    jwtSecret,
     { expiresIn: "24h" },
   );
   // return user session identity as object, and the redirectRout.
