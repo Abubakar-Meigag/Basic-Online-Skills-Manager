@@ -1,8 +1,8 @@
 import express from "express";
 import type { Request, Response } from "express";
 import cors from "cors";
-import swaggerUi from 'swagger-ui-express';
-import { swaggerSpec } from './lib/swagger';
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./lib/swagger";
 
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./lib/swagger";
