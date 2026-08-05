@@ -16,6 +16,11 @@ export type User = {
   last_login_at: string | null;
 };
 
+export enum OrganizationType {
+  COMMERCIAL_PARTNER = "commercial_partner",
+  OUTREACH_PARTNER = "outreach_partner",
+  CYF_STAFF = "cyf_staff",
+}
 export type CourseStatus =
   | "request_pending"
   | "request_open"
