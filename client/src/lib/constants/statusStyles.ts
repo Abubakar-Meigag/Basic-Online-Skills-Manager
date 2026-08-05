@@ -1,10 +1,6 @@
-<<<<<<< HEAD
 import type { CourseStatus } from "../../data/dataType";
 
 export const statusStyles: Record<CourseStatus, string> = {
-=======
-export const statusStyles: Record<string, string> = {
->>>>>>> 2e86ede (West Midlands | 26 July Launch | Iswat Bello | Basic Online Skills Manager | 26 UI commercial partner dashboard (#41))
   request_pending: "bg-yellow-50 text-yellow-700 border border-yellow-200",
   request_open: "bg-yellow-50 text-yellow-700 border border-yellow-200",
   request_claimed: "bg-yellow-50 text-yellow-700 border border-yellow-200",
