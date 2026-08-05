@@ -16,6 +16,53 @@ const ACTIVE_STATUS = [
  * Role comes from the organisation, not the user.
  * organisations.type is one of: 'cyf_staff' | 'commercial' | 'outreach'.
  */
+
+/**
+ * @swagger
+ * /course-pipeline:
+ *   get:
+ *     summary: Get all active courses grouped by status (CYF Staff dashboard)
+ *     description: >
+ *       Returns all courses except cancelled ones, grouped into the six active
+ *       status buckets. Every status key is always present, even when empty ([]).
+ *       Commercial org name is resolved via JOIN; outreach org name via LEFT JOIN
+ *       (null when unassigned). CYF-staff only — no org scoping.
+ *     tags: [Courses]
+ *     responses:
+ *       200:
+ *         description: Courses grouped by status (all six keys always present)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 request_pending:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/CourseSummary'
+ *                 request_open:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/CourseSummary'
+ *                 request_claimed:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/CourseSummary'
+ *                 request_confirmed:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/CourseSummary'
+ *                 course_running:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/CourseSummary'
+ *                 course_completed:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/CourseSummary'
+ *       500:
+ *         description: Internal server error
+ */
 const getCoursePipeline = async (
   req: Request,
   res: Response,
