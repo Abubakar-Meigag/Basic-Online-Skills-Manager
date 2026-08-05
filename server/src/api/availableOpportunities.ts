@@ -69,7 +69,6 @@ const getAvailableOpportunities = async (req: Request, res: Response): Promise<v
         c.city,
         c.trainee_target,
         c.deadline,
-        c.status,
         commercial.organisation_name AS commercial_org
       FROM courses c
       JOIN organisations commercial
