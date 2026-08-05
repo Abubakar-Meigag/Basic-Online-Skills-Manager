@@ -4,11 +4,13 @@
 
 - **Never commit directly to `main`.** It's protected.
 - Create a branch from `main` for every change:
+
 ```bash
   git checkout main
   git pull
   git checkout -b <feature/short-description>
 ```
+
 - Prefix your branch: `feature/`, `fix/`, `chore/`, or `docs/`.
 
 ## Pull requests
