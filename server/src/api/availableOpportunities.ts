@@ -7,6 +7,45 @@ import pool from "../data/connection";
  * req.user is populated by auth middleware after magic-link verification.
  * Note - wire to real session once auth is built.
 */
+
+/**
+ * @swagger
+ * /opportunities:
+ *   get:
+ *     summary: Get all open course opportunities (Outreach dashboard)
+ *     description: >
+ *       Returns all courses with status request_open that outreach partners
+ *       can claim, as a flat array. The commercial partner's organisation name
+ *       is resolved via a join.
+ *     tags: [Opportunities]
+ *     responses:
+ *       200:
+ *         description: A flat array of open opportunities
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     format: uuid
+ *                   city:
+ *                     type: string
+ *                   trainee_target:
+ *                     type: integer
+ *                   deadline:
+ *                     type: string
+ *                     format: date
+ *                   status:
+ *                     type: string
+ *                     example: request_open
+ *                   commercial_org:
+ *                     type: string
+ *       500:
+ *         description: Internal server error
+ */
 const getAvailableOpportunities = async (req: Request, res: Response): Promise<void> => {
   try {
 
