@@ -22,19 +22,19 @@ export default function HomePage() {
             Login Page
           </Link>
           <Link
-            to="/dashboard/cyf-staff/request-pipeline"
+            to="/cyf-staff/request-pipeline"
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
             CYF Staff Dashboard
           </Link>
           <Link
-            to="/dashboard/commercial-partner/requested-courses"
+            to="/commercial-partner/requested-courses"
             className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
           >
             Commercial Partner Dashboard
           </Link>
           <Link
-            to="/dashboard/outreach-partner/find-opportunities"
+            to="/outreach-partner/find-opportunities"
             className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
           >
             Outreach Partner Dashboard

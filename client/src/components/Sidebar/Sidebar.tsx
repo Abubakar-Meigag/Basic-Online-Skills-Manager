@@ -22,7 +22,7 @@ const Sidebar = ({ userType = "commercial-partner" }) => {
       <nav className="px-5">
         <ul>
           {navLinks
-            .filter((link) => link.path.startsWith(`/dashboard/${userType}/`))
+            .filter((link) => link.path.startsWith(`/${userType}/`))
             .map((link) => (
               <li key={link.path}>
                 <NavLink
