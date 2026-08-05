@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import pool from "../data/connection";
+import jwt from "jsonwebtoken";
 import { sendMagicLinkEmail } from "../lib/email";
 
 // Helper to hash tokens before database saves
@@ -107,9 +108,19 @@ export async function verifyMagicLinkToken(rawToken: string) {
   ) {
     redirectRoute = "/dashboard/cyf-staff";
   }
-
+  // Generate JWT Session Token exp 24h
+  const sessionToken = jwt.sign(
+    {
+      id: record.user_id,
+      email: record.email,
+      orgType: record.org_type,
+    },
+    process.env.JWT_SECRET || "your-fallback-secret-key",
+    { expiresIn: "24h" },
+  );
   // return user session identity as object, and the redirectRout.
   return {
+    token: sessionToken,
     user: {
       id: record.user_id,
       email: record.email,
