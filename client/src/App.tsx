@@ -4,7 +4,7 @@ import MagicLinkLogin from "./pages/login/MagicLinkLogin.tsx";
 import Layout from "./components/Layout/Layout";
 import RequestedCoursesPage from "./pages/commercialPartner/RequestedCoursesPage.tsx";
 import RequestNewCoursePage from "./pages/commercialPartner/RequestNewCoursePage.tsx";
-import OutreachPartnerDashboard from "./pages/outreachpartner/OutreachDashboard.tsx";
+import OutreachDashboard from "./pages/outreachPartner/OutreachDashboard.tsx";
 import CYFStaffDashboard from "./pages/cyfstaff/CYFStaffDashboard.tsx";
 
 const App = () => {
@@ -18,10 +18,7 @@ const App = () => {
           <Route path="request-new-course" element={<RequestNewCoursePage />} />
         </Route>
         <Route path="/outreach-partner">
-          <Route
-            path="find-opportunities"
-            element={<OutreachPartnerDashboard />}
-          />
+          <Route path="find-opportunities" element={<OutreachDashboard />} />
         </Route>
         <Route path="/cyf-staff">
           <Route path="request-pipeline" element={<CYFStaffDashboard />} />
