@@ -36,9 +36,7 @@ app.get("/course-pipeline", getCoursePipeline);
 import getCommercialDashboard from "./api/commercialDashboard";
 app.get("/commercial-dashboard", getCommercialDashboard);
 
-
-
-import getAvailableOpportunities from "./api/availableOpportunities"
+import getAvailableOpportunities from "./api/availableOpportunities";
 app.get("/opportunities", getAvailableOpportunities);
 
 import getCourseDetails from "./api/CourseDetails";
