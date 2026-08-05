@@ -12,6 +12,110 @@ import pool from "../data/connection";
  *   - commercial  >> only courses where commercial_org_id === their org
  *   - outreach    >> open opportunities (status request_open) OR courses they host
  */
+
+/**
+ * @swagger
+ * /course-details/{id}:
+ *   get:
+ *     summary: Get full details for a single course (shared across all dashboards)
+ *     description: >
+ *       Returns the complete record for one course by id, plus resolved
+ *       commercial and outreach organisation names. Used by the CYF staff
+ *       Review page, commercial View Details, and outreach View Opportunity
+ *       Details. Role-based access scoping will be enforced once auth is added.
+ *     tags: [Courses]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: The UUID of the course to retrieve.
+ *     responses:
+ *       200:
+ *         description: The full course record, wrapped in a data object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       format: uuid
+ *                     course_name:
+ *                       type: string
+ *                     commercial_org_id:
+ *                       type: string
+ *                       format: uuid
+ *                     outreach_org_id:
+ *                       type: string
+ *                       format: uuid
+ *                       nullable: true
+ *                     account_name:
+ *                       type: string
+ *                     contract_name:
+ *                       type: string
+ *                     trainee_target:
+ *                       type: integer
+ *                     deadline:
+ *                       type: string
+ *                       format: date
+ *                     city:
+ *                       type: string
+ *                     status:
+ *                       type: string
+ *                     start_date:
+ *                       type: string
+ *                       format: date
+ *                       nullable: true
+ *                     end_date:
+ *                       type: string
+ *                       format: date
+ *                       nullable: true
+ *                     venue_address:
+ *                       type: string
+ *                       nullable: true
+ *                     contact_name:
+ *                       type: string
+ *                       nullable: true
+ *                     contact_email:
+ *                       type: string
+ *                       nullable: true
+ *                     client_group_description:
+ *                       type: string
+ *                       nullable: true
+ *                     tech_level:
+ *                       type: string
+ *                       nullable: true
+ *                     goal:
+ *                       type: string
+ *                       nullable: true
+ *                     lunch_arrangement:
+ *                       type: string
+ *                       nullable: true
+ *                     expenses_notes:
+ *                       type: string
+ *                       nullable: true
+ *                     note:
+ *                       type: string
+ *                       nullable: true
+ *                     created_at:
+ *                       type: string
+ *                       format: date-time
+ *                     commercial_org:
+ *                       type: string
+ *                     outreach_org:
+ *                       type: string
+ *                       nullable: true
+ *       404:
+ *         description: No course found with the given id
+ *       500:
+ *         description: Internal server error
+ */
 const getCourseDetails = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
