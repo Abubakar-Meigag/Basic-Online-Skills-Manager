@@ -4,9 +4,6 @@ import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./lib/swagger";
 
-import swaggerUi from "swagger-ui-express";
-import { swaggerSpec } from "./lib/swagger";
-
 const app = express();
 
 app.use(cors());

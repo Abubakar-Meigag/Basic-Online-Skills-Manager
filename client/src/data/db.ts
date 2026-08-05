@@ -294,7 +294,11 @@ export const courses: Course[] = [
   {
     id: "course-008",
     course_name: "Basic Online Skills",
+<<<<<<< HEAD
     commercial_org: "org-com-001",
+=======
+    commercial_org_id: "org-com-001",
+>>>>>>> 8c4458c (West Midlands | 26 July Launch | Iswat Bello | Basic Online Skills Manager | Commercial dashboard design update (#58))
     account_name: "DWP",
     contract_name: "Employment Pathways",
     trainee_target: 12,
@@ -318,7 +322,11 @@ export const courses: Course[] = [
   {
     id: "course-009",
     course_name: "Basic Online Skills",
+<<<<<<< HEAD
     commercial_org: "org-com-001",
+=======
+    commercial_org_id: "org-com-001",
+>>>>>>> 8c4458c (West Midlands | 26 July Launch | Iswat Bello | Basic Online Skills Manager | Commercial dashboard design update (#58))
     account_name: "National Highways",
     contract_name: "Digital Access",
     trainee_target: 18,
@@ -342,7 +350,11 @@ export const courses: Course[] = [
   {
     id: "course-010",
     course_name: "Basic Online Skills",
+<<<<<<< HEAD
     commercial_org: "org-com-001",
+=======
+    commercial_org_id: "org-com-001",
+>>>>>>> 8c4458c (West Midlands | 26 July Launch | Iswat Bello | Basic Online Skills Manager | Commercial dashboard design update (#58))
     account_name: "DWP",
     contract_name: "Job Search Boost",
     trainee_target: 14,
@@ -366,7 +378,11 @@ export const courses: Course[] = [
   {
     id: "course-011",
     course_name: "Basic Online Skills",
+<<<<<<< HEAD
     commercial_org: "org-com-001",
+=======
+    commercial_org_id: "org-com-001",
+>>>>>>> 8c4458c (West Midlands | 26 July Launch | Iswat Bello | Basic Online Skills Manager | Commercial dashboard design update (#58))
     account_name: "Home Office",
     contract_name: "Skills Refresh",
     trainee_target: 16,
@@ -390,7 +406,11 @@ export const courses: Course[] = [
   {
     id: "course-012",
     course_name: "Basic Online Skills",
+<<<<<<< HEAD
     commercial_org: "org-com-001",
+=======
+    commercial_org_id: "org-com-001",
+>>>>>>> 8c4458c (West Midlands | 26 July Launch | Iswat Bello | Basic Online Skills Manager | Commercial dashboard design update (#58))
     account_name: "DBT",
     contract_name: "Community Connect",
     trainee_target: 20,
@@ -414,7 +434,11 @@ export const courses: Course[] = [
   {
     id: "course-013",
     course_name: "Basic Online Skills",
+<<<<<<< HEAD
     commercial_org: "org-com-001",
+=======
+    commercial_org_id: "org-com-001",
+>>>>>>> 8c4458c (West Midlands | 26 July Launch | Iswat Bello | Basic Online Skills Manager | Commercial dashboard design update (#58))
     account_name: "DWP",
     contract_name: "Digital Support",
     trainee_target: 11,
@@ -438,7 +462,11 @@ export const courses: Course[] = [
   {
     id: "course-014",
     course_name: "Basic Online Skills",
+<<<<<<< HEAD
     commercial_org: "org-com-001",
+=======
+    commercial_org_id: "org-com-001",
+>>>>>>> 8c4458c (West Midlands | 26 July Launch | Iswat Bello | Basic Online Skills Manager | Commercial dashboard design update (#58))
     account_name: "DWP",
     contract_name: "North West Access",
     trainee_target: 22,
@@ -462,7 +490,11 @@ export const courses: Course[] = [
   {
     id: "course-015",
     course_name: "Basic Online Skills",
+<<<<<<< HEAD
     commercial_org: "org-com-001",
+=======
+    commercial_org_id: "org-com-001",
+>>>>>>> 8c4458c (West Midlands | 26 July Launch | Iswat Bello | Basic Online Skills Manager | Commercial dashboard design update (#58))
     account_name: "National Highways",
     contract_name: "Community Pathways",
     trainee_target: 13,
@@ -486,7 +518,11 @@ export const courses: Course[] = [
   {
     id: "course-016",
     course_name: "Basic Online Skills",
+<<<<<<< HEAD
     commercial_org: "org-com-001",
+=======
+    commercial_org_id: "org-com-001",
+>>>>>>> 8c4458c (West Midlands | 26 July Launch | Iswat Bello | Basic Online Skills Manager | Commercial dashboard design update (#58))
     account_name: "Home Office",
     contract_name: "Restart Support",
     trainee_target: 9,
@@ -511,7 +547,11 @@ export const courses: Course[] = [
   {
     id: "course-017",
     course_name: "Basic Online Skills",
+<<<<<<< HEAD
     commercial_org: "org-com-001",
+=======
+    commercial_org_id: "org-com-001",
+>>>>>>> 8c4458c (West Midlands | 26 July Launch | Iswat Bello | Basic Online Skills Manager | Commercial dashboard design update (#58))
     account_name: "DWP",
     contract_name: "Digital Confidence",
     trainee_target: 17,
