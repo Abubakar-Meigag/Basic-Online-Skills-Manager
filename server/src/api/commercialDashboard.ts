@@ -8,6 +8,75 @@ import pool from "../data/connection";
  * organisations.type is one of: 'cyf_staff' | 'commercial' | 'outreach'.
  */
 
+/**
+ * @swagger
+ * /commercial/courses:
+ *   get:
+ *     summary: Get the logged-in commercial partner's courses (Commercial dashboard)
+ *     description: >
+ *       Returns all courses belonging to a commercial partner's organisation,
+ *       across all statuses, as a flat array under a "data" key. The outreach
+ *       partner's name is resolved via a LEFT JOIN (null when unassigned).
+ *       NOTE: organisationId is temporarily read from a query param until auth
+ *       is connected; it will later come from the session.
+ *     tags: [Commercial]
+ *     parameters:
+ *       - in: query
+ *         name: organisationId
+ *         required: false
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: >
+ *           TEMPORARY — the commercial organisation's UUID. Defaults to a test
+ *           org if omitted. Will be replaced by the authenticated session.
+ *     responses:
+ *       200:
+ *         description: The partner's courses, wrapped in a data array
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         format: uuid
+ *                       course_name:
+ *                         type: string
+ *                       account_name:
+ *                         type: string
+ *                       contract_name:
+ *                         type: string
+ *                       trainee_target:
+ *                         type: integer
+ *                       deadline:
+ *                         type: string
+ *                         format: date
+ *                       city:
+ *                         type: string
+ *                       status:
+ *                         type: string
+ *                       start_date:
+ *                         type: string
+ *                         format: date
+ *                         nullable: true
+ *                       end_date:
+ *                         type: string
+ *                         format: date
+ *                         nullable: true
+ *                       outreach_partner:
+ *                         type: string
+ *                         nullable: true
+ *       400:
+ *         description: organisationId missing (temporary, until auth is ready)
+ *       500:
+ *         description: Internal server error
+ */
 const getCommercialDashboard = async (req: Request, res: Response) => {
   try {
     // const user = req.user;
