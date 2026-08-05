@@ -13,17 +13,17 @@ const App = () => {
       <Route path="/login" element={<MagicLinkLogin />} />
       <Route path="/" element={<HomePage />} />
       <Route element={<Layout />}>
-        <Route path="/dashboard/commercial-partner">
+        <Route path="/commercial-partner">
           <Route path="requested-courses" element={<RequestedCoursesPage />} />
           <Route path="request-new-course" element={<RequestNewCoursePage />} />
         </Route>
-        <Route path="/dashboard/outreach-partner">
+        <Route path="/outreach-partner">
           <Route
             path="find-opportunities"
             element={<OutreachPartnerDashboard />}
           />
         </Route>
-        <Route path="/dashboard/cyf-staff">
+        <Route path="/cyf-staff">
           <Route path="request-pipeline" element={<CYFStaffDashboard />} />
         </Route>
       </Route>
