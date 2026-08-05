@@ -8,6 +8,7 @@ export interface RequestMagicLinkResponse {
 
 export interface VerifyMagicLinkResponse {
   message: string;
+  token?: string;
   user: {
     id: string;
     email: string;
