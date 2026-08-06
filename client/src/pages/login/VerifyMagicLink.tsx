@@ -34,7 +34,7 @@ export default function VerifyMagicLink() {
         }
 
         // Redirect to the route returned by backend
-        navigate(data.redirectRoute || "/dashboard");
+        navigate(data.redirectRoute || "/");
       })
       .catch((err) => {
         setError(
