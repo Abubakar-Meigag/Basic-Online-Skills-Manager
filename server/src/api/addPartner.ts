@@ -8,6 +8,60 @@ import { PARTNER_TYPES } from "../constants/organisationTypes";
  * Role comes from the organisation, not the user.
  * organisations.type is one of: 'cyf_staff' | 'commercial' | 'outreach'.
  */
+
+/**
+ * @swagger
+ * /partners:
+ *   post:
+ *     summary: Onboard a new partner organisation and its first user (CYF Staff)
+ *     description: >
+ *       Creates a new partner organisation and its first login user together
+ *       in a single transaction (all-or-nothing). Type must be 'commercial' or
+ *       'outreach' — 'cyf_staff' cannot be created here. Rejects duplicate
+ *       organisation name/email_domain and duplicate email with 409.
+ *       CYF-staff only (guard pending auth).
+ *     tags: [Partners]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [organisation_name, type, email_domain, email]
+ *             properties:
+ *               organisation_name:
+ *                 type: string
+ *                 example: Deloitte
+ *               type:
+ *                 type: string
+ *                 enum: [commercial, outreach]
+ *                 example: commercial
+ *               email_domain:
+ *                 type: string
+ *                 example: deloitte.com
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: contact@deloitte.com
+ *     responses:
+ *       201:
+ *         description: Partner organisation and first user created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 organisation:
+ *                   $ref: '#/components/schemas/Organisation'
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Missing required fields or invalid type
+ *       409:
+ *         description: Organisation name/email_domain or email already exists
+ *       500:
+ *         description: Internal server error
+ */
 const addPartner = async (req: Request, res: Response): Promise<void> => {
   // todo(auth): enable once magic-link login is built.
   // const user = (req as any).user;
