@@ -70,8 +70,6 @@ const getAvailableOpportunities = async (
         c.city,
         c.trainee_target,
         c.status,
-        c.start_date,
-        c.end_date,
         c.deadline,
         commercial.organisation_name AS commercial_org,
         outreach.organisation_name AS outreach_org
