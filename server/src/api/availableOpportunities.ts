@@ -71,10 +71,13 @@ const getAvailableOpportunities = async (req: Request, res: Response): Promise<v
         c.start_date,
         c.end_date,
         c.deadline,
-        commercial.organisation_name AS commercial_org
+        commercial.organisation_name AS commercial_org,
+        outreach.organisation_name AS outreach_org
       FROM courses c
       JOIN organisations commercial
         ON c.commercial_org_id = commercial.id
+      JOIN organisations outreach
+        ON c.outreach_org_id = outreach.id
       WHERE c.status = 'request_open'
       ORDER BY c.deadline ASC
     `);
