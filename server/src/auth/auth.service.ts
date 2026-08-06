@@ -12,7 +12,7 @@ function hashToken(token: string): string {
 export async function requestMagicLink(email: string): Promise<void> {
   // Query user and join with organisations to get the type
   const query = `
-    SELECT u.id, u.is_active, o.type as org_type
+    SELECT u.id, u.is_active
     FROM users u
     WHERE u.email = $1
   `;
