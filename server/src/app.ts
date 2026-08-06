@@ -1,7 +1,6 @@
 import express from "express";
 import type { Request, Response } from "express";
 import cors from "cors";
-
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./lib/swagger";
 
@@ -45,6 +44,9 @@ app.get("/course-details/:id", getCourseDetails);
 
 import authRouter from "./auth/auth.router";
 app.use("/api/auth", authRouter);
+
+import addPartner from "./api/addPartner";
+app.post("/addPartner", addPartner);
 
 import getOrganisations from "./api/getOrganisations";
 app.get("/organisations", getOrganisations);
