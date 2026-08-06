@@ -2,17 +2,17 @@ import { NavLink } from "react-router";
 import CYFLogo from "../../assets/CYF-logo.png";
 import { users } from "../../data/db";
 import { navLinks } from "../../lib/constants/navLinks";
-import { Organization_Types, type OrganizationType } from "../../data/dataType";
+import { OrganizationType } from "../../data/dataType";
 import "./Sidebar.css";
 
 const rolePathMap: Record<OrganizationType, string> = {
-  commercial: "commercial-partner",
-  outreach: "outreach-partner",
-  cyf_staff: "cyf-staff",
+  [OrganizationType.COMMERCIAL_PARTNER]: "commercial-partner",
+  [OrganizationType.OUTREACH_PARTNER]: "outreach-partner",
+  [OrganizationType.CYF_STAFF]: "cyf-staff",
 };
 
 const Sidebar = ({
-  userType = Organization_Types.COMMERCIAL,
+  userType = OrganizationType.COMMERCIAL_PARTNER,
 }: {
   userType?: OrganizationType;
 }) => {

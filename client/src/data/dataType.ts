@@ -14,15 +14,15 @@ export type User = {
   is_active: boolean;
   created_at: string;
   last_login_at: string | null;
+  is_logged_in: boolean;
+  organization_type: OrganizationType;
 };
 
-export type OrganizationType = "commercial" | "outreach" | "cyf_staff";
-
-export const Organization_Types = {
-  COMMERCIAL: "commercial",
-  OUTREACH: "outreach",
-  CYF_STAFF: "cyf_staff",
-} as const;
+export enum OrganizationType {
+  COMMERCIAL_PARTNER = "commercial",
+  OUTREACH_PARTNER = "outreach",
+  CYF_STAFF = "cyf_staff",
+}
 
 export type CourseStatus =
   | "request_pending"

@@ -1,31 +1,35 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Organization_Types, type OrganizationType } from "../../data/dataType";
+import { type User, OrganizationType } from "../../data/dataType";
 
 export default function HomePage() {
   const navigate = useNavigate();
 
-  // We define the "Shape" of a user
-  interface User {
-    isLoggedIn: boolean;
-    orgType: OrganizationType; // This forces the role to match our allowed list!
-  }
-
   // This is our "Fake" user for now.
   // You can change "commercial" to "outreach" to test the different doors!
   const mockUser: User = {
-    isLoggedIn: true,
-    orgType: Organization_Types.COMMERCIAL,
+    id: "user-001",
+    email: "test@codeyourfuture.io",
+    organisation_id: null,
+    is_active: true,
+    created_at: "2026-01-01",
+    last_login_at: null,
+    is_logged_in: false,
+    organization_type: OrganizationType.COMMERCIAL_PARTNER,
   };
 
   useEffect(() => {
-    if (!mockUser.isLoggedIn) {
+    if (!mockUser.is_logged_in) {
       navigate("/login");
-    } else if (mockUser.orgType === Organization_Types.COMMERCIAL) {
+    } else if (
+      mockUser.organization_type === OrganizationType.COMMERCIAL_PARTNER
+    ) {
       navigate("/commercial-partner/requested-courses");
-    } else if (mockUser.orgType === Organization_Types.OUTREACH) {
+    } else if (
+      mockUser.organization_type === OrganizationType.OUTREACH_PARTNER
+    ) {
       navigate("/outreach-partner/find-opportunities");
-    } else if (mockUser.orgType === Organization_Types.CYF_STAFF) {
+    } else if (mockUser.organization_type === OrganizationType.CYF_STAFF) {
       navigate("/cyf-staff/request-pipeline");
     } else {
       navigate("/login");
