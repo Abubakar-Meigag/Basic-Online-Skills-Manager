@@ -90,17 +90,17 @@ export async function verifyMagicLinkToken(rawToken: string) {
   ]);
 
   // Determine redirect route based on organisation type
-  let redirectRoute = "/dashboard/cyf-staff"; // default fallback
+  let redirectRoute = "/"; // default fallback
 
   switch (record.org_type) {
     case OrganizationType.COMMERCIAL_PARTNER:
-      redirectRoute = "/dashboard/commercial-partner";
+      redirectRoute = "/commercial-partner";
       break;
     case OrganizationType.OUTREACH_PARTNER:
-      redirectRoute = "/dashboard/outreach-partner";
+      redirectRoute = "/outreach-partner";
       break;
     case OrganizationType.CYF_STAFF:
-      redirectRoute = "/dashboard/cyf-staff";
+      redirectRoute = "/cyf-staff";
       break;
   }
   const jwtSecret = process.env.JWT_SECRET;
