@@ -30,7 +30,7 @@ const OutreachDashboard = () => {
   return (
     <div className="find-opportunities">
       <div className="discovery-header flex justify-between mt-10 mb-20 mx-12">
-        <h2 className="text-xl font-bold text-[#333333]">
+        <h2 className="text-3xl font-bold text-[#333333]">
           Available Opportunities
         </h2>
       </div>
@@ -65,7 +65,7 @@ const OutreachDashboard = () => {
                 <td className="py-4 text-sm text-slate-600 px-14">
                   {course.trainee_target}
                 </td>
-                <td>3 Weeks</td>
+                <td className="py-4 text-sm text-slate-600 px-4">3 Weeks</td>
                 <td className="py-4 text-sm text-slate-600 px-4">
                   {/* This formats the date from ISO string to local format*/}
                   {format(parseISO(course.deadline), "dd/MM/yyyy")}
