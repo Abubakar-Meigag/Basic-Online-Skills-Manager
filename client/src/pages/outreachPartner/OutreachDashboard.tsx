@@ -10,7 +10,9 @@ const OutreachDashboard = () => {
 
   const getCourses = useCallback(async () => {
     try {
-      const res = await fetch("http://localhost:3000/opportunities");
+      const res = await fetch(
+        "https://bosm-backend.trainees.hosting.cyf.academy/opportunities",
+      );
       const data = await res.json();
       const coursesByStatus = data.filter(
         (course: Course) => course.status === "request_open",
