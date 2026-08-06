@@ -23,7 +23,6 @@ app.get("/health", (_req: Request, res: Response) => {
 
 // Import your endpoint handlers here and define your routes after
 
-
 // Example endpoint handler import and route definition
 import testEndPoint from "./api/testEndPoint";
 app.get("/test", testEndPoint);
@@ -46,4 +45,7 @@ app.get("/course-details/:id", getCourseDetails);
 
 import authRouter from "./auth/auth.router";
 app.use("/api/auth", authRouter);
+
+import getOrganisations from "./api/getOrganisations";
+app.get("/organisations", getOrganisations);
 export default app;
