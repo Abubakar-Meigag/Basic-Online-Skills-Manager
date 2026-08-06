@@ -2,10 +2,23 @@ import { NavLink } from "react-router";
 import CYFLogo from "../../assets/CYF-logo.png";
 import { users } from "../../data/db";
 import { navLinks } from "../../lib/constants/navLinks";
+import { Organization_Types, type OrganizationType } from "../../data/dataType";
 import "./Sidebar.css";
 
-const Sidebar = ({ userType = "commercial-partner" }) => {
-  // Change userType prop above to see view for a different user. Accepts strings "commercial-partner", "outreach-partner" & "cyf-staff"
+const rolePathMap: Record<OrganizationType, string> = {
+  commercial: "commercial-partner",
+  outreach: "outreach-partner",
+  cyf_staff: "cyf-staff",
+};
+
+const Sidebar = ({
+  userType = Organization_Types.COMMERCIAL,
+}: {
+  userType?: OrganizationType;
+}) => {
+  // Change userType prop above to see view for a different user.
+
+  const urlRoleName = rolePathMap[userType];
 
   const firstUser = users[0];
 
@@ -22,7 +35,7 @@ const Sidebar = ({ userType = "commercial-partner" }) => {
       <nav className="px-5">
         <ul>
           {navLinks
-            .filter((link) => link.path.startsWith(`/${userType}/`))
+            .filter((link) => link.path.startsWith(`/${urlRoleName}/`))
             .map((link) => (
               <li key={link.path}>
                 <NavLink

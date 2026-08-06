@@ -16,6 +16,14 @@ export type User = {
   last_login_at: string | null;
 };
 
+export type OrganizationType = "commercial" | "outreach" | "cyf_staff";
+
+export const Organization_Types = {
+  COMMERCIAL: "commercial",
+  OUTREACH: "outreach",
+  CYF_STAFF: "cyf_staff",
+} as const;
+
 export type CourseStatus =
   | "request_pending"
   | "request_open"
