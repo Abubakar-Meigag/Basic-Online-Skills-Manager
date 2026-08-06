@@ -11,7 +11,7 @@ import { PARTNER_TYPES } from "../constants/organisationTypes";
 
 /**
  * @swagger
- * /partners:
+ * /addPartner:
  *   post:
  *     summary: Onboard a new partner organisation and its first user (CYF Staff)
  *     description: >
@@ -20,7 +20,7 @@ import { PARTNER_TYPES } from "../constants/organisationTypes";
  *       'outreach' — 'cyf_staff' cannot be created here. Rejects duplicate
  *       organisation name/email_domain and duplicate email with 409.
  *       CYF-staff only (guard pending auth).
- *     tags: [Partners]
+ *     tags: [addPartner]
  *     requestBody:
  *       required: true
  *       content:

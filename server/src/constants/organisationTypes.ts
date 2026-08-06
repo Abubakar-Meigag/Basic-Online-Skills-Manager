@@ -1,8 +1,8 @@
-export const ORGANISATION_TYPE = {
-  CYF_STAFF: "cyf_staff",
-  COMMERCIAL: "commercial",
-  OUTREACH: "outreach",
-} as const;
+export enum ORGANISATION_TYPE {
+  CYF_STAFF = "cyf_staff",
+  COMMERCIAL = "commercial",
+  OUTREACH = "outreach",
+} 
 
 export type OrganisationType =
   (typeof ORGANISATION_TYPE)[keyof typeof ORGANISATION_TYPE];
