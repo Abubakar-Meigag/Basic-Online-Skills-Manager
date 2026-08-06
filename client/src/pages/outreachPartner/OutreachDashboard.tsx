@@ -52,7 +52,7 @@ const OutreachDashboard = () => {
                 className="border-b border-[#F3F3F3] hover:bg-[#F3F3F3] transition-colors"
               >
                 <td className="py-4 text-sm text-slate-500 pl-5">
-                  {course.id}
+                  {course.id.slice(-5)}
                 </td>
                 <td className="py-4 text-sm font-bold text-slate-900 px-4">
                   {course.commercial_org}
