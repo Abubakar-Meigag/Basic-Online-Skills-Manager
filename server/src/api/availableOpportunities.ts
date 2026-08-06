@@ -71,14 +71,12 @@ const getAvailableOpportunities = async (
         c.trainee_target,
         c.start_date,
         c.end_date,
+        c.status,
         c.deadline,
-        commercial.organisation_name AS commercial_org,
-        outreach.organisation_name AS outreach_org
+        commercial.organisation_name AS commercial_org
       FROM courses c
       JOIN organisations commercial
         ON c.commercial_org_id = commercial.id
-      JOIN organisations outreach
-        ON c.outreach_org_id = outreach.id
       WHERE c.status = 'request_open'
       ORDER BY c.deadline ASC
     `);
