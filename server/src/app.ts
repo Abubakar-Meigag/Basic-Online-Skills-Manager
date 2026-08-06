@@ -48,4 +48,7 @@ app.use("/api/auth", authRouter);
 
 import getOrganisations from "./api/getOrganisations";
 app.get("/organisations", getOrganisations);
+
+import addUserToPartner from "./api/addUserToPartner";
+app.post("/partners/:id/users", addUserToPartner);
 export default app;
