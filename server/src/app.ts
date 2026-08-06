@@ -1,9 +1,7 @@
 import express from "express";
 import type { Request, Response } from "express";
 import cors from "cors";
-import authRouter from "./auth/auth.router";
-import swaggerUi from 'swagger-ui-express';
-import { swaggerSpec } from './lib/swagger';
+
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./lib/swagger";
 
@@ -24,7 +22,7 @@ app.get("/health", (_req: Request, res: Response) => {
 //don't change anything above this line, you can add your endpoints below this line
 
 // Import your endpoint handlers here and define your routes after
-app.use("/api/auth", authRouter);
+
 
 // Example endpoint handler import and route definition
 import testEndPoint from "./api/testEndPoint";
@@ -46,4 +44,6 @@ app.get("/opportunities", getAvailableOpportunities);
 import getCourseDetails from "./api/CourseDetails";
 app.get("/course-details/:id", getCourseDetails);
 
+import authRouter from "./auth/auth.router";
+app.use("/api/auth", authRouter);
 export default app;
