@@ -69,6 +69,7 @@ const getAvailableOpportunities = async (
         c.id,
         c.city,
         c.trainee_target,
+        c.status,
         c.deadline,
         commercial.organisation_name AS commercial_org
       FROM courses c
