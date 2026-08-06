@@ -74,7 +74,6 @@ const OutreachDashboard = ({
             <th className={`${tableHeaderStyle} px-4`}>Trainee Target</th>
             <th className={`${tableHeaderStyle} px-4`}>Duration</th>
             <th className={`${tableHeaderStyle} px-4`}>Deadline</th>
-            <th className={`${tableHeaderStyle} px-4`}>Status</th>
             <th className={`${tableHeaderStyle} px-4`}>Actions</th>
           </tr>
         </thead>
@@ -106,13 +105,6 @@ const OutreachDashboard = ({
                 </td>
                 <td className="py-4 text-sm text-slate-600 px-4">
                   {course.deadline}
-                </td>
-                <td className="py-4">
-                  <span
-                    className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${statusStyle}`}
-                  >
-                    {statusText}
-                  </span>
                 </td>
                 <td className="py-4 text-sm px-4">
                   <button
