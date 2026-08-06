@@ -134,7 +134,7 @@ export default function RequestedCoursesPage() {
 
   const capgeminiCourses = useMemo(() => {
     const filteredCourses = courses.filter(
-      (course) => course.commercial_org_id === capgeminiOrgId,
+      (course) => course.commercial_org === capgeminiOrgId,
     );
 
     return filteredCourses;

@@ -112,7 +112,7 @@ export const courses: Course[] = [
   {
     id: "course-001",
     course_name: "Basic Online Skills",
-    commercial_org_id: "org-com-001",
+    commercial_org: "org-com-001",
     account_name: "DWP",
     contract_name: "Debt",
     trainee_target: 15,
@@ -138,7 +138,7 @@ export const courses: Course[] = [
   {
     id: "course-002",
     course_name: "Basic Online Skills",
-    commercial_org_id: "org-com-001",
+    commercial_org: "org-com-001",
     account_name: "DWP",
     contract_name: "Digital Channels",
     trainee_target: 15,
@@ -164,7 +164,7 @@ export const courses: Course[] = [
   {
     id: "course-003",
     course_name: "Basic Online Skills",
-    commercial_org_id: "org-com-001",
+    commercial_org: "org-com-001",
     account_name: "National Highways",
     contract_name: "DWS",
     trainee_target: 10,
@@ -190,7 +190,7 @@ export const courses: Course[] = [
   {
     id: "course-004",
     course_name: "Basic Online Skills",
-    commercial_org_id: "org-com-001",
+    commercial_org: "org-com-001",
     account_name: "DWP",
     contract_name: "Debt",
     trainee_target: 15,
@@ -216,7 +216,7 @@ export const courses: Course[] = [
   {
     id: "course-005",
     course_name: "Basic Online Skills",
-    commercial_org_id: "org-com-001",
+    commercial_org: "org-com-001",
     account_name: "DWP",
     contract_name: "Debt",
     trainee_target: 15,
@@ -242,7 +242,7 @@ export const courses: Course[] = [
   {
     id: "course-006",
     course_name: "Basic Online Skills",
-    commercial_org_id: "org-com-001",
+    commercial_org: "org-com-001",
     account_name: "Home Office",
     contract_name: "DevOps",
     trainee_target: 10,
@@ -268,7 +268,7 @@ export const courses: Course[] = [
   {
     id: "course-007",
     course_name: "Basic Online Skills",
-    commercial_org_id: "org-com-001",
+    commercial_org: "org-com-001",
     account_name: "DBT",
     contract_name: "-",
     trainee_target: 30,
@@ -294,7 +294,7 @@ export const courses: Course[] = [
   {
     id: "course-008",
     course_name: "Basic Online Skills",
-    commercial_org_id: "org-com-001",
+    commercial_org: "org-com-001",
     account_name: "DWP",
     contract_name: "Employment Pathways",
     trainee_target: 12,
@@ -318,7 +318,7 @@ export const courses: Course[] = [
   {
     id: "course-009",
     course_name: "Basic Online Skills",
-    commercial_org_id: "org-com-001",
+    commercial_org: "org-com-001",
     account_name: "National Highways",
     contract_name: "Digital Access",
     trainee_target: 18,
@@ -342,7 +342,7 @@ export const courses: Course[] = [
   {
     id: "course-010",
     course_name: "Basic Online Skills",
-    commercial_org_id: "org-com-001",
+    commercial_org: "org-com-001",
     account_name: "DWP",
     contract_name: "Job Search Boost",
     trainee_target: 14,
@@ -366,7 +366,7 @@ export const courses: Course[] = [
   {
     id: "course-011",
     course_name: "Basic Online Skills",
-    commercial_org_id: "org-com-001",
+    commercial_org: "org-com-001",
     account_name: "Home Office",
     contract_name: "Skills Refresh",
     trainee_target: 16,
@@ -390,7 +390,7 @@ export const courses: Course[] = [
   {
     id: "course-012",
     course_name: "Basic Online Skills",
-    commercial_org_id: "org-com-001",
+    commercial_org: "org-com-001",
     account_name: "DBT",
     contract_name: "Community Connect",
     trainee_target: 20,
@@ -414,7 +414,7 @@ export const courses: Course[] = [
   {
     id: "course-013",
     course_name: "Basic Online Skills",
-    commercial_org_id: "org-com-001",
+    commercial_org: "org-com-001",
     account_name: "DWP",
     contract_name: "Digital Support",
     trainee_target: 11,
@@ -438,7 +438,7 @@ export const courses: Course[] = [
   {
     id: "course-014",
     course_name: "Basic Online Skills",
-    commercial_org_id: "org-com-001",
+    commercial_org: "org-com-001",
     account_name: "DWP",
     contract_name: "North West Access",
     trainee_target: 22,
@@ -462,7 +462,7 @@ export const courses: Course[] = [
   {
     id: "course-015",
     course_name: "Basic Online Skills",
-    commercial_org_id: "org-com-001",
+    commercial_org: "org-com-001",
     account_name: "National Highways",
     contract_name: "Community Pathways",
     trainee_target: 13,
@@ -486,7 +486,7 @@ export const courses: Course[] = [
   {
     id: "course-016",
     course_name: "Basic Online Skills",
-    commercial_org_id: "org-com-001",
+    commercial_org: "org-com-001",
     account_name: "Home Office",
     contract_name: "Restart Support",
     trainee_target: 9,
@@ -511,7 +511,7 @@ export const courses: Course[] = [
   {
     id: "course-017",
     course_name: "Basic Online Skills",
-    commercial_org_id: "org-com-001",
+    commercial_org: "org-com-001",
     account_name: "DWP",
     contract_name: "Digital Confidence",
     trainee_target: 17,
