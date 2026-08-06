@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import pool from "../data/connection";
-import { PARTNER_TYPES } from "../constants/organisationTypes";
+import { PARTNER_TYPES, ORGANISATION_TYPE } from "../constants/organisations";
 
 /**
  * AUTH — enable once login is ready.
@@ -80,7 +80,7 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
-  if (!PARTNER_TYPES.includes(type)) {
+  if (!PARTNER_TYPES.includes(type as ORGANISATION_TYPE)) {
     res.status(400).json({
       error: `type must be one of: ${PARTNER_TYPES.join(", ")}`,
     });
