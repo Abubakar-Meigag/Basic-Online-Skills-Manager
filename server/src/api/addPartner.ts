@@ -20,7 +20,7 @@ import { PARTNER_TYPES } from "../constants/organisationTypes";
  *       'outreach' — 'cyf_staff' cannot be created here. Rejects duplicate
  *       organisation name/email_domain and duplicate email with 409.
  *       CYF-staff only (guard pending auth).
- *     tags: [addPartner]
+ *     tags: [Partners]
  *     requestBody:
  *       required: true
  *       content:
