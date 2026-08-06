@@ -68,6 +68,8 @@ const getAvailableOpportunities = async (req: Request, res: Response): Promise<v
         c.id,
         c.city,
         c.trainee_target,
+        c.start_date,
+        c.end_date,
         c.deadline,
         commercial.organisation_name AS commercial_org
       FROM courses c
