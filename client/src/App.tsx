@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import HomePage from "./pages/test/HomePage.tsx";
+import HomePage from "./pages/home/HomePage.tsx";
 import MagicLinkLogin from "./pages/login/MagicLinkLogin.tsx";
 import Layout from "./components/Layout/Layout";
 import RequestedCoursesPage from "./pages/commercialPartner/RequestedCoursesPage.tsx";
