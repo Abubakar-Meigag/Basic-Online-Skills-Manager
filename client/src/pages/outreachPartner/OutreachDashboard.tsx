@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { differenceInWeeks } from "date-fns";
 import statusLabel from "../../utils/statusLabel";
-import { courses as dbCourses } from "../../data/db";
+
 import type { Course } from "../../data/dataType";
 
 const tableHeaderStyle =
@@ -11,52 +11,28 @@ const courseLengthInWeeks = (startDate: string, endDate: string) =>
   differenceInWeeks(new Date(endDate), new Date(startDate));
 
 const OutreachDashboard = ({
-  partnerName = "DWP",
+  partnerName = "Test Org",
 }: {
   partnerName?: string;
 }) => {
   const [courses, setCourses] = useState<Course[]>([]);
 
-  useEffect(() => {
-    const request_pending = dbCourses.filter(
-      (course) => course.status === "request_pending",
-    );
-    const request_open = dbCourses.filter(
-      (course) => course.status === "request_open",
-    );
-    const request_claimed = dbCourses.filter(
-      (course) => course.status === "request_claimed",
-    );
-    const request_confirmed = dbCourses.filter(
-      (course) => course.status === "request_confirmed",
-    );
-    const course_running = dbCourses.filter(
-      (course) => course.status === "course_running",
-    );
-    const course_completed = dbCourses.filter(
-      (course) => course.status === "course_completed",
-    );
-    const request_cancelled = dbCourses.filter(
-      (course) => course.status === "request_cancelled",
-    );
-
-    // Sorts courses by label
-    const courseByStatus = [
-      ...request_pending,
-      ...request_open,
-      ...request_claimed,
-      ...request_confirmed,
-      ...course_completed,
-      ...course_running,
-      ...request_cancelled,
-    ];
-
-    setCourses(
-      courseByStatus.filter(
-        (course: Course) => course.account_name === partnerName,
-      ),
-    );
+  const getCourses = useCallback(async () => {
+    try {
+      const res = await fetch("http://localhost:3000/opportunities");
+      const data = await res.json();
+      const coursesByPartner = data.filter(
+        (course: Course) => course.outreach_org === partnerName,
+      );
+      setCourses(coursesByPartner);
+    } catch (error) {
+      console.error(error);
+    }
   }, [partnerName]);
+
+  useEffect(() => {
+    getCourses();
+  }, [getCourses]);
 
   return (
     <div className="find-opportunities">
@@ -79,8 +55,6 @@ const OutreachDashboard = ({
         </thead>
         <tbody>
           {courses.map((course) => {
-            const { statusStyle, statusText } = statusLabel(course.status);
-
             return (
               <tr
                 key={course.id}
