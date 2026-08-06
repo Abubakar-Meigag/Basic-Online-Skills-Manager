@@ -1,34 +1,25 @@
 import { useCallback, useEffect, useState } from "react";
-import { differenceInWeeks } from "date-fns";
-import statusLabel from "../../utils/statusLabel";
-
+import { parseISO, format } from "date-fns";
 import type { Course } from "../../data/dataType";
 
 const tableHeaderStyle =
   "py-5 text-[#333333] text-xs font-bold uppercase tracking-wider";
 
-const courseLengthInWeeks = (startDate: string, endDate: string) =>
-  differenceInWeeks(new Date(endDate), new Date(startDate));
-
-const OutreachDashboard = ({
-  partnerName = "Test Org",
-}: {
-  partnerName?: string;
-}) => {
+const OutreachDashboard = () => {
   const [courses, setCourses] = useState<Course[]>([]);
 
   const getCourses = useCallback(async () => {
     try {
       const res = await fetch("http://localhost:3000/opportunities");
       const data = await res.json();
-      const coursesByPartner = data.filter(
-        (course: Course) => course.outreach_org === partnerName,
+      const coursesByStatus = data.filter(
+        (course: Course) => course.status === "request_open",
       );
-      setCourses(coursesByPartner);
+      setCourses(coursesByStatus);
     } catch (error) {
       console.error(error);
     }
-  }, [partnerName]);
+  }, []);
 
   useEffect(() => {
     getCourses();
@@ -64,7 +55,7 @@ const OutreachDashboard = ({
                   {course.id}
                 </td>
                 <td className="py-4 text-sm font-bold text-slate-900 px-4">
-                  {course.commercial_org_id}
+                  {course.commercial_org}
                 </td>
                 <td className="py-4 text-sm text-slate-600 px-4">
                   {course.city}
@@ -72,13 +63,10 @@ const OutreachDashboard = ({
                 <td className="py-4 text-sm text-slate-600 px-14">
                   {course.trainee_target}
                 </td>
-                <td>
-                  {course.start_date && course.end_date
-                    ? courseLengthInWeeks(course.start_date, course.end_date)
-                    : "-"}
-                </td>
+                <td>3 Weeks</td>
                 <td className="py-4 text-sm text-slate-600 px-4">
-                  {course.deadline}
+                  {/* This formats the date from ISO string to local format*/}
+                  {format(parseISO(course.deadline), "dd/MM/yyyy")}
                 </td>
                 <td className="py-4 text-sm px-4">
                   <button
