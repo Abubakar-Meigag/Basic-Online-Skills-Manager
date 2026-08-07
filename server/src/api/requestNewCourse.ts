@@ -51,10 +51,7 @@ import pool from "../data/connection";
  *       500:
  *         description: Internal server error
  */
-const requestNewCourse = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
+const requestNewCourse = async (req: Request, res: Response): Promise<void> => {
   // todo(auth): enable once magic-link login is built.
   // const user = (req as any).user;
   // if (!user || user.type !== "commercial") {
