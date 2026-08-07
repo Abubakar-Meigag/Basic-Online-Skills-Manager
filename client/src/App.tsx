@@ -3,6 +3,7 @@ import HomePage from "./pages/home/HomePage.tsx";
 import MagicLinkLogin from "./pages/login/MagicLinkLogin.tsx";
 import Layout from "./components/Layout/Layout";
 import VerifyMagicLink from "./pages/login/VerifyMagicLink.tsx";
+import { Navigate } from "react-router-dom";
 import {
   RequestedCoursesPage,
   RequestNewCoursePage,
@@ -25,10 +26,12 @@ const App = () => {
       <Route path="/" element={<HomePage />} />
       <Route element={<Layout />}>
         <Route path="/commercial-partner">
+          <Route index element={<Navigate to="requested-courses" replace />} />
           <Route path="requested-courses" element={<RequestedCoursesPage />} />
           <Route path="request-new-course" element={<RequestNewCoursePage />} />
         </Route>
         <Route path="/outreach-partner">
+          <Route index element={<Navigate to="find-opportunities" replace />} />
           <Route
             path="find-opportunities"
             element={<OutreachPartnerDashboard />}
@@ -36,6 +39,7 @@ const App = () => {
           <Route path="hosted-courses" element={<HostedCoursesPage />} />
         </Route>
         <Route path="/cyf-staff">
+          <Route index element={<Navigate to="request-pipeline" replace />} />
           <Route path="request-pipeline" element={<CYFStaffDashboard />} />
           <Route path="manage-partners" element={<ManagePartnersPage />} />
           <Route path="audit-log" element={<AuditLogPage />} />
