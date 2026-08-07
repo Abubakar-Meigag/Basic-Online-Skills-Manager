@@ -56,7 +56,7 @@ const OutreachDashboard = () => {
                 <td className="py-4 text-sm text-slate-500 pl-5">
                   {course.id.slice(-5)}
                 </td>
-                <td className="py-4 text-sm font-bold text-slate-900 px-4">
+                <td className="py-4 text-sm text-slate-900 px-4">
                   {course.commercial_org}
                 </td>
                 <td className="py-4 text-sm text-slate-600 px-4">
