@@ -47,4 +47,7 @@ app.use("/api/auth", authRouter);
 
 import addPartner from "./api/addPartner";
 app.post("/addPartner", addPartner);
+
+import requestNewCourse from "./api/requestNewCourse";
+app.post("/commercial/requestedNewCourses", requestNewCourse);
 export default app;
