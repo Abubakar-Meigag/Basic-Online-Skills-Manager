@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+import { requestMagicLink } from "../../auth/authApi";
 const styles = {
   pageWrapper:
     "min-h-screen bg-gray-50 flex flex-col justify-between p-6 md:p-10",
@@ -54,6 +55,7 @@ const styles = {
 export default function MagicLinkLogin() {
   const [email, setEmail] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
 
   const validateEmail = (input: string): boolean => {
@@ -61,7 +63,7 @@ export default function MagicLinkLogin() {
     return emailRegex.test(input);
   };
 
-  const handleSubmit = (e: React.SubmitEvent): void => {
+  const handleSubmit = async (e: React.SubmitEvent): Promise<void> => {
     e.preventDefault();
 
     if (!validateEmail(email)) {
@@ -70,7 +72,18 @@ export default function MagicLinkLogin() {
     }
 
     setError("");
-    setIsSubmitted(true);
+    setIsLoading(true);
+    try {
+      await requestMagicLink(email);
+      setIsSubmitted(true);
+    } catch (err: any) {
+      setError(
+        err.response?.data?.message ||
+          "Failed to request the Link, please check your connection and try again.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -120,12 +133,17 @@ export default function MagicLinkLogin() {
                     }}
                     placeholder="you@organisation.gov.au"
                     className={styles.input(!!error)}
+                    disabled={isLoading}
                   />
                   {error && <p className={styles.errorMessage}>{error}</p>}
                 </div>
 
-                <button type="submit" className={styles.submitButton}>
-                  Send Login Link
+                <button
+                  type="submit"
+                  className={styles.submitButton}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Sending Link..." : "Send Login Link"}
                 </button>
 
                 <p className={styles.helperText}>

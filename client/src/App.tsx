@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import HomePage from "./pages/home/HomePage.tsx";
 import MagicLinkLogin from "./pages/login/MagicLinkLogin.tsx";
 import Layout from "./components/Layout/Layout";
+import VerifyMagicLink from "./pages/login/VerifyMagicLink.tsx";
 import RequestedCoursesPage from "./pages/commercialPartner/RequestedCoursesPage.tsx";
 import RequestNewCoursePage from "./pages/commercialPartner/RequestNewCoursePage.tsx";
 import OutreachPartnerDashboard from "./pages/outreachPartner/OutreachDashboard.tsx";
@@ -11,6 +12,7 @@ const App = () => {
   return (
     <Routes>
       <Route path="/login" element={<MagicLinkLogin />} />
+      <Route path="/verify" element={<VerifyMagicLink />} />
       <Route path="/" element={<HomePage />} />
       <Route element={<Layout />}>
         <Route path="/commercial-partner">
