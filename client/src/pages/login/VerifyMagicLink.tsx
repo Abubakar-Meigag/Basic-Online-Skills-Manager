@@ -36,7 +36,7 @@ export default function VerifyMagicLink() {
         // Redirect to the route returned by backend
         navigate(data.redirectRoute || "/");
       })
-      .catch((err) => {
+      .catch((err: any) => {
         setError(
           err.response?.data?.message ||
             "Verification failed or link has expired.",

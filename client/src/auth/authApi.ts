@@ -4,6 +4,25 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
   "https://bosm-backend.trainees.hosting.cyf.academy/api";
 
+// Create an Axios Instance
+export const api = axios.create({
+  baseURL: API_BASE_URL,
+});
+
+// Add Request Interceptor to automatically attach token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("authToken");
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
+
 export interface RequestMagicLinkResponse {
   message: string;
 }
@@ -24,7 +43,7 @@ export interface VerifyMagicLinkResponse {
 export async function requestMagicLink(
   email: string,
 ): Promise<RequestMagicLinkResponse> {
-  const response = await axios.post<RequestMagicLinkResponse>(
+  const response = await api.post<RequestMagicLinkResponse>(
     `${API_BASE_URL}/auth/magic-link`,
     { email },
   );
@@ -36,7 +55,7 @@ export async function requestMagicLink(
 export async function verifyMagicLink(
   token: string,
 ): Promise<VerifyMagicLinkResponse> {
-  const response = await axios.post<VerifyMagicLinkResponse>(
+  const response = await api.post<VerifyMagicLinkResponse>(
     `${API_BASE_URL}/auth/verify`,
     { token },
   );
