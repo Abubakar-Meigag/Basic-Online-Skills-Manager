@@ -36,7 +36,7 @@ export type CourseStatus =
 export type Course = {
   id: string;
   course_name: string;
-  commercial_org_id: string;
+  commercial_org: string;
   account_name: string;
   contract_name: string;
   trainee_target: number;
