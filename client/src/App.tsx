@@ -4,7 +4,7 @@ import MagicLinkLogin from "./pages/login/MagicLinkLogin.tsx";
 import Layout from "./components/Layout/Layout";
 import RequestedCoursesPage from "./pages/commercialPartner/RequestedCoursesPage.tsx";
 import RequestNewCoursePage from "./pages/commercialPartner/RequestNewCoursePage.tsx";
-import OutreachPartnerDashboard from "./pages/outreachpartner/OutreachDashboard.tsx";
+import OutreachPartnerDashboard from "./pages/outreachPartner/OutreachDashboard.tsx";
 import CYFStaffDashboard from "./pages/cyfstaff/CYFStaffDashboard.tsx";
 
 const App = () => {
