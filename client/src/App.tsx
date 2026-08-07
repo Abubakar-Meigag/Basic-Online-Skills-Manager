@@ -2,10 +2,19 @@ import { Route, Routes } from "react-router-dom";
 import HomePage from "./pages/home/HomePage.tsx";
 import MagicLinkLogin from "./pages/login/MagicLinkLogin.tsx";
 import Layout from "./components/Layout/Layout";
-import RequestedCoursesPage from "./pages/commercialPartner/RequestedCoursesPage.tsx";
-import RequestNewCoursePage from "./pages/commercialPartner/RequestNewCoursePage.tsx";
-import OutreachPartnerDashboard from "./pages/outreachpartner/OutreachDashboard.tsx";
-import CYFStaffDashboard from "./pages/cyfstaff/CYFStaffDashboard.tsx";
+import {
+  RequestedCoursesPage,
+  RequestNewCoursePage,
+} from "./pages/commercialPartner/index.ts";
+import {
+  OutreachPartnerDashboard,
+  HostedCoursesPage,
+} from "./pages/outreachpartner/index.ts";
+import {
+  CYFStaffDashboard,
+  ManagePartnersPage,
+  AuditLogPage,
+} from "./pages/cyfstaff/index.ts";
 
 const App = () => {
   return (
@@ -22,9 +31,12 @@ const App = () => {
             path="find-opportunities"
             element={<OutreachPartnerDashboard />}
           />
+          <Route path="hosted-courses" element={<HostedCoursesPage />} />
         </Route>
         <Route path="/cyf-staff">
           <Route path="request-pipeline" element={<CYFStaffDashboard />} />
+          <Route path="manage-partners" element={<ManagePartnersPage />} />
+          <Route path="audit-log" element={<AuditLogPage />} />
         </Route>
       </Route>
     </Routes>
