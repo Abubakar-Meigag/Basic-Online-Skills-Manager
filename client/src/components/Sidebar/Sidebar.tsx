@@ -11,14 +11,10 @@ const rolePathMap: Record<OrganizationType, string> = {
   [OrganizationType.CYF_STAFF]: "cyf-staff",
 };
 
-const Sidebar = ({
-  userType = OrganizationType.COMMERCIAL_PARTNER,
-}: {
-  userType?: OrganizationType;
-}) => {
+const Sidebar = ({ userType }: { userType?: OrganizationType }) => {
   // Change userType prop above to see view for a different user.
 
-  const urlRoleName = rolePathMap[userType];
+  const urlRoleName = userType ? rolePathMap[userType] : "";
 
   const firstUser = users[0];
 
