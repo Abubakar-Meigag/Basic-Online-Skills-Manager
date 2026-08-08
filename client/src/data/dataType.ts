@@ -43,7 +43,7 @@ export type Course = {
   deadline: string;
   city: string;
   status: CourseStatus;
-  outreach_org_id: string | null;
+  outreach_org: string | null;
   start_date: string | null;
   end_date: string | null;
   venue_address: string | null;
