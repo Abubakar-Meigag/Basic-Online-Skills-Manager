@@ -1,13 +1,11 @@
-import { Link } from "react-router-dom";
-
-export default function CYFStaffDashboard() {
+const CYFStaffDashboard = () => {
   return (
-    <div style={{ padding: "24px" }}>
-      <h1>Welcome CYF Staff</h1>
-      <p>You are logged in as a CYF Staff member.</p>
-      <p>
-        <Link to="/">Back to Home</Link>
-      </p>
+    <div className="request-pipeline">
+      <div className="flex justify-between mt-10 mb-20 mx-12">
+        <h2 className="text-3xl font-bold text-[#333333]">Request Pipeline</h2>
+      </div>
     </div>
   );
-}
+};
+
+export default CYFStaffDashboard;
