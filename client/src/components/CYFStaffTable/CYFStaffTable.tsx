@@ -3,6 +3,7 @@ import tableHeaderStyle from "../../lib/constants/tableHeaderStyle";
 import type { Course } from "../../data/dataType";
 
 const CYFStaffTable = ({ courses }: { courses: Course[] }) => {
+  console.log(courses);
   return (
     <table className="find-opportunities-table w-full text-left border border-[#E3E3E3] border-collapse">
       <thead>
@@ -13,6 +14,7 @@ const CYFStaffTable = ({ courses }: { courses: Course[] }) => {
           <th className={`${tableHeaderStyle} px-4`}>Trainee Target</th>
           <th className={`${tableHeaderStyle} px-4`}>Duration</th>
           <th className={`${tableHeaderStyle} px-4`}>Deadline</th>
+          <th className={`${tableHeaderStyle} px-4`}>Status</th>
           <th className={`${tableHeaderStyle} px-4`}>Actions</th>
         </tr>
       </thead>
