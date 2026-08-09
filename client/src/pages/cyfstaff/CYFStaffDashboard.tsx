@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import CYFStaffTable from "../../components/CYFStaffTable/CYFStaffTable";
+import courseCountStyle from "../../lib/constants/courseCountStyle.json" with { type: "json" };
 
 const CYFStaffDashboard = () => {
   const [courses, setCourses] = useState<any>();
@@ -24,31 +25,41 @@ const CYFStaffDashboard = () => {
 
   return (
     <div className="request-pipeline">
-      <div className="flex justify-between mt-10 mb-20 mx-12">
+      <div className="mt-10 mb-10 mx-12">
         <h2 className="text-3xl font-bold text-[#333333]">Request Pipeline</h2>
-        <p>Courses grouped by their current stage</p>
+        <p className="text-gray-500">Courses grouped by their current stage</p>
       </div>
       {courses && (
-        <div className="courses-count">
-          <div>
-            <p>Pending Review</p>
-            <p>{courses.request_pending.length}</p>
+        <div className="courses-count flex justify-between w-4xl ml-12">
+          <div className={courseCountStyle.card}>
+            <p className={courseCountStyle.status}>Pending Review</p>
+            <p className={courseCountStyle.count}>
+              {courses.request_pending.length}
+            </p>
           </div>
-          <div>
-            <p>Open</p>
-            <p>{courses.request_open.length}</p>
+          <div className={courseCountStyle.card}>
+            <p className={courseCountStyle.status}>Open</p>
+            <p className={courseCountStyle.count}>
+              {courses.request_open.length}
+            </p>
           </div>
-          <div>
-            <p>Confirmed</p>
-            <p>{courses.request_confirmed.length}</p>
+          <div className={courseCountStyle.card}>
+            <p className={courseCountStyle.status}>Confirmed</p>
+            <p className={courseCountStyle.count}>
+              {courses.request_confirmed.length}
+            </p>
           </div>
-          <div>
-            <p>Running</p>
-            <p>{courses.course_running.length}</p>
+          <div className={courseCountStyle.card}>
+            <p className={courseCountStyle.status}>Running</p>
+            <p className={courseCountStyle.count}>
+              {courses.course_running.length}
+            </p>
           </div>
-          <div>
-            <p>Completed</p>
-            <p>{courses.course_completed.length}</p>
+          <div className={courseCountStyle.card}>
+            <p className={courseCountStyle.status}>Completed</p>
+            <p className={courseCountStyle.count}>
+              {courses.course_completed.length}
+            </p>
           </div>
         </div>
       )}
