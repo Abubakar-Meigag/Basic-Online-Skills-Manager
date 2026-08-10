@@ -55,12 +55,35 @@ import pool from "../data/connection";
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Course'
+ *       400:
+ *         description: Organisation name is required
  *       403:
  *         description: Unauthorized User
- *       400:
+ *       404:
  *         description: Course not found
  *       409:
  *         description: Course already claimed
  *       500:
  *         description: Internal server error
  */
+const claimOpportunity = async (req: Request, res: Response) => {
+  // const user = req.user;
+  // if (!user || user.type !== "outreach") {
+  //   return res.status(403).json({ error: "Forbidden" });
+  // }
+  // const organisationId = user.organisationId;
+
+  /**
+   * TEMPORARY: until auth is connected, take org id from the query
+   */
+
+  const organisationId =
+    (req.query.organisationId as string) ||
+    "60ea2b0f-e04e-4f9a-ac72-38bae06d98bc";
+
+  if (!organisationId) {
+    return res.status(400).json({
+      error: "organisationId query param is required",
+    });
+  }
+};
