@@ -57,4 +57,6 @@ app.post("/partners/:id/users", addUserToPartner);
 import requestNewCourse from "./api/requestNewCourse";
 app.post("/commercial/requestedNewCourses", requestNewCourse);
 
+import getOutreachCourse from "./api/outreachCourses";
+app.get("/outreach/courses", getOutreachCourse);
 export default app;
