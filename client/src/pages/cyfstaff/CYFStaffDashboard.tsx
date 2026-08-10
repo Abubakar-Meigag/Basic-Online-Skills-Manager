@@ -47,10 +47,15 @@ const CYFStaffDashboard = () => {
               count={courses.course_completed.length}
             />
           </div>
+          <p className="mb-2 font-bold">Request Pending</p>
           <CYFStaffTable courses={courses.request_pending} />
+          <p className="mb-2 font-bold">Request Open</p>
           <CYFStaffTable courses={courses.request_open} />
+          <p className="mb-2 font-bold">Request Confirmed</p>
           <CYFStaffTable courses={courses.request_confirmed} />
+          <p className="mb-2 font-bold">Course Running</p>
           <CYFStaffTable courses={courses.course_running} />
+          <p className="mb-2 font-bold">Course Completed</p>
           <CYFStaffTable courses={courses.course_completed} />
         </div>
       )}
