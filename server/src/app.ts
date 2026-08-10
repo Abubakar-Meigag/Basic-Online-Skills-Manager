@@ -53,4 +53,8 @@ app.get("/organisations", getOrganisations);
 
 import addUserToPartner from "./api/addUserToPartner";
 app.post("/partners/:id/users", addUserToPartner);
+
+import requestNewCourse from "./api/requestNewCourse";
+app.post("/commercial/requestedNewCourses", requestNewCourse);
+
 export default app;

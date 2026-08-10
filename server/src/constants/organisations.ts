@@ -2,7 +2,7 @@ export enum ORGANISATION_TYPE {
   CYF_STAFF = "cyf_staff",
   COMMERCIAL = "commercial",
   OUTREACH = "outreach",
-} 
+}
 
 export type OrganisationType = ORGANISATION_TYPE;
 
