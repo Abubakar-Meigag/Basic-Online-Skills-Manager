@@ -1,5 +1,6 @@
 import { parseISO, format } from "date-fns";
 import tableHeaderStyle from "../../lib/constants/tableHeaderStyle";
+import statusLabel from "../../utils/statusLabel";
 import type { Course } from "../../data/dataType";
 
 const CYFStaffTable = ({ courses }: { courses: Course[] }) => {
@@ -19,6 +20,7 @@ const CYFStaffTable = ({ courses }: { courses: Course[] }) => {
       </thead>
       <tbody>
         {courses.map((course) => {
+          const { statusStyle, statusText } = statusLabel(course.status);
           return (
             <tr
               key={course.id}
@@ -41,7 +43,11 @@ const CYFStaffTable = ({ courses }: { courses: Course[] }) => {
                 {/* This formats the date from ISO string to local format*/}
                 {format(parseISO(course.deadline), "dd/MM/yyyy")}
               </td>
-              <td>{course.status}</td>
+              <td
+                className={`inline-flex rounded-sm px-2 py-1 text-xs font-semibold mt-3 ${statusStyle}`}
+              >
+                {statusText}
+              </td>
               <td className="py-4 text-sm px-4">
                 <button
                   type="button"
