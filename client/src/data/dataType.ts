@@ -43,7 +43,7 @@ export type Course = {
   deadline: string;
   city: string;
   status: CourseStatus;
-  outreach_org: string | null;
+  outreach_org_id: string | null;
   start_date: string | null;
   end_date: string | null;
   venue_address: string | null;
@@ -56,6 +56,18 @@ export type Course = {
   expenses_notes: string | null;
   note: string | null;
   created_at: string;
+};
+
+export type CoursePipelineItem = {
+  id: string;
+  city: string;
+  status: CourseStatus;
+  deadline: string | null;
+  start_date: string | null;
+  end_date: string | null;
+  created_at: string;
+  commercial_org: string;
+  outreach_org: string | null;
 };
 
 export type AuditLogEntry = {

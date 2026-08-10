@@ -1,9 +1,9 @@
 import { parseISO, format } from "date-fns";
 import tableHeaderStyle from "../../lib/constants/tableHeaderStyle";
 import statusLabel from "../../utils/statusLabel";
-import type { Course } from "../../data/dataType";
+import type { CoursePipelineItem } from "../../data/dataType";
 
-const CYFStaffTable = ({ courses }: { courses: Course[] }) => {
+const CYFStaffTable = ({ courses }: { courses: CoursePipelineItem[] }) => {
   return (
     <table className="find-opportunities-table w-full text-left border border-[#E3E3E3] border-collapse mb-8">
       <thead>
@@ -21,6 +21,7 @@ const CYFStaffTable = ({ courses }: { courses: Course[] }) => {
       <tbody>
         {courses.map((course) => {
           const { statusStyle, statusText } = statusLabel(course.status);
+
           return (
             <tr
               key={course.id}
@@ -41,7 +42,8 @@ const CYFStaffTable = ({ courses }: { courses: Course[] }) => {
               <td className="py-4 text-sm text-slate-600 px-4">3 Weeks</td>
               <td className="py-4 text-sm text-slate-600 px-4">
                 {/* This formats the date from ISO string to local format*/}
-                {format(parseISO(course.deadline), "dd/MM/yyyy")}
+                {course.deadline &&
+                  format(parseISO(course.deadline), "dd/MM/yyyy")}
               </td>
               <td
                 className={`inline-flex rounded-sm px-2 py-1 text-xs font-semibold mt-3 ${statusStyle}`}

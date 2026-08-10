@@ -1,9 +1,19 @@
 import { useCallback, useEffect, useState } from "react";
 import CYFStaffTable from "../../components/CYFStaffTable/CYFStaffTable";
 import CourseCount from "../../components/CourseCount/CourseCount";
+import type { CoursePipelineItem } from "../../data/dataType";
+
+interface CoursePipelineItems {
+  request_pending: CoursePipelineItem[];
+  request_open: CoursePipelineItem[];
+  request_claimed: CoursePipelineItem[];
+  request_confirmed: CoursePipelineItem[];
+  course_running: CoursePipelineItem[];
+  course_completed: CoursePipelineItem[];
+}
 
 const CYFStaffDashboard = () => {
-  const [courses, setCourses] = useState<any>();
+  const [courses, setCourses] = useState<CoursePipelineItems>();
 
   const getCourses = useCallback(async () => {
     try {
