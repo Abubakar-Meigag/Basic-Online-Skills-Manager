@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import CYFStaffTable from "../../components/CYFStaffTable/CYFStaffTable";
-import courseCountStyle from "../../lib/constants/courseCountStyle.json" with { type: "json" };
+import CourseCount from "../../components/CourseCount/CourseCount";
 
 const CYFStaffDashboard = () => {
   const [courses, setCourses] = useState<any>();
@@ -30,37 +30,28 @@ const CYFStaffDashboard = () => {
         <p className="text-gray-500">Courses grouped by their current stage</p>
       </div>
       {courses && (
-        <div className="courses-count flex justify-between w-4xl ml-12">
-          <div className={courseCountStyle.card}>
-            <p className={courseCountStyle.status}>Pending Review</p>
-            <p className={courseCountStyle.count}>
-              {courses.request_pending.length}
-            </p>
+        <div className="m-10">
+          <div className="courses-count flex justify-between w-4xl mb-10">
+            <CourseCount
+              type="Pending Review"
+              count={courses.request_pending.length}
+            />
+            <CourseCount type="Open" count={courses.request_open.length} />
+            <CourseCount
+              type="Confirmed"
+              count={courses.request_confirmed.length}
+            />
+            <CourseCount type="Running" count={courses.course_running.length} />
+            <CourseCount
+              type="Completed"
+              count={courses.course_completed.length}
+            />
           </div>
-          <div className={courseCountStyle.card}>
-            <p className={courseCountStyle.status}>Open</p>
-            <p className={courseCountStyle.count}>
-              {courses.request_open.length}
-            </p>
-          </div>
-          <div className={courseCountStyle.card}>
-            <p className={courseCountStyle.status}>Confirmed</p>
-            <p className={courseCountStyle.count}>
-              {courses.request_confirmed.length}
-            </p>
-          </div>
-          <div className={courseCountStyle.card}>
-            <p className={courseCountStyle.status}>Running</p>
-            <p className={courseCountStyle.count}>
-              {courses.course_running.length}
-            </p>
-          </div>
-          <div className={courseCountStyle.card}>
-            <p className={courseCountStyle.status}>Completed</p>
-            <p className={courseCountStyle.count}>
-              {courses.course_completed.length}
-            </p>
-          </div>
+          <CYFStaffTable courses={courses.request_pending} />
+          <CYFStaffTable courses={courses.request_open} />
+          <CYFStaffTable courses={courses.request_confirmed} />
+          <CYFStaffTable courses={courses.course_running} />
+          <CYFStaffTable courses={courses.course_completed} />
         </div>
       )}
     </div>

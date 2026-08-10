@@ -1,5 +1,0 @@
-{
-  "card": "border border-[#F3F3F3] shadow-sm rounded-xl p-5",
-  "status": "mb-2 w-30",
-  "count": "text-4xl font-bold"
-}

@@ -3,15 +3,14 @@ import tableHeaderStyle from "../../lib/constants/tableHeaderStyle";
 import type { Course } from "../../data/dataType";
 
 const CYFStaffTable = ({ courses }: { courses: Course[] }) => {
-  console.log(courses);
   return (
-    <table className="find-opportunities-table w-full text-left border border-[#E3E3E3] border-collapse">
+    <table className="find-opportunities-table w-full text-left border border-[#E3E3E3] border-collapse mb-8">
       <thead>
         <tr className="bg-[#F3F3F3]">
           <th className={`${tableHeaderStyle} pl-10`}>ID</th>
           <th className={`${tableHeaderStyle} px-4`}>Commercial Partner</th>
+          <th className={`${tableHeaderStyle} px-4`}>Outreach Partner</th>
           <th className={`${tableHeaderStyle} px-4`}>Location</th>
-          <th className={`${tableHeaderStyle} px-4`}>Trainee Target</th>
           <th className={`${tableHeaderStyle} px-4`}>Duration</th>
           <th className={`${tableHeaderStyle} px-4`}>Deadline</th>
           <th className={`${tableHeaderStyle} px-4`}>Status</th>
@@ -32,7 +31,7 @@ const CYFStaffTable = ({ courses }: { courses: Course[] }) => {
                 {course.commercial_org}
               </td>
               <td className="py-4 text-sm text-slate-600 px-4">
-                {course.outreach_org}
+                {course.outreach_org ? course.outreach_org : "-"}
               </td>
               <td className="py-4 text-sm text-slate-600 px-4">
                 {course.city}
