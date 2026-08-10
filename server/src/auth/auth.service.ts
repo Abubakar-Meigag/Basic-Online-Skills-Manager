@@ -54,7 +54,7 @@ export async function verifyMagicLinkToken(rawToken: string) {
       u.id as user_id, 
       u.email, 
       u.is_active,
-      o.type as org_type
+      o.type as org_type,
       o.id as organisation_id
     FROM login_tokens lt
     JOIN users u ON lt.user_id = u.id
