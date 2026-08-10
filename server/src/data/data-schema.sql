@@ -3,6 +3,7 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE TABLE organisations(
       id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       organisation_name  TEXT NOT NULL,
+      city               TEXT NOT NULL,
       type               TEXT NOT NULL,
       email_domain       TEXT NOT NULL,
       created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -49,4 +50,13 @@ CREATE TABLE audit_log(
       entity_type   TEXT NOT NULL,
       entity_id     UUID NOT NULL,
       created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE login_tokens (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token_hash  TEXT NOT NULL,
+  expires_at  TIMESTAMPTZ NOT NULL,
+  used_at     TIMESTAMPTZ,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
