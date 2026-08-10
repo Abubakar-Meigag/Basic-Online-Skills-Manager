@@ -64,4 +64,6 @@ import updateCourseStatus from "./api/updateCourseStatus";
 import { requireAuth } from "./api/middleware/requireAuth";
 app.patch("/course/:id/status", requireAuth, updateCourseStatus);
 
+import claimOpportunity from "./api/claimOpportunity";
+app.post("/courses/:id/claim", requireAuth, claimOpportunity);
 export default app;
