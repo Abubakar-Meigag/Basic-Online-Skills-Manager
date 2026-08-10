@@ -57,4 +57,7 @@ app.post("/partners/:id/users", addUserToPartner);
 import claimOpportunity from "./api/claimOpportunity";
 app.post("/courses/:id/claim", claimOpportunity);
 
+import requestNewCourse from "./api/requestNewCourse";
+app.post("/commercial/requestedNewCourses", requestNewCourse);
+
 export default app;

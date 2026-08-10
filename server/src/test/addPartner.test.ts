@@ -46,7 +46,7 @@ describe("POST /addPartner", () => {
       })
       .mockResolvedValueOnce(undefined);
 
-        const response = await request(app).post("/addPartner").send({
+    const response = await request(app).post("/addPartner").send({
       organisation_name: "Deloitte",
       type: "commercial",
       email_domain: "deloitte.com",
@@ -60,7 +60,7 @@ describe("POST /addPartner", () => {
   });
 
   it("returns 400 when a required field is missing", async () => {
-        const response = await request(app).post("/addPartner").send({
+    const response = await request(app).post("/addPartner").send({
       organisation_name: "Deloitte",
       type: "commercial",
       email_domain: "deloitte.com",
@@ -74,7 +74,7 @@ describe("POST /addPartner", () => {
   });
 
   it("returns 400 for an invalid type", async () => {
-        const response = await request(app).post("/addPartner").send({
+    const response = await request(app).post("/addPartner").send({
       organisation_name: "Deloitte",
       type: "cyf_staff",
       email_domain: "deloitte.com",
@@ -95,7 +95,7 @@ describe("POST /addPartner", () => {
       .mockResolvedValueOnce({ rows: [{ id: "existing-org" }] }) // org exists
       .mockResolvedValueOnce(undefined); // ROLLBACK
 
-        const response = await request(app).post("/addPartner").send({
+    const response = await request(app).post("/addPartner").send({
       organisation_name: "Capgemini",
       type: "commercial",
       email_domain: "capgemini.com",
@@ -112,12 +112,12 @@ describe("POST /addPartner", () => {
     (pool.connect as any).mockResolvedValueOnce(client);
 
     client.query
-      .mockResolvedValueOnce(undefined) 
-      .mockResolvedValueOnce({ rows: [] }) 
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce({ rows: [] })
       .mockResolvedValueOnce({ rows: [{ id: "existing-user" }] })
-      .mockResolvedValueOnce(undefined); 
+      .mockResolvedValueOnce(undefined);
 
-        const response = await request(app).post("/addPartner").send({
+    const response = await request(app).post("/addPartner").send({
       organisation_name: "Deloitte",
       type: "commercial",
       email_domain: "deloitte.com",
@@ -137,7 +137,7 @@ describe("POST /addPartner", () => {
       .mockResolvedValueOnce(undefined) // BEGIN
       .mockRejectedValueOnce(new Error("DB down")); // org check throws
 
-        const response = await request(app).post("/addPartner").send({
+    const response = await request(app).post("/addPartner").send({
       organisation_name: "Deloitte",
       type: "commercial",
       email_domain: "deloitte.com",

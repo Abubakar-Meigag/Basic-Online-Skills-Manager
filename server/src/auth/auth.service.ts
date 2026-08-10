@@ -55,6 +55,7 @@ export async function verifyMagicLinkToken(rawToken: string) {
       u.email, 
       u.is_active,
       o.type as org_type
+      o.id as organisation_id
     FROM login_tokens lt
     JOIN users u ON lt.user_id = u.id
     LEFT JOIN organisations o ON u.organisation_id = o.id
@@ -114,6 +115,7 @@ export async function verifyMagicLinkToken(rawToken: string) {
       id: record.user_id,
       email: record.email,
       orgType: record.org_type,
+      organisationId: record.organisation_id,
     },
     jwtSecret,
     { expiresIn: "24h" },
@@ -125,6 +127,7 @@ export async function verifyMagicLinkToken(rawToken: string) {
       id: record.user_id,
       email: record.email,
       orgType: record.org_type,
+      organisationId: record.organisation_id,
     },
     redirectRoute,
   };
