@@ -29,7 +29,7 @@ export default function VerifyMagicLink() {
       .then((data) => {
         // Save JWT session token & user info in localStorage
         if (data.token) {
-          localStorage.setItem("authToken", data.token);
+          localStorage.setItem("sessionToken", data.token);
           localStorage.setItem("user", JSON.stringify(data.user));
         }
 
