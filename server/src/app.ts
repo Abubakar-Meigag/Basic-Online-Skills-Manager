@@ -5,6 +5,8 @@ import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./lib/swagger";
 import { OrganizationType } from "./data/dataType";
 import { authorizeRole } from "./middleware/authMiddleware";
+import { requireAuth } from "./api/middleware/requireAuth";
+
 
 // --- Import all your API handlers here
 import testEndPoint from "./api/testEndPoint";
@@ -18,6 +20,7 @@ import addPartner from "./api/addPartner";
 import getOrganisations from "./api/getOrganisations";
 import addUserToPartner from "./api/addUserToPartner";
 import requestNewCourse from "./api/requestNewCourse";
+import updateCourseStatus from "./api/updateCourseStatus";
 
 const app = express();
 
@@ -73,9 +76,12 @@ app.post(
   requestNewCourse,
 );
 
+app.patch("/api/course/:id/status", authorizeRole(OrganizationType.CYF_STAFF), requireAuth, updateCourseStatus);
+
 // Shared Routes
 app.get("/api/course-details/:id", getCourseDetails); // Shared
 
 app.use("/api/auth", authRouter);
+
 
 export default app;
