@@ -14,8 +14,6 @@ export type User = {
   is_active: boolean;
   created_at: string;
   last_login_at: string | null;
-  is_logged_in: boolean;
-  organization_type: OrganizationType;
 };
 
 export enum OrganizationType {
