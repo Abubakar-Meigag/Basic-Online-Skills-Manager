@@ -8,6 +8,7 @@ export interface UserPayload {
   id: string;
   email: string;
   orgType: string;
+  organisationId: string;
 }
 
 // Helper to hash tokens before database saves
@@ -118,7 +119,8 @@ export async function verifyMagicLinkToken(rawToken: string) {
    const payload: UserPayload = {
     id: record.user_id,
     email: record.email,
-    orgType: record.org_type, 
+    orgType: record.org_type,
+    organisationId: record.organisation_id,
   };
 
   const sessionToken = jwt.sign(payload, jwtSecret, { expiresIn: "24h" });
