@@ -54,9 +54,6 @@ app.get("/organisations", getOrganisations);
 import addUserToPartner from "./api/addUserToPartner";
 app.post("/partners/:id/users", addUserToPartner);
 
-import claimOpportunity from "./api/claimOpportunity";
-app.post("/courses/:id/claim", claimOpportunity);
-
 import requestNewCourse from "./api/requestNewCourse";
 app.post("/commercial/requestedNewCourses", requestNewCourse);
 
@@ -66,4 +63,5 @@ app.patch("/course/:id/status", requireAuth, updateCourseStatus);
 
 import claimOpportunity from "./api/claimOpportunity";
 app.post("/courses/:id/claim", requireAuth, claimOpportunity);
+
 export default app;
