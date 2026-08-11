@@ -23,7 +23,7 @@ export const authorizeRole = (requiredRole: string) => {
 
     // Get the token
     // Split "Bearer xxxxx" into ["Bearer", "xxxxx"] and take the second part
-    const token = authHeader.split(" ")[1] as string; 
+    const token = authHeader.split(" ")[1] as string;
 
     // Verify the card's signature against the JWT_SECRET and algorithm.
     try {

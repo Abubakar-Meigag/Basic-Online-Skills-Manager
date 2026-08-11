@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import CYFStaffTable from "../../components/CYFStaffTable/CYFStaffTable";
 import CourseCount from "../../components/CourseCount/CourseCount";
 import type { CoursePipelineItem } from "../../data/dataType";
-import { api } from "../../auth/authApi"; 
+import { api } from "../../auth/authApi";
 
 interface CoursePipelineItems {
   request_pending: CoursePipelineItem[];
@@ -19,7 +19,7 @@ const CYFStaffDashboard = () => {
   const getCourses = useCallback(async () => {
     try {
       const res = await api.get("/course-pipeline");
-      setCourses(res.data); 
+      setCourses(res.data);
     } catch (error) {
       console.error("Authorization failed fetching course pipeline:", error);
     }
