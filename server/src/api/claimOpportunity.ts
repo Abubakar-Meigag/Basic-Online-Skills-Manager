@@ -67,23 +67,55 @@ import pool from "../data/connection";
  *         description: Internal server error
  */
 const claimOpportunity = async (req: Request, res: Response) => {
-  // const user = req.user;
-  // if (!user || user.type !== "outreach") {
-  //   return res.status(403).json({ error: "Forbidden" });
-  // }
-  // const organisationId = user.organisationId;
+  try {
+    // const user = req.user;
+    // if (!user || user.type !== "outreach") {
+    //   return res.status(403).json({ error: "Forbidden" });
+    // }
+    // const organisationId = user.organisationId;
 
-  /**
-   * TEMPORARY: until auth is connected, take org id from the query
-   */
+    /**
+     * TEMPORARY: until auth is connected, take org id from the query
+     */
 
-  const organisationId =
-    (req.query.organisationId as string) ||
-    "60ea2b0f-e04e-4f9a-ac72-38bae06d98bc";
+    const organisationId =
+      (req.query.organisationId as string) ||
+      "60ea2b0f-e04e-4f9a-ac72-38bae06d98bc";
 
-  if (!organisationId) {
-    return res.status(400).json({
-      error: "organisationId query param is required",
-    });
+    if (!organisationId) {
+      return res.status(400).json({
+        error: "organisationId query param is required",
+      });
+    }
+
+    const { id } = req.params;
+
+    const query = await pool.query(
+      `SELECT
+        c.*,
+        commercial.organisation_name AS commercial_org,
+        outreach.organisation_name   AS outreach_org
+      FROM courses c
+      JOIN organisations commercial
+        ON c.commercial_org_id = commercial.id
+      LEFT JOIN organisations outreach
+        ON c.outreach_org_id = outreach.id
+      WHERE c.id = $1`,
+      [id],
+    );
+
+    const course = query.rows[0];
+
+    if (!course) {
+      res.status(404).json({ error: "Course not found" });
+      return;
+    }
+
+    return res.status(201).json(course);
+  } catch (err) {
+    console.error("Error claiming course: ", err);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export default claimOpportunity;
