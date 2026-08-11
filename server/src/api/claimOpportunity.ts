@@ -68,7 +68,7 @@ import pool from "../data/connection";
  */
 const claimOpportunity = async (req: Request, res: Response) => {
   try {
-    const user = req.user;
+    const user = (req as any).user;
     if (!user || user.type !== "outreach") {
       return res.status(403).json({ error: "Forbidden" });
     }
