@@ -7,22 +7,22 @@ interface AuthenticatedRequest extends Request {
   user?: UserPayload;
 }
 
-const jwtSecret = process.env.JWT_SECRET as string;
-
 export const authorizeRole = (requiredRole: string) => {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    const jwtSecret = process.env.JWT_SECRET as string;
+
     // Finding the Key Card
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!authHeader) {
       return res.status(401).json({
         message: "Authentication required. No token found.",
         redirectTo: "/login",
       });
     }
 
-    // Get the token part after "Bearer "
-    const token = authHeader.split(" ")[1] as string;
+    // Get the token
+    const token = authHeader as string;
 
     // Verify the card's signature against the JWT_SECRET and algorithm.
     try {
