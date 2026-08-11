@@ -17,6 +17,7 @@ import authRouter from "./auth/auth.router";
 import addPartner from "./api/addPartner";
 import getOrganisations from "./api/getOrganisations";
 import addUserToPartner from "./api/addUserToPartner";
+import requestNewCourse from "./api/requestNewCourse";
 
 const app = express();
 
@@ -66,21 +67,15 @@ app.post(
   addUserToPartner,
 );
 
+app.post(
+  "/commercial/requestedNewCourses",
+  authorizeRole(OrganizationType.COMMERCIAL_PARTNER),
+  requestNewCourse,
+);
+
 // Shared Routes
 app.get("/course-details/:id", getCourseDetails); // Shared
 
 app.use("/api/auth", authRouter);
-
-import addPartner from "./api/addPartner";
-app.post("/addPartner", addPartner);
-
-import getOrganisations from "./api/getOrganisations";
-app.get("/organisations", getOrganisations);
-
-import addUserToPartner from "./api/addUserToPartner";
-app.post("/partners/:id/users", addUserToPartner);
-
-import requestNewCourse from "./api/requestNewCourse";
-app.post("/commercial/requestedNewCourses", requestNewCourse);
 
 export default app;
