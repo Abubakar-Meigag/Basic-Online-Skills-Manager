@@ -69,7 +69,8 @@ import pool from "../data/connection";
 const claimOpportunity = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
-    if (!user || user.type !== "outreach") {
+
+    if (!user || user.orgType !== "outreach") {
       return res.status(403).json({ error: "Forbidden" });
     }
     const organisationId = user.organisationId;
@@ -101,6 +102,10 @@ const claimOpportunity = async (req: Request, res: Response) => {
     if (!course) {
       res.status(404).json({ error: "Course not found" });
       return;
+    }
+
+    if (course.outreach_org_id !== null) {
+      res.status(409).json({ error: "Course already claimed" });
     }
 
     return res.status(201).json(course);
