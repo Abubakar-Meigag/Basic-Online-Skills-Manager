@@ -5,8 +5,6 @@ import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./lib/swagger";
 import { OrganizationType } from "./data/dataType";
 import { authorizeRole } from "./middleware/authMiddleware";
-import { requireAuth } from "./api/middleware/requireAuth";
-
 
 // --- Import all your API handlers here
 import testEndPoint from "./api/testEndPoint";
@@ -63,7 +61,11 @@ app.get(
   getOrganisations,
 );
 
-app.post("/api/addPartner", authorizeRole(OrganizationType.CYF_STAFF), addPartner);
+app.post(
+  "/api/addPartner",
+  authorizeRole(OrganizationType.CYF_STAFF),
+  addPartner,
+);
 app.post(
   "/api/partners/:id/users",
   authorizeRole(OrganizationType.CYF_STAFF),
@@ -76,12 +78,15 @@ app.post(
   requestNewCourse,
 );
 
-app.patch("/api/course/:id/status", authorizeRole(OrganizationType.CYF_STAFF), requireAuth, updateCourseStatus);
+app.patch(
+  "/api/course/:id/status",
+  authorizeRole(OrganizationType.CYF_STAFF),
+  updateCourseStatus,
+);
 
 // Shared Routes
 app.get("/api/course-details/:id", getCourseDetails); // Shared
 
 app.use("/api/auth", authRouter);
-
 
 export default app;
