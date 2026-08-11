@@ -106,7 +106,14 @@ const claimOpportunity = async (req: Request, res: Response) => {
 
     if (course.outreach_org_id !== null) {
       res.status(409).json({ error: "Course already claimed" });
+      return;
     }
+
+    await pool.query(
+      `INSERT INTO audit_log (user_id, action, entity_type, entity_id)
+       VALUES ($1, $2, $3, $4)`,
+      [user.id, "course.claimed", "course", course.id],
+    );
 
     return res.status(201).json(course);
   } catch (err) {
