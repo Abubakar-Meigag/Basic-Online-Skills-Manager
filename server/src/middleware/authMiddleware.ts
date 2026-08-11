@@ -14,7 +14,7 @@ export const authorizeRole = (requiredRole: string) => {
     // Finding the Key Card
     const authHeader = req.headers.authorization;
 
-    if (!authHeader) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         message: "Authentication required. No token found.",
         redirectTo: "/login",
@@ -22,7 +22,8 @@ export const authorizeRole = (requiredRole: string) => {
     }
 
     // Get the token
-    const token = authHeader as string;
+    // Split "Bearer xxxxx" into ["Bearer", "xxxxx"] and take the second part
+    const token = authHeader.split(" ")[1] as string; 
 
     // Verify the card's signature against the JWT_SECRET and algorithm.
     try {
@@ -30,7 +31,7 @@ export const authorizeRole = (requiredRole: string) => {
         throw new Error("JWT_SECRET is missing from server environment.");
       }
 
-      const decoded = jwt.verify(token, jwtSecret, {
+      const decoded = jwt.verify(token, jwtSecret!, {
         algorithms: ["HS256"],
       }) as unknown as UserPayload;
 
