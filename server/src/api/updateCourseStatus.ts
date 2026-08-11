@@ -1,11 +1,10 @@
 import type { Request, Response } from "express";
 import pool from "../data/connection";
 
-
 const ALLOWED_STATUSES = [
-  "request_open", 
-  "request_confirmed", 
-  "course_running", 
+  "request_open",
+  "request_confirmed",
+  "course_running",
   "course_completed",
 ];
 
@@ -72,7 +71,6 @@ const updateCourseStatus = async (
   const { id } = req.params;
   const { status } = req.body;
 
-
   if (!status) {
     res.status(400).json({ error: "status is required" });
     return;
@@ -88,7 +86,6 @@ const updateCourseStatus = async (
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-
 
     const existing = await client.query(
       `SELECT id FROM courses WHERE id = $1`,
