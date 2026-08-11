@@ -32,9 +32,9 @@ describe("POST /partners/:id/users", () => {
             organisation_id: "org-1",
           },
         ],
-      }) 
-      .mockResolvedValueOnce(undefined) 
-      .mockResolvedValueOnce(undefined); 
+      })
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(undefined);
 
     const response = await request(app)
       .post("/partners/org-1/users")
@@ -51,9 +51,9 @@ describe("POST /partners/:id/users", () => {
     (pool.connect as any).mockResolvedValueOnce(client);
 
     client.query
-      .mockResolvedValueOnce(undefined) 
-      .mockResolvedValueOnce({ rows: [{ id: "org-from-path" }] }) 
-      .mockResolvedValueOnce({ rows: [] }) 
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce({ rows: [{ id: "org-from-path" }] })
+      .mockResolvedValueOnce({ rows: [] })
       .mockResolvedValueOnce({
         rows: [
           {
@@ -62,9 +62,9 @@ describe("POST /partners/:id/users", () => {
             organisation_id: "org-from-path",
           },
         ],
-      }) 
+      })
       .mockResolvedValueOnce(undefined) // audit_log
-      .mockResolvedValueOnce(undefined); 
+      .mockResolvedValueOnce(undefined);
 
     // Body tries to smuggle a different organisation_id - must be ignored
     const response = await request(app)
@@ -142,7 +142,7 @@ describe("POST /partners/:id/users", () => {
 
     client.query
       .mockResolvedValueOnce(undefined) // BEGIN
-      .mockRejectedValueOnce(new Error("DB down")); 
+      .mockRejectedValueOnce(new Error("DB down"));
 
     const response = await request(app)
       .post("/partners/org-1/users")

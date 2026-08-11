@@ -71,4 +71,16 @@ app.get("/course-details/:id", getCourseDetails); // Shared
 
 app.use("/api/auth", authRouter);
 
-export default app; // This is a DEFAULT export
+import addPartner from "./api/addPartner";
+app.post("/addPartner", addPartner);
+
+import getOrganisations from "./api/getOrganisations";
+app.get("/organisations", getOrganisations);
+
+import addUserToPartner from "./api/addUserToPartner";
+app.post("/partners/:id/users", addUserToPartner);
+
+import requestNewCourse from "./api/requestNewCourse";
+app.post("/commercial/requestedNewCourses", requestNewCourse);
+
+export default app;
