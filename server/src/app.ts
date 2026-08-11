@@ -40,41 +40,41 @@ app.post("/api/testSwagger", testSwagger);
 
 // Protected routes
 app.get(
-  "/course-pipeline",
+  "/api/course-pipeline",
   authorizeRole(OrganizationType.CYF_STAFF),
   getCoursePipeline,
 );
 app.get(
-  "/commercial-dashboard",
+  "/api/commercial-dashboard",
   authorizeRole(OrganizationType.COMMERCIAL_PARTNER),
   getCommercialDashboard,
 );
 app.get(
-  "/opportunities",
+  "/api/opportunities",
   authorizeRole(OrganizationType.OUTREACH_PARTNER),
   getAvailableOpportunities,
 );
 app.get(
-  "/organisations",
+  "/api/organisations",
   authorizeRole(OrganizationType.CYF_STAFF),
   getOrganisations,
 );
 
-app.post("/addPartner", authorizeRole(OrganizationType.CYF_STAFF), addPartner);
+app.post("/api/addPartner", authorizeRole(OrganizationType.CYF_STAFF), addPartner);
 app.post(
-  "/partners/:id/users",
+  "/api/partners/:id/users",
   authorizeRole(OrganizationType.CYF_STAFF),
   addUserToPartner,
 );
 
 app.post(
-  "/commercial/requestedNewCourses",
+  "/api/commercial/requestedNewCourses",
   authorizeRole(OrganizationType.COMMERCIAL_PARTNER),
   requestNewCourse,
 );
 
 // Shared Routes
-app.get("/course-details/:id", getCourseDetails); // Shared
+app.get("/api/course-details/:id", getCourseDetails); // Shared
 
 app.use("/api/auth", authRouter);
 

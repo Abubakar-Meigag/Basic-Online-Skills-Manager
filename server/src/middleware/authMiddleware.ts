@@ -17,7 +17,7 @@ export const authorizeRole = (requiredRole: string) => {
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         message: "Authentication required. No token found.",
-        redirectTo: "/login",
+        redirectRoute: "/login",
       });
     }
 
@@ -42,7 +42,7 @@ export const authorizeRole = (requiredRole: string) => {
       if (req.user.orgType !== requiredRole) {
         return res.status(403).json({
           message: "Access Denied: Redirecting to your dashboard.",
-          redirectTo: "/", // This tells the frontend where to go
+          redirectRoute: "/", // This tells the frontend where to go
         });
       }
 
@@ -51,7 +51,7 @@ export const authorizeRole = (requiredRole: string) => {
     } catch (error) {
       return res.status(401).json({
         message: "Your session is invalid or expired. Please log in again.",
-        redirectTo: "/login", // Tell the frontend to send them to the sign-in door
+        redirectRoute: "/login", // Tell the frontend to send them to the sign-in door
       });
     }
   };
