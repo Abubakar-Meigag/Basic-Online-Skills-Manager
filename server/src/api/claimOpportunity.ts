@@ -68,19 +68,11 @@ import pool from "../data/connection";
  */
 const claimOpportunity = async (req: Request, res: Response) => {
   try {
-    // const user = req.user;
-    // if (!user || user.type !== "outreach") {
-    //   return res.status(403).json({ error: "Forbidden" });
-    // }
-    // const organisationId = user.organisationId;
-
-    /**
-     * TEMPORARY: until auth is connected, take org id from the query
-     */
-
-    const organisationId =
-      (req.query.organisationId as string) ||
-      "60ea2b0f-e04e-4f9a-ac72-38bae06d98bc";
+    const user = req.user;
+    if (!user || user.type !== "outreach") {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    const organisationId = user.organisationId;
 
     if (!organisationId) {
       return res.status(400).json({
