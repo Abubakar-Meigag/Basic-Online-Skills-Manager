@@ -108,11 +108,21 @@ const claimOpportunity = async (req: Request, res: Response) => {
       res.status(409).json({ error: "Course already claimed" });
       return;
     }
+    
+    if (course.status !== "request_open") {
+      res.status(409).json({ error: "Course not available to be claimed" });
+      return;
+    }
 
     await pool.query(
       `INSERT INTO audit_log (user_id, action, entity_type, entity_id)
        VALUES ($1, $2, $3, $4)`,
       [user.id, "course.claimed", "course", course.id],
+    );
+
+    await pool.query(
+      `UPDATE courses SET outreach_org_id = $1, status = $2 WHERE id = $3`,
+      [organisationId, "request_claimed", id],
     );
 
     return res.status(201).json(course);
