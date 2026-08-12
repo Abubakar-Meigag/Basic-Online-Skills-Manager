@@ -58,6 +58,18 @@ export type Course = {
   created_at: string;
 };
 
+export type CoursePipelineItem = {
+  id: string;
+  city: string;
+  status: CourseStatus;
+  deadline: string | null;
+  start_date: string | null;
+  end_date: string | null;
+  created_at: string;
+  commercial_org: string;
+  outreach_org: string | null;
+};
+
 export type AuditLogEntry = {
   id: string;
   user_id: string;

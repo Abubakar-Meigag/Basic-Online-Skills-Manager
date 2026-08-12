@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { parseISO, format } from "date-fns";
+import tableHeaderStyle from "../../lib/constants/tableHeaderStyle";
 import type { Course } from "../../data/dataType";
-
-const tableHeaderStyle =
-  "py-5 text-[#333333] text-xs font-bold uppercase tracking-wider";
 
 const OutreachDashboard = () => {
   const [courses, setCourses] = useState<Course[]>([]);
