@@ -83,6 +83,8 @@ const claimOpportunity = async (req: Request, res: Response) => {
 
     const { id } = req.params;
 
+    const { start_date, venue_address, contact_name, contact_email } = req.body;
+
     const query = await pool.query(
       `SELECT
         c.*,
@@ -108,7 +110,7 @@ const claimOpportunity = async (req: Request, res: Response) => {
       res.status(409).json({ error: "Course already claimed" });
       return;
     }
-    
+
     if (course.status !== "request_open") {
       res.status(409).json({ error: "Course not available to be claimed" });
       return;
@@ -121,8 +123,22 @@ const claimOpportunity = async (req: Request, res: Response) => {
     );
 
     await pool.query(
-      `UPDATE courses SET outreach_org_id = $1, status = $2 WHERE id = $3`,
-      [organisationId, "request_claimed", id],
+      `UPDATE courses SET outreach_org_id = $1, 
+      status = $2,
+      start_date = $3,
+      venue_address = $4,
+      contact_name = $5,
+      contact_email = $6 
+      WHERE id = $7`,
+      [
+        organisationId,
+        "request_claimed",
+        start_date,
+        venue_address,
+        contact_name,
+        contact_email,
+        id,
+      ],
     );
 
     return res.status(201).json(course);
