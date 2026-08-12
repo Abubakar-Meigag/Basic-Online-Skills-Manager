@@ -32,19 +32,24 @@ const getOutreachCourse = async (
       return;
     }
     const query = `
-      SELECT 
-        c.*,
-        o.organisation_name AS partner_organisation
-      FROM courses c
-      LEFT JOIN organisations o ON c.commercial_org_id = o.id
-      WHERE c.outreach_org_id = $1
-      ORDER BY c.start_date ASC NULLS LAST
-    `;
+    SELECT 
+  c.course_name,
+  o.organisation_name AS partner_organisation,
+  c.trainee_target,
+  c.venue_address AS venue,
+  c.start_date,
+  c.end_date,
+  c.status
+FROM courses c
+LEFT JOIN organisations o ON c.commercial_org_id = o.id
+WHERE c.outreach_org_id = $1
+ORDER BY c.start_date ASC NULLS LAST`;
     // Send array of rows back to the client
     const result = await pool.query(query, [user.organisationId]);
 
     res.json(result.rows);
-  } catch {
+  } catch (error) {
+    console.error("Database error:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
