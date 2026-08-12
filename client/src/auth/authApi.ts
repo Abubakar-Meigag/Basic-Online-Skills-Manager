@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  "https://bosm-backend.trainees.hosting.cyf.academy/api";
+  "https://bosm-backend.trainees.hosting.cyf.academy";
 
 // Create an Axios Instance
 export const api = axios.create({
