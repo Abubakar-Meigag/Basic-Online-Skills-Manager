@@ -1,6 +1,5 @@
 import { NavLink } from "react-router";
 import CYFLogo from "../../assets/CYF-logo.png";
-import { users } from "../../data/db";
 import { navLinks } from "../../lib/constants/navLinks";
 import { OrganizationType } from "../../data/dataType";
 import "./Sidebar.css";
@@ -16,11 +15,13 @@ const Sidebar = ({ userType }: { userType?: OrganizationType }) => {
 
   const urlRoleName = userType ? rolePathMap[userType] : "";
 
-  const firstUser = users[0];
+  // Get the real user from localStorage
+  const userString = localStorage.getItem("user");
+  const user = userString ? JSON.parse(userString) : null;
 
   // Use their email, or a backup if they don't exist
-  const userEmail = firstUser ? firstUser.email : "user@email.com";
-  const userInitial = userEmail ? userEmail[0].toUpperCase() : "U";
+  const userEmail = user ? user.email : "guest@email.com";
+  const userInitial = userEmail ? userEmail[0].toUpperCase() : "G";
 
   return (
     <div className="sidebar flex flex-col h-screen shrink-0 sticky top-0 self-start border-r border-[#E3E3E3]">
