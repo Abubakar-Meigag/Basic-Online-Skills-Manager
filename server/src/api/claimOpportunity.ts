@@ -85,6 +85,19 @@ const claimOpportunity = async (req: Request, res: Response) => {
 
     const { start_date, venue_address, contact_name, contact_email } = req.body;
 
+    // Validate deadline is a real YYYY-MM-DD date.
+    const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+    if (!datePattern.test(start_date)) {
+      res.status(400).json({
+        error: "deadline must be in YYYY-MM-DD format",
+      });
+      return;
+    }
+
+    const parsedStartDate = new Date(start_date);
+    const end_date = new Date(parsedStartDate);
+    end_date.setDate(parsedStartDate.getDate() + 21);
+
     const query = await pool.query(
       `SELECT
         c.*,
@@ -126,14 +139,16 @@ const claimOpportunity = async (req: Request, res: Response) => {
       `UPDATE courses SET outreach_org_id = $1, 
       status = $2,
       start_date = $3,
-      venue_address = $4,
-      contact_name = $5,
-      contact_email = $6 
-      WHERE id = $7`,
+      end_date = $4
+      venue_address = $5,
+      contact_name = $6,
+      contact_email = $7 
+      WHERE id = $8`,
       [
         organisationId,
         "request_claimed",
         start_date,
+        end_date,
         venue_address,
         contact_name,
         contact_email,
