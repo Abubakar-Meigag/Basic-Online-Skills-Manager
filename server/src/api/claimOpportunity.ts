@@ -83,7 +83,18 @@ const claimOpportunity = async (req: Request, res: Response) => {
 
     const { id } = req.params;
 
-    const { start_date, venue_address, contact_name, contact_email } = req.body;
+    const {
+      start_date,
+      venue_address,
+      contact_name,
+      contact_email,
+      client_group_description,
+      tech_level,
+      goal,
+      lunch_arrangement,
+      expenses_notes,
+      note,
+    } = req.body;
 
     // Validate deadline is a real YYYY-MM-DD date.
     const datePattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -139,11 +150,17 @@ const claimOpportunity = async (req: Request, res: Response) => {
       `UPDATE courses SET outreach_org_id = $1, 
       status = $2,
       start_date = $3,
-      end_date = $4
+      end_date = $4,
       venue_address = $5,
       contact_name = $6,
-      contact_email = $7 
-      WHERE id = $8`,
+      contact_email = $7,
+      client_group_description = $8,
+      tech_level = $9,
+      goal = $10,
+      lunch_arrangement = $11,
+      expenses_notes = $12,
+      note = $13
+      WHERE id = $14`,
       [
         organisationId,
         "request_claimed",
@@ -152,6 +169,12 @@ const claimOpportunity = async (req: Request, res: Response) => {
         venue_address,
         contact_name,
         contact_email,
+        client_group_description,
+        tech_level,
+        goal,
+        lunch_arrangement,
+        expenses_notes,
+        note,
         id,
       ],
     );
