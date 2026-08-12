@@ -57,7 +57,7 @@ const RequestNewCourse = () => {
       return;
     }
 
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("sessionToken");
     if (!token) {
       setError("You are not logged in. Please log in and try again.");
       return;
@@ -87,7 +87,12 @@ const RequestNewCourse = () => {
         let message = "Something went wrong. Please try again.";
         try {
           const data = await response.json();
-          if (data?.error) message = data.error;
+          if (data?.message) message = data.message;
+          else if (data?.error) message = data.error;  
+          if (response.status === 403 && data?.redirectRoute) { // Middleware sends redirectRoute on auth failures
+            navigate(data.redirectRoute);
+            return;
+          }
         } catch (parseError) {
           console.error("Could not parse error response:", parseError);
         }
