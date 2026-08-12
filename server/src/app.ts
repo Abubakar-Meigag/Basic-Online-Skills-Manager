@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./lib/swagger";
+import { requireAuth } from "./api/middleware/requireAuth";
 
 const app = express();
 
@@ -58,5 +59,5 @@ import requestNewCourse from "./api/requestNewCourse";
 app.post("/commercial/requestedNewCourses", requestNewCourse);
 
 import getOutreachCourse from "./api/outreachCourses";
-app.get("/outreach/courses", getOutreachCourse);
+app.get("/outreach/courses", requireAuth, getOutreachCourse);
 export default app;
