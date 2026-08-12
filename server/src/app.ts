@@ -83,6 +83,6 @@ app.patch(
 // Shared Routes
 app.get("/course-details/:id", getCourseDetails); // Shared
 
-app.use("/auth", authRouter);
+app.use("/api/auth", authRouter);
 
 export default app;
