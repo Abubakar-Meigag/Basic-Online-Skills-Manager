@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { api } from "../../auth/authApi";
+import type { AxiosError } from "axios";
 
-const API_BASE = "https://bosm-backend.trainees.hosting.cyf.academy";
 const DASHBOARD_ROUTE = "/commercial-partner/requested-courses";
 
 type FormState = {
@@ -65,45 +66,35 @@ const RequestNewCourse = () => {
 
     setSubmitting(true);
     try {
-      const response = await fetch(
-        `${API_BASE}/commercial/requestedNewCourses`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            account_name: account_name.trim(),
-            contract_name: contract_name.trim(),
-            city: city.trim(),
-            trainee_target: target,
-            deadline, // YYYY-MM-DD
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        let message = "Something went wrong. Please try again.";
-        try {
-          const data = await response.json();
-          if (data?.message) message = data.message;
-          else if (data?.error) message = data.error;  
-          if (response.status === 403 && data?.redirectRoute) { // Middleware sends redirectRoute on auth failures
-            navigate(data.redirectRoute);
-            return;
-          }
-        } catch (parseError) {
-          console.error("Could not parse error response:", parseError);
-        }
-        setError(message);
-        return;
-      }
+      await api.post(`/commercial/requestedNewCourses`, {
+        account_name: account_name.trim(),
+        contract_name: contract_name.trim(),
+        city: city.trim(),
+        trainee_target: target,
+        deadline, // YYYY-MM-DD
+      });
 
       // go back to the dashboard
       navigate(DASHBOARD_ROUTE);
-    } catch {
-      setError("Could not reach the server. Please check your connection.");
+    } catch (err) {
+      const axiosErr = err as AxiosError<{
+        message?: string;
+        error?: string;
+        redirectRoute?: string;
+      }>;
+
+      const data = axiosErr.response?.data;
+
+      // Middleware sends redirectRoute on auth failures (401/403)
+      if ((axiosErr.response?.status === 401 || axiosErr.response?.status === 403) && data?.redirectRoute) {
+        navigate(data.redirectRoute);
+        return;
+      }
+      const message =
+        data?.message ??
+        data?.error ??
+        "Something went wrong. Please try again.";
+      setError(message);
     } finally {
       setSubmitting(false);
     }
