@@ -67,48 +67,52 @@ import pool from "../data/connection";
  *         description: Internal server error
  */
 const claimOpportunity = async (req: Request, res: Response) => {
+  const user = (req as any).user;
+
+  if (!user || user.orgType !== "outreach") {
+    return res.status(403).json({ error: "Forbidden" });
+  }
+  const organisationId = user.organisationId;
+
+  if (!organisationId) {
+    return res.status(400).json({
+      error: "organisationId query param is required",
+    });
+  }
+
+  const { id } = req.params;
+
+  const {
+    start_date,
+    venue_address,
+    contact_name,
+    contact_email,
+    client_group_description,
+    tech_level,
+    goal,
+    lunch_arrangement,
+    expenses_notes,
+    note,
+  } = req.body;
+
+  // Validate deadline is a real YYYY-MM-DD date.
+  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+  if (!datePattern.test(start_date)) {
+    res.status(400).json({
+      error: "deadline must be in YYYY-MM-DD format",
+    });
+    return;
+  }
+
+  const parsedStartDate = new Date(start_date);
+  // Calculate end date from start date.
+  const end_date = new Date(parsedStartDate);
+  end_date.setDate(parsedStartDate.getDate() + 21);
+  const client = await pool.connect();
   try {
-    const user = (req as any).user;
+    await client.query("BEGIN");
 
-    if (!user || user.orgType !== "outreach") {
-      return res.status(403).json({ error: "Forbidden" });
-    }
-    const organisationId = user.organisationId;
-
-    if (!organisationId) {
-      return res.status(400).json({
-        error: "organisationId query param is required",
-      });
-    }
-
-    const { id } = req.params;
-
-    const {
-      start_date,
-      venue_address,
-      contact_name,
-      contact_email,
-      client_group_description,
-      tech_level,
-      goal,
-      lunch_arrangement,
-      expenses_notes,
-      note,
-    } = req.body;
-
-    // Validate deadline is a real YYYY-MM-DD date.
-    const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-    if (!datePattern.test(start_date)) {
-      res.status(400).json({
-        error: "deadline must be in YYYY-MM-DD format",
-      });
-      return;
-    }
-
-    const parsedStartDate = new Date(start_date);
-    const end_date = new Date(parsedStartDate);
-    end_date.setDate(parsedStartDate.getDate() + 21);
-
+    // Check if course exist.
     const query = await pool.query(
       `SELECT
         c.*,
@@ -126,27 +130,25 @@ const claimOpportunity = async (req: Request, res: Response) => {
     const course = query.rows[0];
 
     if (!course) {
+      await client.query("ROLLBACK");
       res.status(404).json({ error: "Course not found" });
       return;
     }
 
     if (course.outreach_org_id !== null) {
+      await client.query("ROLLBACK");
       res.status(409).json({ error: "Course already claimed" });
       return;
     }
 
     if (course.status !== "request_open") {
+      await client.query("ROLLBACK");
       res.status(409).json({ error: "Course not available to be claimed" });
       return;
     }
 
-    await pool.query(
-      `INSERT INTO audit_log (user_id, action, entity_type, entity_id)
-       VALUES ($1, $2, $3, $4)`,
-      [user.id, "course.claimed", "course", course.id],
-    );
-
-    await pool.query(
+    // Add details/Assign course to outreach partner
+    await client.query(
       `UPDATE courses SET outreach_org_id = $1, 
       status = $2,
       start_date = $3,
@@ -179,10 +181,22 @@ const claimOpportunity = async (req: Request, res: Response) => {
       ],
     );
 
+    // Update audit log
+    await client.query(
+      `INSERT INTO audit_log (user_id, action, entity_type, entity_id)
+       VALUES ($1, $2, $3, $4)`,
+      [user.id, "course.claimed", "course", course.id],
+    );
+
+    await client.query("COMMIT");
+
     return res.status(201).json(course);
   } catch (err) {
+    await client.query("ROLLBACK");
     console.error("Error claiming course: ", err);
     return res.status(500).json({ error: "Internal server error" });
+  } finally {
+    client.release();
   }
 };
 
