@@ -55,7 +55,7 @@ import addUserToPartner from "./api/addUserToPartner";
 app.post("/partners/:id/users", addUserToPartner);
 
 import requestNewCourse from "./api/requestNewCourse";
-app.post("/commercial/requestedNewCourses", requireAuth, requestNewCourse);
+app.post("/commercial/requestedNewCourses", requestNewCourse);
 
 import updateCourseStatus from "./api/updateCourseStatus";
 import { requireAuth } from "./api/middleware/requireAuth";
