@@ -58,7 +58,11 @@ const Sidebar = ({ userType }: { userType?: OrganizationType }) => {
 
           <div className="flex flex-col">
             <span className="text-sm font-semibold">{userEmail}</span>
-            <NavLink to="/login" className="text-xs text-gray-500">
+            <NavLink
+              to="/login"
+              className="text-xs text-gray-500"
+              onClick={() => localStorage.clear()}
+            >
               Logout
             </NavLink>
           </div>
