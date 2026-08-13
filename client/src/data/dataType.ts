@@ -10,12 +10,10 @@ export type Organisation = {
 export type User = {
   id: string;
   email: string;
-  organisation_id: string | null;
+  organisation_id: string;
   is_active: boolean;
   created_at: string;
   last_login_at: string | null;
-  is_logged_in: boolean;
-  organization_type: OrganizationType;
 };
 
 export enum OrganizationType {

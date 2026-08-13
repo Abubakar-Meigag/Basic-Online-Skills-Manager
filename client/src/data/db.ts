@@ -60,8 +60,6 @@ export const users: User[] = [
     is_active: true,
     created_at: "2026-01-01T09:00:00Z",
     last_login_at: "2026-07-25T08:00:00Z",
-    is_logged_in: false,
-    organization_type: OrganizationType.CYF_STAFF,
   },
   {
     id: "user-002",
@@ -70,8 +68,6 @@ export const users: User[] = [
     is_active: true,
     created_at: "2026-01-05T09:00:00Z",
     last_login_at: "2026-07-24T14:30:00Z",
-    is_logged_in: false,
-    organization_type: OrganizationType.CYF_STAFF,
   },
 
   // Commercial (Capgemini — one shared login for MVP)
@@ -82,8 +78,6 @@ export const users: User[] = [
     is_active: true,
     created_at: "2026-01-12T09:00:00Z",
     last_login_at: "2026-07-23T11:00:00Z",
-    is_logged_in: false,
-    organization_type: OrganizationType.COMMERCIAL_PARTNER,
   },
 
   // Outreach partners
@@ -94,8 +88,6 @@ export const users: User[] = [
     is_active: true,
     created_at: "2026-01-20T09:00:00Z",
     last_login_at: "2026-07-22T15:00:00Z",
-    is_logged_in: false,
-    organization_type: OrganizationType.OUTREACH_PARTNER,
   },
   {
     id: "user-005",
@@ -104,8 +96,6 @@ export const users: User[] = [
     is_active: true,
     created_at: "2026-01-22T09:00:00Z",
     last_login_at: "2026-07-20T10:00:00Z",
-    is_logged_in: false,
-    organization_type: OrganizationType.OUTREACH_PARTNER,
   },
   {
     id: "user-006",
@@ -114,8 +104,6 @@ export const users: User[] = [
     is_active: true,
     created_at: "2026-02-02T09:00:00Z",
     last_login_at: null,
-    is_logged_in: false,
-    organization_type: OrganizationType.OUTREACH_PARTNER,
   },
 ];
 
