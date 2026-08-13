@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import pool from "../data/connection";
-import { OrganizationType } from "../data/dataType";
 
 /**
  * @swagger
@@ -27,10 +26,7 @@ const getOutreachCourse = async (
 ): Promise<void> => {
   try {
     const user = (req as any).user;
-    if (!user || user.orgType !== OrganizationType.OUTREACH_PARTNER) {
-      res.status(403).json({ error: "Forbidden: Outreach access required." });
-      return;
-    }
+
     const query = `
     SELECT 
   c.course_name,
