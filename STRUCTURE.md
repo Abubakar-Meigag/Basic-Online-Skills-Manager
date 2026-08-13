@@ -99,13 +99,18 @@ Located in the `server/` directory. This is the behind-the-scenes part that does
 - **What goes here:** Automated scripts that check if the **behind-the-scenes part** is working correctly.
 - **Example:** `app.test.ts` (checks if the server starts correctly), `api.test.ts` (checks if the data "Pipes" are working).
 
-### 6. `app.ts`
+### 6. `src/middleware/`
+
+- **What goes here:** The "Security Guards" or "Bouncers" of the application. These are functions that run **after** the server receives a request but **before** it reaches the final logic.
+- **Example:** `authMiddleware.ts` (checks if a user has a valid key card/JWT before letting them see private data).
+
+### 7. `app.ts`
 
 - **What it does:** The central Express application entry point. This is the **Switchboard** where we "mount" (plug in) our global rules:
   - **Middleware:** Security checks and data handling rules.
   - **Routers:** The directory that connects URLs to specific logic files.
 
-### 7. `index.ts`
+### 8. `index.ts`
 
 - **What it does:** This is the power switch for the server. Its only job is to start the Express app and tell it which **Port** (e.g., 3000) to listen to for incoming requests.
 

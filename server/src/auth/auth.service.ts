@@ -4,6 +4,13 @@ import jwt from "jsonwebtoken";
 import { OrganizationType } from "../data/dataType";
 import { sendMagicLinkEmail } from "../lib/email";
 
+export interface UserPayload {
+  id: string;
+  email: string;
+  orgType: string;
+  organisationId: string;
+}
+
 // Helper to hash tokens before database saves
 function hashToken(token: string): string {
   return crypto.createHash("sha256").update(token).digest("hex");
@@ -110,16 +117,15 @@ export async function verifyMagicLinkToken(rawToken: string) {
     throw new Error("JWT_SECRET is not defined in environment variables.");
   }
   // Generate JWT Session Token exp 24h
-  const sessionToken = jwt.sign(
-    {
-      id: record.user_id,
-      email: record.email,
-      orgType: record.org_type,
-      organisationId: record.organisation_id,
-    },
-    jwtSecret,
-    { expiresIn: "24h" },
-  );
+  const payload: UserPayload = {
+    id: record.user_id,
+    email: record.email,
+    orgType: record.org_type,
+    organisationId: record.organisation_id,
+  };
+
+  const sessionToken = jwt.sign(payload, jwtSecret, { expiresIn: "24h" });
+
   // return user session identity as object, and the redirectRout.
   return {
     token: sessionToken,
