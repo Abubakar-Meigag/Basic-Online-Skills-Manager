@@ -25,17 +25,18 @@ describe("claimOpportunity", () => {
         contact_name: "John Doe",
         contact_email: "john@example.com",
       },
-      user: {
-        id: "user-1",
-        organisationId: "org-2",
-        orgType: "outreach",
-      },
+    } as any;
+
+    (req as any).user = {
+      id: "user-1",
+      organisationId: "org-2",
+      orgType: "outreach",
     };
 
     res = {
       status: statusMock,
       json: jsonMock,
-    };
+    } as any;
   });
 
   describe("Authorization", () => {
