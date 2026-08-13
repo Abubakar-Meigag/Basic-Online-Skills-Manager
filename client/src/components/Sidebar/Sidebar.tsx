@@ -1,6 +1,6 @@
 import { NavLink } from "react-router";
 import CYFLogo from "../../assets/CYF-logo.png";
-import { users } from "../../data/db";
+// import { users } from "../../data/db";
 import { navLinks } from "../../lib/constants/navLinks";
 import { OrganizationType } from "../../data/dataType";
 import "./Sidebar.css";
@@ -16,11 +16,11 @@ const Sidebar = ({ userType }: { userType?: OrganizationType }) => {
 
   const urlRoleName = userType ? rolePathMap[userType] : "";
 
-  const firstUser = users[0];
+  // const firstUser = users[0];
 
   // Use their email, or a backup if they don't exist
-  const userEmail = firstUser ? firstUser.email : "user@email.com";
-  const userInitial = userEmail ? userEmail[0].toUpperCase() : "U";
+  // const userEmail = firstUser ? firstUser.email : "user@email.com";
+  // const userInitial = userEmail ? userEmail[0].toUpperCase() : "U";
 
   return (
     <div className="sidebar flex flex-col h-screen shrink-0 sticky top-0 self-start border-r border-[#E3E3E3]">
@@ -52,11 +52,11 @@ const Sidebar = ({ userType }: { userType?: OrganizationType }) => {
       <div className="mt-auto p-5 border-t border-[#E3E3E3]">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-sm font-semibold text-red-700">
-            {userInitial}
+            {/* {userInitial} */}
           </div>
 
           <div className="flex flex-col">
-            <span className="text-sm font-semibold">{userEmail}</span>
+            {/* <span className="text-sm font-semibold">{userEmail}</span> */}
             <NavLink to="/login" className="text-xs text-gray-500">
               Logout
             </NavLink>
