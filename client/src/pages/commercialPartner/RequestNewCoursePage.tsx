@@ -58,12 +58,6 @@ const RequestNewCourse = () => {
       return;
     }
 
-    const token = localStorage.getItem("sessionToken");
-    if (!token) {
-      setError("You are not logged in. Please log in and try again.");
-      return;
-    }
-
     setSubmitting(true);
     try {
       await api.post(`/commercial/requestedNewCourses`, {
