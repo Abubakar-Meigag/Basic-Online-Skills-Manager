@@ -2,16 +2,15 @@ import { useCallback, useEffect, useState } from "react";
 import { parseISO, format } from "date-fns";
 import tableHeaderStyle from "../../lib/constants/tableHeaderStyle";
 import type { Course } from "../../data/dataType";
+import { api } from "../../auth/authApi";
 
 const OutreachDashboard = () => {
   const [courses, setCourses] = useState<Course[]>([]);
 
   const getCourses = useCallback(async () => {
     try {
-      const res = await fetch(
-        "https://bosm-backend.trainees.hosting.cyf.academy/opportunities",
-      );
-      const data = await res.json();
+      const res = await api.get("/opportunities");
+      const data = res.data;
       const coursesByStatus = data.filter(
         (course: Course) => course.status === "request_open",
       );

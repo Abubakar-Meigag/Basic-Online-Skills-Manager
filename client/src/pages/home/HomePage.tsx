@@ -1,37 +1,49 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { type User, OrganizationType } from "../../data/dataType";
+import { jwtDecode } from "jwt-decode";
+import { OrganizationType } from "../../data/dataType";
+
+// Blueprint of our real JWT
+interface DecodedToken {
+  orgType: string;
+  exp: number;
+}
 
 export default function HomePage() {
   const navigate = useNavigate();
 
-  // This is our "Fake" user for now.
-  // You can change "commercial" to "outreach" to test the different doors!
-  const mockUser: User = {
-    id: "user-001",
-    email: "test@codeyourfuture.io",
-    organisation_id: null,
-    is_active: true,
-    created_at: "2026-01-01",
-    last_login_at: null,
-    is_logged_in: false,
-    organization_type: OrganizationType.COMMERCIAL_PARTNER,
-  };
-
   useEffect(() => {
-    if (!mockUser.is_logged_in) {
+    const token = localStorage.getItem("sessionToken");
+
+    if (!token) {
       navigate("/login");
-    } else if (
-      mockUser.organization_type === OrganizationType.COMMERCIAL_PARTNER
-    ) {
-      navigate("/commercial-partner/requested-courses");
-    } else if (
-      mockUser.organization_type === OrganizationType.OUTREACH_PARTNER
-    ) {
-      navigate("/outreach-partner/find-opportunities");
-    } else if (mockUser.organization_type === OrganizationType.CYF_STAFF) {
-      navigate("/cyf-staff/request-pipeline");
-    } else {
+      return;
+    }
+
+    try {
+      // 1. Decode the REAL token from the server
+      const decoded = jwtDecode<DecodedToken>(token);
+
+      // 2. Check if expired
+      if (decoded.exp < Date.now() / 1000) {
+        localStorage.removeItem("sessionToken");
+        navigate("/login");
+        return;
+      }
+
+      // 3. Redirect based on real data
+      const role = decoded.orgType;
+
+      if (role === OrganizationType.CYF_STAFF) {
+        navigate("/cyf-staff/request-pipeline");
+      } else if (role === OrganizationType.COMMERCIAL_PARTNER) {
+        navigate("/commercial-partner/requested-courses");
+      } else if (role === OrganizationType.OUTREACH_PARTNER) {
+        navigate("/outreach-partner/find-opportunities");
+      } else {
+        navigate("/login");
+      }
+    } catch (error) {
       navigate("/login");
     }
   }, [navigate]);
@@ -41,7 +53,7 @@ export default function HomePage() {
       {/* This div will be the spinner */}
       <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-red-600"></div>
 
-      {/* It's still good to have a small text label for accessibility */}
+      {/* small text label for accessibility */}
       <p className="text-sm text-gray-500">Loading your dashboard...</p>
     </div>
   );
