@@ -80,17 +80,21 @@ app.patch(
   updateCourseStatus,
 );
 
+<<<<<<< HEAD
 app.get(
   "/outreach/courses",
   authorizeRole(OrganizationType.OUTREACH_PARTNER),
   getOutreachCourses,
 );
+=======
+>>>>>>> b77c254 (Fix type issues from #104 (#107))
 app.post(
   "/courses/:id/claim",
   authorizeRole(OrganizationType.OUTREACH_PARTNER),
   claimOpportunity,
 );
 
+<<<<<<< HEAD
 app.get(
   "/course-details/staff/:id",
   authorizeRole(OrganizationType.CYF_STAFF),
@@ -108,6 +112,10 @@ app.get(
 );
 
 app.get("/audit-log", authorizeRole(OrganizationType.CYF_STAFF), getAuditLog);
+=======
+// Shared Routes
+app.get("/course-details/:id", getCourseDetails); // Shared
+>>>>>>> b77c254 (Fix type issues from #104 (#107))
 
 app.use("/auth", authRouter);
 
