@@ -55,8 +55,8 @@ import pool from "../data/connection";
 const requestNewCourse = async (req: Request, res: Response): Promise<void> => {
   // checking auth
   const user = (req as any).user;
-  if (!user || user.orgType !== "commercial") {
-    res.status(403).json({ error: "Forbidden" });
+  if (!user) {
+    res.status(401).json({ error: "Not authenticated" });
     return;
   }
 
