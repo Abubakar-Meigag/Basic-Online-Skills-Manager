@@ -85,4 +85,10 @@ app.get("/course-details/:id", getCourseDetails); // Shared
 
 app.use("/auth", authRouter);
 
+import claimOpportunity from "./api/claimOpportunity";
+app.post("/courses/:id/claim", requireAuth, claimOpportunity);
+
+import { requireAuth } from "./api/middleware/requireAuth";
+app.patch("/course/:id/status", requireAuth, updateCourseStatus);
+
 export default app;
