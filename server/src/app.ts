@@ -19,6 +19,7 @@ import getOrganisations from "./api/getOrganisations";
 import addUserToPartner from "./api/addUserToPartner";
 import requestNewCourse from "./api/requestNewCourse";
 import updateCourseStatus from "./api/updateCourseStatus";
+import claimOpportunity from "./api/claimOpportunity";
 
 const app = express();
 
@@ -80,15 +81,15 @@ app.patch(
   updateCourseStatus,
 );
 
+app.post(
+  "/courses/:id/claim",
+  authorizeRole(OrganizationType.OUTREACH_PARTNER),
+  claimOpportunity,
+);
+
 // Shared Routes
 app.get("/course-details/:id", getCourseDetails); // Shared
 
 app.use("/auth", authRouter);
-
-import claimOpportunity from "./api/claimOpportunity";
-app.post("/courses/:id/claim", requireAuth, claimOpportunity);
-
-import { requireAuth } from "./api/middleware/requireAuth";
-app.patch("/course/:id/status", requireAuth, updateCourseStatus);
 
 export default app;
