@@ -20,6 +20,7 @@ import getOrganisations from "./api/getOrganisations";
 import addUserToPartner from "./api/addUserToPartner";
 import requestNewCourse from "./api/requestNewCourse";
 import updateCourseStatus from "./api/updateCourseStatus";
+import claimOpportunity from "./api/claimOpportunity";
 
 const app = express();
 
@@ -86,6 +87,12 @@ app.get(
   authorizeRole(OrganizationType.OUTREACH_PARTNER),
   getOutreachCourses,
 );
+app.post(
+  "/courses/:id/claim",
+  authorizeRole(OrganizationType.OUTREACH_PARTNER),
+  claimOpportunity,
+);
+
 // Shared Routes
 app.get("/course-details/:id", getCourseDetails); // Shared
 
