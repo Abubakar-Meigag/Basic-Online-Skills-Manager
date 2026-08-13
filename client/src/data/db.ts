@@ -2,7 +2,6 @@
 // Structure mirrors the agreed schema — swap for real Postgres later.
 
 import type { Organisation, User, Course, AuditLogEntry } from "./dataType";
-import { OrganizationType } from "./dataType";
 
 // Organisations
 export const organisations: Organisation[] = [
