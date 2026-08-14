@@ -1,3 +1,10 @@
 a.active {
   color: #ee4344;
 }
+
+.email-truncate {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -19,12 +19,11 @@ const Sidebar = () => {
   // Use the user's REAL orgType from the token/storage to determine the links
   const urlRoleName = user ? rolePathMap[user.orgType as OrganizationType] : "";
 
-  // Use their email, or a backup if they don't exist
   const userEmail = user?.email || "";
   const userInitial = userEmail ? userEmail[0].toUpperCase() : "U";
 
   return (
-    <div className="sidebar flex flex-col h-screen shrink-0 sticky top-0 self-start border-r border-[#E3E3E3]">
+    <div className="sidebar flex flex-col h-screen shrink-0 sticky top-0 self-start border-r border-[#E3E3E3] overflow-hidden">
       <div className="p-5">
         <img className="mb-5" src={CYFLogo} width="120" height="120" />
       </div>
