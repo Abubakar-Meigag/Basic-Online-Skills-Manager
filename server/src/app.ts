@@ -113,4 +113,6 @@ app.use("/auth", authRouter);
 
 app.use("/auth", authRouter);
 
+app.use("/auth", authRouter);
+
 export default app;
