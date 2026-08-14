@@ -8,6 +8,7 @@ import { useState } from "react";
 import CourseDetail from "./CourseDetail/CourseDetail";
 import statusLabel from "../../utils/statusLabel";
 import type { CoursePipelineItem } from "../../data/dataType";
+import CourseActionButton from "./CourseActionButton/CourseActionButton";
 
 const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,7 +34,7 @@ const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
               Course Details
             </DialogTitle>
             <div className="flex justify-between mb-10">
-              <div>
+              <div className="mr-25">
                 <CourseDetail
                   label="Outreach Partner"
                   detail={course.outreach_org}
@@ -70,10 +71,12 @@ const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
                 />
               </div>
             </div>
-            <button className="px-5">Publish</button>
-            <button className="px-5">Reschedule</button>
-            <button className="px-5">Confirm</button>
-            <button className="px-5">Cancel</button>
+            <div className="button-bank grid grid-cols-2 gap-5">
+              <CourseActionButton text="Publish" colour="bg-blue-500" />
+              <CourseActionButton text="Reschedule" colour="bg-yellow-500" />
+              <CourseActionButton text="Confirm" colour="bg-green-500" />
+              <CourseActionButton text="Cancel Course" colour="bg-red-500" />
+            </div>
           </DialogPanel>
         </div>
       </Dialog>
