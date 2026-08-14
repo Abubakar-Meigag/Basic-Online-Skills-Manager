@@ -12,6 +12,7 @@ import testSwagger from "./api/testSwagger";
 import getCoursePipeline from "./api/coursePipeline";
 import getCommercialDashboard from "./api/commercialDashboard";
 import getAvailableOpportunities from "./api/availableOpportunities";
+import getOutreachCourses from "./api/outreachCourses";
 import getCourseDetails from "./api/CourseDetails";
 import authRouter from "./auth/auth.router";
 import addPartner from "./api/addPartner";
@@ -81,6 +82,11 @@ app.patch(
   updateCourseStatus,
 );
 
+app.get(
+  "/outreach/courses",
+  authorizeRole(OrganizationType.OUTREACH_PARTNER),
+  getOutreachCourses,
+);
 app.post(
   "/courses/:id/claim",
   authorizeRole(OrganizationType.OUTREACH_PARTNER),
@@ -89,7 +95,5 @@ app.post(
 
 // Shared Routes
 app.get("/course-details/:id", getCourseDetails); // Shared
-
-app.use("/auth", authRouter);
 
 export default app;

@@ -1,6 +1,5 @@
 import { NavLink } from "react-router";
 import CYFLogo from "../../assets/CYF-logo.png";
-// import { users } from "../../data/db";
 import { navLinks } from "../../lib/constants/navLinks";
 import { OrganizationType } from "../../data/dataType";
 import "./Sidebar.css";
@@ -11,16 +10,16 @@ const rolePathMap: Record<OrganizationType, string> = {
   [OrganizationType.CYF_STAFF]: "cyf-staff",
 };
 
-const Sidebar = ({ userType }: { userType?: OrganizationType }) => {
-  // Change userType prop above to see view for a different user.
+// The sidebar is now "Smart" and self-sufficient.
+const Sidebar = () => {
+  // Get the real user from localStorage
+  const userString = localStorage.getItem("user");
+  const user = userString ? JSON.parse(userString) : null;
 
-  const urlRoleName = userType ? rolePathMap[userType] : "";
+  // Use the user's REAL orgType from the token/storage to determine the links
+  const urlRoleName = user ? rolePathMap[user.orgType as OrganizationType] : "";
 
-  const getUser = localStorage.getItem("user");
-
-  const user = getUser ? JSON.parse(getUser) : null;
-
-  const userEmail = user.email;
+  const userEmail = user?.email || "";
   const userInitial = userEmail ? userEmail[0].toUpperCase() : "U";
 
   return (
@@ -56,11 +55,13 @@ const Sidebar = ({ userType }: { userType?: OrganizationType }) => {
             {userInitial}
           </div>
 
-          <div className="flex flex-col min-w-0 flex-1 w-full">
-            <span className="text-sm font-semibold email-truncate">
-              {userEmail}
-            </span>
-            <NavLink to="/login" className="text-xs text-gray-500">
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold">{userEmail}</span>
+            <NavLink
+              to="/login"
+              className="text-xs text-gray-500"
+              onClick={() => localStorage.clear()}
+            >
               Logout
             </NavLink>
           </div>

@@ -10,17 +10,35 @@ export const api = axios.create({
 });
 
 // Add Request Interceptor to automatically attach token
+// This adds the token to every request
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("sessionToken");
-
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-
     return config;
   },
   (error) => Promise.reject(error),
+);
+
+// This Handles security errors from the server
+api.interceptors.response.use(
+  (response) => response, // If the request is successful, just let it pass
+  (error) => {
+    // If the server sends a 403 (Wrong Role) or 401 (Not Logged in)
+    if (error.response && error.response.data.redirectRoute) {
+      // If the session is invalid, wipe the local data
+      if (error.response.status === 401) {
+        localStorage.clear();
+      }
+
+      // We use window.location.href because this file is outside of React components
+      window.location.href = error.response.data.redirectRoute;
+    }
+
+    return Promise.reject(error);
+  },
 );
 
 export interface RequestMagicLinkResponse {
