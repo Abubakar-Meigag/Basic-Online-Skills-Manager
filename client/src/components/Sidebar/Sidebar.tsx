@@ -20,8 +20,7 @@ const Sidebar = ({ userType }: { userType?: OrganizationType }) => {
 
   const user = getUser ? JSON.parse(getUser) : null;
 
-  // Use their email, or a backup if they don't exist
-  const userEmail = user ? user.email : "user@email.com";
+  const userEmail = user.email;
   const userInitial = userEmail ? userEmail[0].toUpperCase() : "U";
 
   return (
