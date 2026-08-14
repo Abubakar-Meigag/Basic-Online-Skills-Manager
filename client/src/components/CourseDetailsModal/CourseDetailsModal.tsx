@@ -5,7 +5,7 @@ import {
   DialogBackdrop,
 } from "@headlessui/react";
 import { useState } from "react";
-import CourseDetail from "../CourseDetail/CourseDetail";
+import CourseDetail from "./CourseDetail/CourseDetail";
 import statusLabel from "../../utils/statusLabel";
 import type { CoursePipelineItem } from "../../data/dataType";
 
