@@ -16,7 +16,7 @@ const Layout = () => {
   }
   return (
     <div className="layout flex h-screen overflow-hidden">
-      <Sidebar userType={currentUserType} />
+      <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <Outlet />
       </main>

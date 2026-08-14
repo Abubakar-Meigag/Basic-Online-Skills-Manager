@@ -1,6 +1,5 @@
 import { NavLink } from "react-router";
 import CYFLogo from "../../assets/CYF-logo.png";
-import { users } from "../../data/db";
 import { navLinks } from "../../lib/constants/navLinks";
 import { OrganizationType } from "../../data/dataType";
 import "./Sidebar.css";
@@ -11,15 +10,17 @@ const rolePathMap: Record<OrganizationType, string> = {
   [OrganizationType.CYF_STAFF]: "cyf-staff",
 };
 
-const Sidebar = ({ userType }: { userType?: OrganizationType }) => {
-  // Change userType prop above to see view for a different user.
+// The sidebar is now "Smart" and self-sufficient.
+const Sidebar = () => {
+  // Get the real user from localStorage
+  const userString = localStorage.getItem("user");
+  const user = userString ? JSON.parse(userString) : null;
 
-  const urlRoleName = userType ? rolePathMap[userType] : "";
-
-  const firstUser = users[0];
+  // Use the user's REAL orgType from the token/storage to determine the links
+  const urlRoleName = user ? rolePathMap[user.orgType as OrganizationType] : "";
 
   // Use their email, or a backup if they don't exist
-  const userEmail = firstUser ? firstUser.email : "user@email.com";
+  const userEmail = user?.email || "";
   const userInitial = userEmail ? userEmail[0].toUpperCase() : "U";
 
   return (
@@ -57,7 +58,11 @@ const Sidebar = ({ userType }: { userType?: OrganizationType }) => {
 
           <div className="flex flex-col">
             <span className="text-sm font-semibold">{userEmail}</span>
-            <NavLink to="/login" className="text-xs text-gray-500">
+            <NavLink
+              to="/login"
+              className="text-xs text-gray-500"
+              onClick={() => localStorage.clear()}
+            >
               Logout
             </NavLink>
           </div>
