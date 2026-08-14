@@ -20,8 +20,8 @@ const Sidebar = () => {
   const urlRoleName = user ? rolePathMap[user.orgType as OrganizationType] : "";
 
   // Use their email, or a backup if they don't exist
-  const userEmail = user ? user.email : "guest@email.com";
-  const userInitial = userEmail ? userEmail[0].toUpperCase() : "G";
+  const userEmail = user?.email || "";
+  const userInitial = userEmail ? userEmail[0].toUpperCase() : "U";
 
   return (
     <div className="sidebar flex flex-col h-screen shrink-0 sticky top-0 self-start border-r border-[#E3E3E3]">
