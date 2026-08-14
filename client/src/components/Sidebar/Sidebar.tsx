@@ -55,7 +55,7 @@ const Sidebar = () => {
       <div className="mt-auto p-5 border-t border-[#E3E3E3]">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-sm font-semibold text-red-700">
-            {/* {userInitial} */}
+            {userInitial}
           </div>
 
           <div className="flex flex-col min-w-0 flex-1 w-full">
