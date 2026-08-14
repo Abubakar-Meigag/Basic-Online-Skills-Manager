@@ -13,7 +13,6 @@ import getCoursePipeline from "./api/coursePipeline";
 import getCommercialDashboard from "./api/commercialDashboard";
 import getAvailableOpportunities from "./api/availableOpportunities";
 import getOutreachCourses from "./api/outreachCourses";
-import getCourseDetails from "./api/CourseDetails";
 import authRouter from "./auth/auth.router";
 import addPartner from "./api/addPartner";
 import getOrganisations from "./api/getOrganisations";
@@ -94,6 +93,6 @@ app.post(
 );
 
 // Shared Routes
-app.get("/course-details/:id", getCourseDetails); // Shared
+// app.get("/course-details/:id", getCourseDetails); // Shared
 
 export default app;
