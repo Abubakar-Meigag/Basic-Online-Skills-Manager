@@ -11,14 +11,15 @@ const rolePathMap: Record<OrganizationType, string> = {
   [OrganizationType.CYF_STAFF]: "cyf-staff",
 };
 
-const Sidebar = ({ userType }: { userType?: OrganizationType }) => {
-  // Change userType prop above to see view for a different user.
+// The sidebar is now "Smart" and self-sufficient.
+const Sidebar = () => {
+  // Get the real user from localStorage
+  const userString = localStorage.getItem("user");
+  const user = userString ? JSON.parse(userString) : null;
 
   const urlRoleName = userType ? rolePathMap[userType] : "";
 
   const getUser = localStorage.getItem("user");
-
-  const user = getUser ? JSON.parse(getUser) : null;
 
   // Use their email, or a backup if they don't exist
   const userEmail = user ? user.email : "user@email.com";
