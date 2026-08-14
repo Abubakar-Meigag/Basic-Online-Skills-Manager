@@ -6,9 +6,9 @@ const CourseDetail = ({
   detail: string | null;
 }) => {
   return (
-    <div>
-      <p>{label}</p>
-      <p>{detail}</p>
+    <div className="my-5">
+      <p className="text-[#333333] font-bold">{label}:</p>{" "}
+      <p className="text-slate-600">{detail}</p>
     </div>
   );
 };
