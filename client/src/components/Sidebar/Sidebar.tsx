@@ -25,7 +25,7 @@ const Sidebar = ({ userType }: { userType?: OrganizationType }) => {
   const userInitial = userEmail ? userEmail[0].toUpperCase() : "U";
 
   return (
-    <div className="sidebar flex flex-col h-screen shrink-0 sticky top-0 self-start border-r border-[#E3E3E3]">
+    <div className="sidebar flex flex-col h-screen shrink-0 sticky top-0 self-start border-r border-[#E3E3E3] overflow-hidden">
       <div className="p-5">
         <img className="mb-5" src={CYFLogo} width="120" height="120" />
       </div>
@@ -57,8 +57,10 @@ const Sidebar = ({ userType }: { userType?: OrganizationType }) => {
             {userInitial}
           </div>
 
-          <div className="flex flex-col">
-            <span className="text-sm font-semibold">{userEmail}</span>
+          <div className="flex flex-col min-w-0 flex-1 w-full">
+            <span className="text-sm font-semibold email-truncate">
+              {userEmail}
+            </span>
             <NavLink to="/login" className="text-xs text-gray-500">
               Logout
             </NavLink>
