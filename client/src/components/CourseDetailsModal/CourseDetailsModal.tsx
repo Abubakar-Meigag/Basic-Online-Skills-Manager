@@ -6,10 +6,12 @@ import {
 } from "@headlessui/react";
 import { useState } from "react";
 import CourseDetail from "../CourseDetail/CourseDetail";
+import statusLabel from "../../utils/statusLabel";
 import type { CoursePipelineItem } from "../../data/dataType";
 
 const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { statusStyle, statusText } = statusLabel(course.status);
 
   return (
     <>
@@ -27,7 +29,9 @@ const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
         <DialogBackdrop className="fixed inset-0 bg-black/30" />
         <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
           <DialogPanel className="max-w-lg space-y-4 border bg-white p-12 border-[#E3E3E3]">
-            <DialogTitle className="font-bold">Course Details</DialogTitle>
+            <DialogTitle className="font-bold text-xl">
+              Course Details
+            </DialogTitle>
             <div className="flex justify-between mb-10">
               <div>
                 <CourseDetail
@@ -55,7 +59,11 @@ const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
                 />
                 <CourseDetail label="City" detail={course.city} />
                 <CourseDetail label="Duration" detail="3 Weeks" />
-                <CourseDetail label="Status" detail={course.status} />{" "}
+                <CourseDetail
+                  label="Status"
+                  style={`${statusStyle} inline-flex rounded-sm px-2 py-1 text-xs font-semibold mt-3`}
+                  detail={statusText}
+                />
                 <CourseDetail
                   label="Contact Person"
                   detail={course.contact_name}
