@@ -111,4 +111,6 @@ app.get("/audit-log", authorizeRole(OrganizationType.CYF_STAFF), getAuditLog);
 
 app.use("/auth", authRouter);
 
+app.use("/auth", authRouter);
+
 export default app;
