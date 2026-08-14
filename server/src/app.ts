@@ -96,4 +96,6 @@ app.post(
 // Shared Routes
 app.get("/course-details/:id", getCourseDetails); // Shared
 
+app.use("/auth", authRouter);
+
 export default app;
