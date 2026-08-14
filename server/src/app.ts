@@ -19,6 +19,7 @@ import getOrganisations from "./api/getOrganisations";
 import addUserToPartner from "./api/addUserToPartner";
 import requestNewCourse from "./api/requestNewCourse";
 import updateCourseStatus from "./api/updateCourseStatus";
+import claimOpportunity from "./api/claimOpportunity";
 
 const app = express();
 
@@ -78,6 +79,12 @@ app.patch(
   "/course/:id/status",
   authorizeRole(OrganizationType.CYF_STAFF),
   updateCourseStatus,
+);
+
+app.post(
+  "/courses/:id/claim",
+  authorizeRole(OrganizationType.OUTREACH_PARTNER),
+  claimOpportunity,
 );
 
 // Shared Routes
