@@ -3,13 +3,14 @@ import pool from "../data/connection";
 
 /**
  * @swagger
- * /course-details/staff/{id}:
+ * /course-details/commercial/{id}:
  *   get:
- *     summary: Get full course details (CYF Staff)
+ *     summary: Get full course details (Commercial partner)
  *     description: >
- *       Returns the full details of a single course. CYF staff can view any
- *       course, so there is no per-record ownership restriction here.
- *       CYF-staff only (enforced by authorizeRole middleware).
+ *       Returns the full details of a single course, but only if it belongs to
+ *       the requesting commercial partner's own organisation. Returns 403 for a
+ *       course owned by another organisation.
+ *       Commercial-partner only (enforced by authorizeRole middleware).
  *     tags: [Courses]
  *     parameters:
  *       - in: path
@@ -21,16 +22,19 @@ import pool from "../data/connection";
  *     responses:
  *       200:
  *         description: The course details
+ *       403:
+ *         description: The course belongs to another organisation
  *       404:
  *         description: No course found with the given id
  *       500:
  *         description: Internal server error
  */
-const getStaffCourseDetails = async (
+const getCommercialCourseDetails = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   try {
+    const user = (req as any).user;
     const { id } = req.params;
 
     const query = await pool.query(
@@ -53,7 +57,12 @@ const getStaffCourseDetails = async (
       return;
     }
 
-    // Staff can view any course — no ownership check.
+    // Ownership: a commercial partner can only view their own org's courses.
+    if (course.commercial_org_id !== user.organisationId) {
+      res.status(403).json({ error: "Forbidden" });
+      return;
+    }
+
     res.json({ data: course });
   } catch (error) {
     console.error("Database error:", error);
@@ -61,4 +70,4 @@ const getStaffCourseDetails = async (
   }
 };
 
-export default getStaffCourseDetails;
+export default getCommercialCourseDetails;
