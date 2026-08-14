@@ -55,17 +55,17 @@ export async function verifyMagicLinkToken(rawToken: string) {
   // Find matching token in login_tokens table
   const query = `
     SELECT 
-      lt.id as token_id, 
+      lt.id AS token_id, 
       lt.expires_at, 
       lt.used_at,
-      u.id as user_id, 
+      u.id AS user_id, 
       u.email, 
       u.is_active,
-      o.type as org_type,
-      o.id as organisation_id
+      org.type AS org_type,
+      org.id AS organisation_id
     FROM login_tokens lt
     JOIN users u ON lt.user_id = u.id
-    LEFT JOIN organisations o ON u.organisation_id = o.id
+    LEFT JOIN organisations org ON u.organisation_id = org.id
     WHERE lt.token_hash = $1
   `;
   const result = await pool.query(query, [hashedToken]);
