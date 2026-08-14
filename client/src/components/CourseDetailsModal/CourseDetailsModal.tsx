@@ -14,7 +14,6 @@ const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
   return (
     <>
       <button
-        className="px-5"
         className="text-red-600 hover:text-red-800 font-medium"
         onClick={() => setIsOpen(true)}
       >
@@ -25,7 +24,6 @@ const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
         onClose={() => setIsOpen(false)}
         className="relative z-50"
       >
-        {" "}
         <DialogBackdrop className="fixed inset-0 bg-black/30" />
         <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
           <DialogPanel className="max-w-lg space-y-4 border bg-white p-12 border-[#E3E3E3]">
