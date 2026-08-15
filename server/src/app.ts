@@ -95,7 +95,7 @@ app.post(
   claimOpportunity,
 );
 
-app.use("/auth", authRouter);
+
 
 app.get(
   "/course-details/staff/:id",
