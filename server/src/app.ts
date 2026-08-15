@@ -95,6 +95,7 @@ app.post(
   claimOpportunity,
 );
 
+
 app.use("/auth", authRouter);
 
 app.get(
