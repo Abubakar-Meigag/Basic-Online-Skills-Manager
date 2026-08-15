@@ -95,7 +95,6 @@ app.post(
   claimOpportunity,
 );
 
-
 app.use("/auth", authRouter);
 
 app.get(
@@ -113,6 +112,5 @@ app.get(
   authorizeRole(OrganizationType.OUTREACH_PARTNER),
   getOutreachCourseDetails,
 );
-
 
 export default app;
