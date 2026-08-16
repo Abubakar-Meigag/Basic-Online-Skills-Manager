@@ -21,7 +21,7 @@ import requestNewCourse from "./api/requestNewCourse";
 import updateCourseStatus from "./api/updateCourseStatus";
 import claimOpportunity from "./api/claimOpportunity";
 import getStaffCourseDetails from "./api/getStaffCourseDetails";
-import getCommercialCourseDetails from "./api/getCommercialCourseDetails ";
+import getCommercialCourseDetails from "./api/getCommercialCourseDetails";
 import getOutreachCourseDetails from "./api/getOutreachCourseDetails";
 
 const app = express();
