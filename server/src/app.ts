@@ -13,7 +13,6 @@ import getCoursePipeline from "./api/coursePipeline";
 import getCommercialDashboard from "./api/commercialDashboard";
 import getAvailableOpportunities from "./api/availableOpportunities";
 import getOutreachCourses from "./api/outreachCourses";
-import getCourseDetails from "./api/CourseDetails";
 import authRouter from "./auth/auth.router";
 import addPartner from "./api/addPartner";
 import getOrganisations from "./api/getOrganisations";
@@ -21,6 +20,9 @@ import addUserToPartner from "./api/addUserToPartner";
 import requestNewCourse from "./api/requestNewCourse";
 import updateCourseStatus from "./api/updateCourseStatus";
 import claimOpportunity from "./api/claimOpportunity";
+import getStaffCourseDetails from "./api/getStaffCourseDetails";
+import getCommercialCourseDetails from "./api/getCommercialCourseDetails";
+import getOutreachCourseDetails from "./api/getOutreachCourseDetails";
 
 const app = express();
 
@@ -93,8 +95,23 @@ app.post(
   claimOpportunity,
 );
 
-// Shared Routes
-app.get("/course-details/:id", getCourseDetails); // Shared
+
+
+app.get(
+  "/course-details/staff/:id",
+  authorizeRole(OrganizationType.CYF_STAFF),
+  getStaffCourseDetails,
+);
+app.get(
+  "/course-details/commercial/:id",
+  authorizeRole(OrganizationType.COMMERCIAL_PARTNER),
+  getCommercialCourseDetails,
+);
+app.get(
+  "/course-details/outreach/:id",
+  authorizeRole(OrganizationType.OUTREACH_PARTNER),
+  getOutreachCourseDetails,
+);
 
 app.use("/auth", authRouter);
 
