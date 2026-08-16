@@ -112,7 +112,6 @@ const AddUserForm = ({ onBack, onCreated }: AddUserFormProps) => {
         )}
 
         <div className="space-y-5">
-          {/* Organisation dropdown */}
           <div>
             <label htmlFor="organisation" className={labelClass}>
               Organisation
@@ -138,7 +137,6 @@ const AddUserForm = ({ onBack, onCreated }: AddUserFormProps) => {
             </select>
           </div>
 
-          {/* Email */}
           <div>
             <label htmlFor="email" className={labelClass}>
               Email
@@ -155,7 +153,6 @@ const AddUserForm = ({ onBack, onCreated }: AddUserFormProps) => {
           </div>
         </div>
 
-        {/* Buttons */}
         <div className="mt-6 flex gap-3">
           <button
             type="submit"
