@@ -95,8 +95,6 @@ app.post(
   claimOpportunity,
 );
 
-
-
 app.get(
   "/course-details/staff/:id",
   authorizeRole(OrganizationType.CYF_STAFF),
