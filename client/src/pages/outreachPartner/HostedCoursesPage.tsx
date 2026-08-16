@@ -51,7 +51,6 @@ const HostedCoursesPage = () => {
 
   const getHostedCourses = useCallback(async () => {
     try {
-      setLoading(true);
       setError(null);
       const res = await api.get("/outreach/courses");
       setCourses(res.data);
@@ -64,7 +63,20 @@ const HostedCoursesPage = () => {
   }, []);
 
   useEffect(() => {
-    getHostedCourses();
+    let isMounted = true;
+
+    const fetchData = async () => {
+      setLoading(true);
+      await getHostedCourses();
+    };
+
+    if (isMounted) {
+      fetchData();
+    }
+
+    return () => {
+      isMounted = false;
+    };
   }, [getHostedCourses]);
 
   const formatDate = (dateStr?: string | null) => {
