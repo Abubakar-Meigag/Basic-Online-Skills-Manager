@@ -61,7 +61,6 @@ const AddUserForm = ({ onBack, onCreated }: AddUserFormProps) => {
 
     setSubmitting(true);
     try {
-      // Org id goes in the URL path; only email in the body.
       await api.post(`/partners/${orgId}/users`, {
         email: email.trim(),
       });
