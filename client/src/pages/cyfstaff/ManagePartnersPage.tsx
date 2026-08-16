@@ -1,8 +1,61 @@
-export default function ManagePartnersPage() {
+import { useState } from "react";
+import AddPartnerForm from "./addPartner/AddPartnerForm";
+
+type ActiveForm = "none" | "partner" | "user";
+
+const ManagePartnersPage = () => {
+  const [activeForm, setActiveForm] = useState<ActiveForm>("none");
+
+  // Return to the table (cancel).
+  const handleBack = () => {
+    setActiveForm("none");
+  };
+
+  // After a successful create: leave the form and return to the table.
+  const handleCreated = () => {
+    setActiveForm("none");
+  };
+
+  if (activeForm === "partner") {
+    return <AddPartnerForm onBack={handleBack} onCreated={handleCreated} />;
+  }
+
+  // if (activeForm === "user") {
+  //   return <AddUserForm onBack={handleBack} onCreated={handleCreated} />;
+  // }
+
   return (
-    <div>
-      <h1>Manage Partners</h1>
-      <p>Form coming soon...</p>
+    <div className="px-8 py-8">
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-[#333333]">Manage Partners</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            All registered outreach partner organisations
+          </p>
+        </div>
+
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => setActiveForm("partner")}
+            className="rounded-md bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          >
+            Add Partner
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveForm("user")}
+            disabled
+            className="rounded-md bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Add User
+          </button>
+        </div>
+      </div>
+
+      {/* The partners table goes here (existing / to be added). */}
     </div>
   );
-}
+};
+
+export default ManagePartnersPage;
