@@ -1,5 +1,6 @@
 import { useState } from "react";
 import AddPartnerForm from "./addPartner/AddPartnerForm";
+import AddUserForm from "./addPartner/AddUserForm";
 
 type ActiveForm = "none" | "partner" | "user";
 
@@ -20,9 +21,9 @@ const ManagePartnersPage = () => {
     return <AddPartnerForm onBack={handleBack} onCreated={handleCreated} />;
   }
 
-  // if (activeForm === "user") {
-  //   return <AddUserForm onBack={handleBack} onCreated={handleCreated} />;
-  // }
+  if (activeForm === "user") {
+    return <AddUserForm onBack={handleBack} onCreated={handleCreated} />;
+  }
 
   return (
     <div className="px-8 py-8">
@@ -30,7 +31,7 @@ const ManagePartnersPage = () => {
         <div>
           <h1 className="text-3xl font-bold text-[#333333]">Manage Partners</h1>
           <p className="mt-1 text-sm text-gray-500">
-            All registered outreach partner organisations
+            All registered partner organisations
           </p>
         </div>
 
@@ -45,7 +46,6 @@ const ManagePartnersPage = () => {
           <button
             type="button"
             onClick={() => setActiveForm("user")}
-            disabled
             className="rounded-md bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
           >
             Add User

@@ -37,13 +37,6 @@ const getOrganisations = async (
   _req: Request,
   res: Response,
 ): Promise<void> => {
-  // todo(auth): enable once magic-link login is built.
-  // const user = (req as any).user;
-  // if (!user || user.type !== "cyf_staff") {
-  //   res.status(403).json({ error: "Forbidden" });
-  //   return;
-  // }
-
   try {
     const query = await pool.query(
       `SELECT id, organisation_name, type

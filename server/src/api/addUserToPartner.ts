@@ -50,12 +50,6 @@ import pool from "../data/connection";
  *         description: Internal server error
  */
 const addUserToPartner = async (req: Request, res: Response): Promise<void> => {
-  // todo(auth): enable once magic-link login is built.
-  // const user = (req as any).user;
-  // if (!user || user.type !== "cyf_staff") {
-  //   res.status(403).json({ error: "Forbidden" });
-  //   return;
-  // }
 
   const { id } = req.params;
   const { email } = req.body;
