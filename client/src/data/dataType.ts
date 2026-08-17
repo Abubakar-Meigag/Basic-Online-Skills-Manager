@@ -2,6 +2,7 @@
 export type Organisation = {
   id: string;
   organisation_name: string;
+  city: string;
   type: "cyf_staff" | "commercial" | "outreach";
   email_domain: string;
   created_at: string;
