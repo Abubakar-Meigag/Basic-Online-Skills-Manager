@@ -26,6 +26,7 @@ const CYFStaffDashboard = () => {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     getCourses();
   }, [getCourses]);
 
@@ -45,6 +46,7 @@ const CYFStaffDashboard = () => {
               count={courses.request_pending.length}
             />
             <CourseCount type="Open" count={courses.request_open.length} />
+            <CourseCount type="Claimed" count={courses.request_claimed.length} />
             <CourseCount
               type="Confirmed"
               count={courses.request_confirmed.length}
