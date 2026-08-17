@@ -39,7 +39,7 @@ const getOrganisations = async (
 ): Promise<void> => {
   try {
     const query = await pool.query(
-      `SELECT id, organisation_name, type
+      `SELECT id, organisation_name, type, city
        FROM organisations
        ORDER BY organisation_name ASC`,
     );

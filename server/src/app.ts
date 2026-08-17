@@ -7,8 +7,6 @@ import { OrganizationType } from "./data/dataType";
 import { authorizeRole } from "./middleware/authMiddleware";
 
 // --- Import all your API handlers here
-import testEndPoint from "./api/testEndPoint";
-import testSwagger from "./api/testSwagger";
 import getCoursePipeline from "./api/coursePipeline";
 import getCommercialDashboard from "./api/commercialDashboard";
 import getAvailableOpportunities from "./api/availableOpportunities";
@@ -39,9 +37,6 @@ app.get("/", (_req: Request, res: Response) => {
 app.get("/health", (_req: Request, res: Response) => {
   res.json({ ok: true, message: "Server is healthy" });
 });
-
-app.get("/test", testEndPoint);
-app.post("/api/testSwagger", testSwagger);
 
 // Protected routes
 app.get(

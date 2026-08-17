@@ -2,12 +2,6 @@ import type { Request, Response } from "express";
 import pool from "../data/connection";
 
 /**
- * TODO(auth): uncomment once magic-link login is built req.user comes from session middleware.
- * req.user is populated by auth middleware after magic-link verification.
- * Note - wire to real session once auth is built.
- */
-
-/**
  * @swagger
  * /opportunities:
  *   get:
@@ -50,20 +44,6 @@ const getAvailableOpportunities = async (
   res: Response,
 ): Promise<void> => {
   try {
-    //     const user = (req as any).user;
-
-    //     if (!user) {
-    //       res.status(401).json({ error: "Not authenticated" });
-    //       return;
-    //     }
-
-    //     if (user.organisation_type !== "outreach") {
-    //       res
-    //         .status(403)
-    //         .json({ error: "Only outreach partners can view opportunities" });
-    //       return;
-    //     }
-
     const query = await pool.query(`
       SELECT
         c.id,
