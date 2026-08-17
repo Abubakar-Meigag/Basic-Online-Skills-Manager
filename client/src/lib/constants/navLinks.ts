@@ -25,6 +25,10 @@ export const navLinks: NavLinkItem[] = [
     path: "/cyf-staff/request-pipeline",
   },
   {
+    label: "Manage Partners",
+    path: "/cyf-staff/manage-partners",
+  },
+  {
     label: "Manage Users",
     path: "/cyf-staff/manage-users",
   },

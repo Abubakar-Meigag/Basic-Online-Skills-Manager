@@ -31,29 +31,22 @@ const ManageUsersPage = () => {
         <div>
           <h1 className="text-3xl font-bold text-[#333333]">Manage Users</h1>
           <p className="mt-1 text-sm text-gray-500">
-            All registered users for the various Organizations
+            All registered users for the various organizations
           </p>
         </div>
 
         <div className="flex gap-3">
           <button
             type="button"
-            onClick={() => setActiveForm("partner")}
-            className="rounded-md bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-          >
-            Add Partner
-          </button>
-          <button
-            type="button"
             onClick={() => setActiveForm("user")}
-            className="rounded-md bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-md bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700"
           >
             Add User
           </button>
         </div>
       </div>
 
-      {/* The partners table goes here (existing / to be added). */}
+      {/* The users table goes here (existing / to be added). */}
     </div>
   );
 };
