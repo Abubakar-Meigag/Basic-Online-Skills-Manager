@@ -89,16 +89,7 @@ export default function MagicLinkLogin() {
   return (
     <div className={styles.pageWrapper}>
       {/* Top Left Official CYF Logo Image */}
-      <header className={styles.headerWrapper}>
-        <div className={styles.logoContainer}>
-          <img
-            src="https://codeyourfuture.io/wp-content/uploads/2019/03/cyf_brand.png"
-            alt="Code Your Future"
-            className={styles.logoImage}
-          />
-        </div>
-      </header>
-
+      <header className={styles.headerWrapper}></header>
       {/* Main Centered Login Card */}
       <main className={styles.container}>
         <div className={styles.card}>
