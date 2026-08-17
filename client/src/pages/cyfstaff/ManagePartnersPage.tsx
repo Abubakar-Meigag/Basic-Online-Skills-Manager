@@ -92,7 +92,7 @@ const ManagePartnersPage = () => {
   return (
     <section className="p-6">
       {/* Use PageHeader for a consistent look */}
-      <div className="sticky top-0 z-20 bg-white px-8 pt-8 pb-4">
+      <div className="sticky top-0 z-20 bg-white px-8 pt-2 pb-1">
         <div className="flex items-start justify-between">
           <PageHeader
             title="Manage Partners"
@@ -107,7 +107,7 @@ const ManagePartnersPage = () => {
         </div>
       </div>
 
-      <div className="mt-8 overflow-hidden rounded-lg border border-gray-200 bg-white">
+      <div className="mt-2 overflow-y-auto rounded-lg border border-gray-200 bg-white max-h-[calc(100vh-200px)]">
         {isLoading ? (
           <div className="p-10 text-center">Loading...</div>
         ) : (
