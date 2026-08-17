@@ -55,17 +55,29 @@ const CYFStaffDashboard = () => {
               count={courses.course_completed.length}
             />
           </div>
-          <p className="bg-yellow-50 text-yellow-700 border-4 w-fit p-1 mb-2 font-bold border-yellow-200">Request Pending</p>
+          <p className="bg-yellow-50 text-yellow-700 border-4 w-fit p-1 mb-2 font-bold border-yellow-200">
+            Request Pending
+          </p>
           <CYFStaffTable courses={courses.request_pending} />
-          <p className="bg-yellow-50 text-yellow-600 border-4 w-fit p-1 mb-2 font-bold border-yellow-300">Request Open</p>
+          <p className="bg-yellow-50 text-yellow-600 border-4 w-fit p-1 mb-2 font-bold border-yellow-300">
+            Request Open
+          </p>
           <CYFStaffTable courses={courses.request_open} />
-          <p className="bg-yellow-50 text-yellow-700 border-4 w-fit p-1 mb-2 font-bold border-yellow-500">Request Claimed</p>
-          <CYFStaffTable courses={courses.request_claimed} /> 
-          <p className="bg-green-50 text-green-700 border-4 w-fit p-1 mb-2 font-bold border-green-300">Request Confirmed</p>
+          <p className="bg-yellow-50 text-yellow-700 border-4 w-fit p-1 mb-2 font-bold border-yellow-500">
+            Request Claimed
+          </p>
+          <CYFStaffTable courses={courses.request_claimed} />
+          <p className="bg-green-50 text-green-700 border-4 w-fit p-1 mb-2 font-bold border-green-300">
+            Request Confirmed
+          </p>
           <CYFStaffTable courses={courses.request_confirmed} />
-          <p className="bg-blue-50 text-blue-700 border-4 w-fit p-1 mb-2 font-bold border-blue-300">Course Running</p>
+          <p className="bg-blue-50 text-blue-700 border-4 w-fit p-1 mb-2 font-bold border-blue-300">
+            Course Running
+          </p>
           <CYFStaffTable courses={courses.course_running} />
-          <p className="bg-green-50 text-green-700 border-4 w-fit p-1 mb-2 font-bold border-green-500">Course Completed</p>
+          <p className="bg-green-50 text-green-700 border-4 w-fit p-1 mb-2 font-bold border-green-500">
+            Course Completed
+          </p>
           <CYFStaffTable courses={courses.course_completed} />
         </div>
       )}

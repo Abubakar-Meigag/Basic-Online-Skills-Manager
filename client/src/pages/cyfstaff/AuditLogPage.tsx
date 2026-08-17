@@ -23,7 +23,6 @@ const AuditLogPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
 
-
   const getAuditLog = useCallback(async () => {
     try {
       const res = await api.get("/audit-log");
@@ -71,7 +70,10 @@ const AuditLogPage = () => {
             <tbody>
               {loading && (
                 <tr>
-                  <td colSpan={5} className="py-8 text-center text-sm text-slate-500">
+                  <td
+                    colSpan={5}
+                    className="py-8 text-center text-sm text-slate-500"
+                  >
                     Loading audit entries…
                   </td>
                 </tr>
@@ -79,7 +81,10 @@ const AuditLogPage = () => {
 
               {!loading && error && (
                 <tr>
-                  <td colSpan={5} className="py-8 text-center text-sm text-red-600">
+                  <td
+                    colSpan={5}
+                    className="py-8 text-center text-sm text-red-600"
+                  >
                     {error}
                   </td>
                 </tr>
@@ -87,7 +92,10 @@ const AuditLogPage = () => {
 
               {!loading && !error && entries.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="py-8 text-center text-sm text-slate-500">
+                  <td
+                    colSpan={5}
+                    className="py-8 text-center text-sm text-slate-500"
+                  >
                     No audit entries yet.
                   </td>
                 </tr>
@@ -124,7 +132,8 @@ const AuditLogPage = () => {
         {!loading && !error && entries.length > 0 && (
           <div className="flex items-center justify-between mt-4 mb-10 text-sm text-slate-600">
             <span>
-              Showing {start + 1}–{Math.min(start + ROWS_PER_PAGE, entries.length)} of{" "}
+              Showing {start + 1}–
+              {Math.min(start + ROWS_PER_PAGE, entries.length)} of{" "}
               {entries.length}
             </span>
             <div className="flex items-center gap-4">
