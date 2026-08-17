@@ -9,7 +9,7 @@ type Organisation = {
 };
 
 type AddUserFormProps = {
-  onBack: () => void; // return to the Manage Partners table (cancel)
+  onBack: () => void; // return to the Manage Users table (cancel)
   onCreated: () => void; // called after a user is successfully created
 };
 
@@ -94,7 +94,7 @@ const AddUserForm = ({ onBack, onCreated }: AddUserFormProps) => {
         onClick={onBack}
         className="mb-4 text-sm text-gray-500 hover:text-gray-700"
       >
-        ← Back to Manage Partners
+        ← Back to Manage Users
       </button>
       <h1 className="text-2xl font-bold text-gray-900">Add User</h1>
       <p className="mt-1 text-sm text-gray-500">

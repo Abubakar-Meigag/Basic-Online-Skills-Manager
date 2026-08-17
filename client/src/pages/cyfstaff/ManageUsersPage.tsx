@@ -4,7 +4,7 @@ import AddUserForm from "./addPartner/AddUserForm";
 
 type ActiveForm = "none" | "partner" | "user";
 
-const ManagePartnersPage = () => {
+const ManageUsersPage = () => {
   const [activeForm, setActiveForm] = useState<ActiveForm>("none");
 
   // Return to the table (cancel).
@@ -29,9 +29,9 @@ const ManagePartnersPage = () => {
     <div className="px-8 py-8">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#333333]">Manage Partners</h1>
+          <h1 className="text-3xl font-bold text-[#333333]">Manage Users</h1>
           <p className="mt-1 text-sm text-gray-500">
-            All registered partner organisations
+            All registered users for the various Organizations
           </p>
         </div>
 
@@ -58,4 +58,4 @@ const ManagePartnersPage = () => {
   );
 };
 
-export default ManagePartnersPage;
+export default ManageUsersPage;
