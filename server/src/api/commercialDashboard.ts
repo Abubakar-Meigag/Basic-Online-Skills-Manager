@@ -2,13 +2,6 @@ import { Request, Response } from "express";
 import pool from "../data/connection";
 
 /**
- * AUTH - enable once login is ready.
- * Flow: magic-link login verifies the user, then the session carries { user_id, organisation_id, type }.
- * Role comes from the organisation, not the user.
- * organisations.type is one of: 'cyf_staff' | 'commercial' | 'outreach'.
- */
-
-/**
  * @swagger
  * /commercial/courses:
  *   get:
@@ -79,18 +72,8 @@ import pool from "../data/connection";
  */
 const getCommercialDashboard = async (req: Request, res: Response) => {
   try {
-    // const user = req.user;
-    // if (!user || user.type !== "commercial") {
-    //   return res.status(403).json({ error: "Forbidden" });
-    // }
-    // const organisationId = user.organisationId;
-
-    /**
-     * TEMPORARY: until auth is connected, take org id from the query
-     */
-    const organisationId =
-      (req.query.organisationId as string) ||
-      "60ea2b0f-e04e-4f9a-ac72-38bae06d98bc";
+    const user = (req as any).user;
+    const organisationId = user.organisationId;
 
     if (!organisationId) {
       return res.status(400).json({

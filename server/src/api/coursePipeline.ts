@@ -11,13 +11,6 @@ const ACTIVE_STATUS = [
 ] as const;
 
 /**
- * AUTH — enable once login is ready.
- * CYF-staff-only endpoint: staff see ALL courses (no org scoping).
- * Role comes from the organisation, not the user.
- * organisations.type is one of: 'cyf_staff' | 'commercial' | 'outreach'.
- */
-
-/**
  * @swagger
  * /course-pipeline:
  *   get:
@@ -68,12 +61,6 @@ const getCoursePipeline = async (
   res: Response,
 ): Promise<void> => {
   try {
-    // const user = req.user;
-    // if (!user || user.type !== "cyf_staff") {
-    //   res.status(403).json({ error: "Forbidden" });
-    //   return;
-    // }
-
     const query = await pool.query(`
                   SELECT
                     c.id,

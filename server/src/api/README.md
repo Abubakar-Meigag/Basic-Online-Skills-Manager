@@ -14,8 +14,6 @@ Every teammate adding a new endpoint needs to do **two things**:
 
 `components.schemas` in `swagger.ts` is just a list of reusable object shapes — one entry per table/entity (`Course`, `User`, etc.).
 
-If you're building an endpoint for an entity that **already has a schema** (e.g. `/api/testSwagger`), skip this step — just reference it in your route comment (see step 2).
-
 If you're building an endpoint for a **new entity** that doesn't have a schema yet, add it here:
 
 ```ts
