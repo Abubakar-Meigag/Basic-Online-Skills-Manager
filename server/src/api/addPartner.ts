@@ -1,12 +1,7 @@
 import type { Request, Response } from "express";
 import pool from "../data/connection";
-import { ORGANISATION_TYPE } from ".././constants/organisations";
+import { ORGANISATION_TYPE, PARTNER_TYPES } from ".././constants/organisations";
 
-const PARTNER_TYPES = [
-  ORGANISATION_TYPE.CYF_STAFF,
-  ORGANISATION_TYPE.COMMERCIAL,
-  ORGANISATION_TYPE.OUTREACH,
-] as const;
 
 /**
  * @swagger
