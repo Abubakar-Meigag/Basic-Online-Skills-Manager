@@ -29,6 +29,7 @@ const getOutreachCourse = async (
 
     const query = `
     SELECT 
+    c.id,
   c.course_name,
   o.organisation_name AS partner_organisation,
   c.trainee_target,

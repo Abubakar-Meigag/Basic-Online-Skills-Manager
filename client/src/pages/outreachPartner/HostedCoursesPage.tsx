@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { parseISO, format } from "date-fns";
 import tableHeaderStyle from "../../lib/constants/tableHeaderStyle";
 import { statusStyles } from "../../lib/constants/statusStyles";
@@ -48,34 +48,48 @@ const HostedCoursesPage = () => {
   const [courses, setCourses] = useState<HostedCourse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const isMounted = useRef<boolean>(true);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const getHostedCourses = useCallback(async () => {
     try {
-      setError(null);
       const res = await api.get("/outreach/courses");
-      setCourses(res.data);
+
+      if (isMounted.current) {
+        setCourses(res.data);
+        setError(null);
+      }
     } catch (err) {
       console.error(err);
-      setError("Failed to fetch hosted courses. Please try again.");
+      if (isMounted.current) {
+        setError("Failed to fetch hosted courses. Please try again.");
+      }
     } finally {
-      setLoading(false);
+      if (isMounted.current) {
+        setLoading(false);
+      }
     }
   }, []);
 
   useEffect(() => {
-    let isMounted = true;
+    let cancelled = false;
 
-    const fetchData = async () => {
-      setLoading(true);
-      await getHostedCourses();
+    const runFetch = async () => {
+      if (!cancelled) {
+        await getHostedCourses();
+      }
     };
 
-    if (isMounted) {
-      fetchData();
-    }
+    runFetch();
 
     return () => {
-      isMounted = false;
+      cancelled = true;
     };
   }, [getHostedCourses]);
 
@@ -137,7 +151,7 @@ const HostedCoursesPage = () => {
             </tr>
           </thead>
           <tbody>
-            {courses.map((course, idx) => {
+            {courses.map((course) => {
               const { statusStyle, statusText } = statusLabel(course.status);
               const appliedStatusStyle =
                 statusStyle ||
@@ -145,7 +159,7 @@ const HostedCoursesPage = () => {
                 "bg-slate-100 text-slate-700";
 
               return (
-                <tr key={course.id || idx} className={STYLES.tableRow}>
+                <tr key={course.id} className={STYLES.tableRow}>
                   <td className={STYLES.cellTextBold}>{course.course_name}</td>
                   <td className={STYLES.cellText}>
                     {course.partner_organisation ||
