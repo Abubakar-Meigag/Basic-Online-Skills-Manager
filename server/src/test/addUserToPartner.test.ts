@@ -1,10 +1,29 @@
 import request from "supertest";
+import jwt from "jsonwebtoken";
 import app from "../app";
 import pool from "../data/connection";
+import { OrganizationType } from "../data/dataType";
 
 vi.mock("../data/connection", () => ({
   default: { connect: vi.fn() },
 }));
+
+// Middleware reads JWT_SECRET at verify time, so set it before any request runs.
+process.env.JWT_SECRET = "test-secret";
+
+// A valid CYF-staff token
+const staffToken = jwt.sign(
+  {
+    id: "staff-1",
+    email: "staff@codeyourfuture.io",
+    orgType: OrganizationType.CYF_STAFF,
+    organisationId: "cyf-org",
+  },
+  process.env.JWT_SECRET,
+  { algorithm: "HS256", expiresIn: "1h" },
+);
+
+const auth = `Bearer ${staffToken}`;
 
 const makeClient = () => ({
   query: vi.fn(),
@@ -32,12 +51,13 @@ describe("POST /partners/:id/users", () => {
             organisation_id: "org-1",
           },
         ],
-      })
-      .mockResolvedValueOnce(undefined)
-      .mockResolvedValueOnce(undefined);
+      }) // INSERT user
+      .mockResolvedValueOnce(undefined) // audit_log
+      .mockResolvedValueOnce(undefined); // COMMIT
 
     const response = await request(app)
       .post("/partners/org-1/users")
+      .set("Authorization", auth)
       .send({ email: "second@capgemini.com" });
 
     expect(response.status).toBe(201);
@@ -51,9 +71,9 @@ describe("POST /partners/:id/users", () => {
     (pool.connect as any).mockResolvedValueOnce(client);
 
     client.query
-      .mockResolvedValueOnce(undefined)
-      .mockResolvedValueOnce({ rows: [{ id: "org-from-path" }] })
-      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce(undefined) // BEGIN
+      .mockResolvedValueOnce({ rows: [{ id: "org-from-path" }] }) // org exists
+      .mockResolvedValueOnce({ rows: [] }) // email not taken
       .mockResolvedValueOnce({
         rows: [
           {
@@ -62,19 +82,18 @@ describe("POST /partners/:id/users", () => {
             organisation_id: "org-from-path",
           },
         ],
-      })
+      }) // INSERT user
       .mockResolvedValueOnce(undefined) // audit_log
-      .mockResolvedValueOnce(undefined);
+      .mockResolvedValueOnce(undefined); // COMMIT
 
-    // Body tries to smuggle a different organisation_id - must be ignored
     const response = await request(app)
       .post("/partners/org-from-path/users")
+      .set("Authorization", auth)
       .send({ email: "new@capgemini.com", organisation_id: "attacker-org" });
 
     expect(response.status).toBe(201);
     expect(response.body.organisation_id).toBe("org-from-path");
 
-    // Confirm the INSERT used the path id, not the body id
     const insertCall = client.query.mock.calls.find(
       (c: any[]) =>
         typeof c[0] === "string" && c[0].includes("INSERT INTO users"),
@@ -84,7 +103,11 @@ describe("POST /partners/:id/users", () => {
   });
 
   it("returns 400 when email is missing", async () => {
-    const response = await request(app).post("/partners/org-1/users").send({});
+    const response = await request(app)
+      .post("/partners/org-1/users")
+      .set("Authorization", auth)
+      .send({});
+
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("error");
     expect(pool.connect).not.toHaveBeenCalled();
@@ -93,7 +116,9 @@ describe("POST /partners/:id/users", () => {
   it("returns 400 when email is malformed", async () => {
     const response = await request(app)
       .post("/partners/org-1/users")
+      .set("Authorization", auth)
       .send({ email: "not-an-email" });
+
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("error");
     expect(pool.connect).not.toHaveBeenCalled();
@@ -110,6 +135,7 @@ describe("POST /partners/:id/users", () => {
 
     const response = await request(app)
       .post("/partners/missing-org/users")
+      .set("Authorization", auth)
       .send({ email: "someone@example.com" });
 
     expect(response.status).toBe(404);
@@ -129,6 +155,7 @@ describe("POST /partners/:id/users", () => {
 
     const response = await request(app)
       .post("/partners/org-1/users")
+      .set("Authorization", auth)
       .send({ email: "taken@capgemini.com" });
 
     expect(response.status).toBe(409);
@@ -142,14 +169,24 @@ describe("POST /partners/:id/users", () => {
 
     client.query
       .mockResolvedValueOnce(undefined) // BEGIN
-      .mockRejectedValueOnce(new Error("DB down"));
+      .mockRejectedValueOnce(new Error("DB down")); // org check throws
 
     const response = await request(app)
       .post("/partners/org-1/users")
+      .set("Authorization", auth)
       .send({ email: "someone@example.com" });
 
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");
     expect(client.release).toHaveBeenCalled();
+  });
+
+  it("returns 401 when no token is provided", async () => {
+    const response = await request(app)
+      .post("/partners/org-1/users")
+      .send({ email: "someone@example.com" });
+
+    expect(response.status).toBe(401);
+    expect(pool.connect).not.toHaveBeenCalled();
   });
 });

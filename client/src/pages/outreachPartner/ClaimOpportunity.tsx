@@ -263,7 +263,7 @@ const ClaimOpportunity = ({
 
           <div className="rounded-md border border-gray-200 bg-gray-50 px-4 py-3">
             <span className="text-xs font-semibold  tracking-wide text-gray-500">
-                  Automation shows up after choosing Start Date
+              Automation shows up after choosing Start Date
             </span>
             <p className="mt-1 text-sm text-gray-600">
               End Date:{" "}
