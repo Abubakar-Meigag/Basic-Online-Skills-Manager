@@ -50,17 +50,16 @@ import pool from "../data/connection";
  *         description: Internal server error
  */
 const addUserToPartner = async (req: Request, res: Response): Promise<void> => {
-  // todo(auth): enable once magic-link login is built.
-  // const user = (req as any).user;
-  // if (!user || user.type !== "cyf_staff") {
-  //   res.status(403).json({ error: "Forbidden" });
-  //   return;
-  // }
-
+  const user = (req as any).user;
   const { id } = req.params;
   const { email } = req.body;
 
-  // Validation (before touching the DB)
+  // Validation
+  if (!user) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
   if (!email) {
     res.status(400).json({ error: "email is required" });
     return;
@@ -110,9 +109,9 @@ const addUserToPartner = async (req: Request, res: Response): Promise<void> => {
 
     // Audit: record that a user was created
     await client.query(
-      `INSERT INTO audit_log (action, entity_type, entity_id)
-       VALUES ($1, $2, $3)`,
-      ["user.created", "user", newUser.id],
+      `INSERT INTO audit_log (user_id, action, entity_type, entity_id)
+       VALUES ($1, $2, $3, $4)`,
+      [user.id, "user.created", "user", newUser.id],
     );
 
     await client.query("COMMIT");

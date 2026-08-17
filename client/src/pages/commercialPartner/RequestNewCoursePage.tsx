@@ -80,7 +80,11 @@ const RequestNewCourse = () => {
       const data = axiosErr.response?.data;
 
       // Middleware sends redirectRoute on auth failures (401/403)
-      if ((axiosErr.response?.status === 401 || axiosErr.response?.status === 403) && data?.redirectRoute) {
+      if (
+        (axiosErr.response?.status === 401 ||
+          axiosErr.response?.status === 403) &&
+        data?.redirectRoute
+      ) {
         navigate(data.redirectRoute);
         return;
       }
