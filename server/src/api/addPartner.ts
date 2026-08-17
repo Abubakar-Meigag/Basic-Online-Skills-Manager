@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import pool from "../data/connection";
 import { ORGANISATION_TYPE, PARTNER_TYPES } from ".././constants/organisations";
 
+const DOMAIN_REGEX = /^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i;
 
 /**
  * @swagger
@@ -63,12 +64,22 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
+  if (!DOMAIN_REGEX.test(email_domain)) {
+    res.status(400).json({
+      error:
+        "email_domain must be a bare domain like 'company.com' (no '@', 'http://', or trailing slash)",
+    });
+    return;
+  }
+
+  const normalisedDomain = email_domain.toLowerCase(); 
+
   try {
     // Reject if an org with this name or email_domain already exists.
     const existingOrg = await pool.query(
       `SELECT id FROM organisations
        WHERE organisation_name = $1 OR email_domain = $2`,
-      [organisation_name, email_domain],
+      [organisation_name, normalisedDomain],
     );
     if (existingOrg.rows.length > 0) {
       res.status(409).json({
@@ -81,7 +92,7 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
       `INSERT INTO organisations (organisation_name, type, email_domain, city)
        VALUES ($1, $2, $3, $4)
        RETURNING id, organisation_name, type, email_domain, city, created_at`,
-      [organisation_name, type, email_domain, city],
+      [organisation_name, type, normalisedDomain, city],
     );
 
     res.status(201).json({ organisation: result.rows[0] });
