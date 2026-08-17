@@ -12,7 +12,8 @@ import CourseActionButton from "./CourseActionButton/CourseActionButton";
 
 const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { statusStyle, statusText } = statusLabel(course.status);
+  const status = course.status;
+  const { statusStyle, statusText } = statusLabel(status);
 
   return (
     <>
@@ -72,10 +73,27 @@ const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
               </div>
             </div>
             <div className="button-bank grid grid-cols-2 gap-5">
-              <CourseActionButton text="Publish" colour="bg-blue-500" />
-              <CourseActionButton text="Reschedule" colour="bg-yellow-500" />
-              <CourseActionButton text="Confirm" colour="bg-green-500" />
-              <CourseActionButton text="Cancel Course" colour="bg-red-500" />
+              {status !== "request_open" &&
+                status !== "request_confirmed" &&
+                status !== "course_running" &&
+                status !== "course_completed" && (
+                  <CourseActionButton text="Publish" colour="bg-blue-500" />
+                )}
+
+              {status !== "course_running" && status !== "course_completed" && (
+                <CourseActionButton text="Reschedule" colour="bg-yellow-500" />
+              )}
+
+              {status !== "request_pending" &&
+                status !== "request_confirmed" &&
+                status !== "course_running" &&
+                status !== "course_completed" && (
+                  <CourseActionButton text="Confirm" colour="bg-green-500" />
+                )}
+
+              {status !== "course_running" && status !== "course_completed" && (
+                <CourseActionButton text="Cancel Course" colour="bg-red-500" />
+              )}
             </div>
           </DialogPanel>
         </div>
