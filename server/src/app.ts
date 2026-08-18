@@ -21,6 +21,7 @@ import claimOpportunity from "./api/claimOpportunity";
 import getStaffCourseDetails from "./api/getStaffCourseDetails";
 import getCommercialCourseDetails from "./api/getCommercialCourseDetails";
 import getOutreachCourseDetails from "./api/getOutreachCourseDetails";
+import getUsers from "./api/getUsers";
 
 const app = express();
 
@@ -59,7 +60,7 @@ app.get(
   authorizeRole(OrganizationType.CYF_STAFF),
   getOrganisations,
 );
-
+app.get("/users", authorizeRole(OrganizationType.CYF_STAFF), getUsers);
 app.post("/addPartner", authorizeRole(OrganizationType.CYF_STAFF), addPartner);
 app.post(
   "/partners/:id/users",

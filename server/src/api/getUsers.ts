@@ -10,7 +10,7 @@ import pool from "../data/connection";
  *       Returns an array of users joined with their organisation name.
  *       Includes ID, email, organisation name, and active status.
  *       Ordered by organisation_name for scannability.
- *     tags: [Staff]
+ *     tags: [Partners]
  *     responses:
  *       200:
  *         description: A flat array of users with joined organisation data
