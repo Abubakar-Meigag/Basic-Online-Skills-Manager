@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react"; // Added useMemo
 import { api } from "../../auth/authApi";
 import DataTable from "../../components/DataTable";
 import PageHeader from "../../components/PageHeader";
@@ -8,57 +8,16 @@ import AddUserForm from "./addPartner/AddUserForm";
 import statusLabel from "../../utils/statusLabel";
 import { userOrPartnerStatusStyles } from "../../lib/constants/userOrPartnerStatusStyles";
 
-// 1. Define columns outside the component
-const columns: TableColumn<User>[] = [
-  {
-    header: "ID",
-    accessor: "id",
-    cellClassName: "text-xs text-gray-600 font-mono",
-    render: (value) => String(value).slice(0, 5),
-  },
-  {
-    header: "Organisation Name",
-    accessor: "organisation_name",
-    render: (value) => value || "N/A",
-  },
-  {
-    header: "Email Address",
-    accessor: "email",
-    cellClassName: "font-medium text-[#333333]",
-  },
-  {
-    header: "Status",
-    accessor: "is_active",
-    render: (isActive) => {
-      // Map the boolean to the string key in our map
-      const statusKey = isActive ? "active" : "not_active";
-
-      const { statusStyle, statusText } = statusLabel(
-        statusKey,
-        userOrPartnerStatusStyles,
-      );
-
-      return (
-        <span
-          className={`px-2 py-1 rounded-sm text-xs font-semibold ${statusStyle}`}
-        >
-          <span className="capitalize">{statusText}</span>
-        </span>
-      );
-    },
-  },
-];
-
 const ManageUsersPage = () => {
   const [activeForm, setActiveForm] = useState<"none" | "user">("none");
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // 1. Fetch Users Logic
   const getUsers = useCallback(async () => {
     try {
       setIsLoading(true);
       const res = await api.get("/users");
-      // Check Swagger: use res.data or res.data.data based on your API structure
       setUsers(res.data || []);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -66,6 +25,70 @@ const ManageUsersPage = () => {
       setIsLoading(false);
     }
   }, []);
+
+  // 2. Update Status Logic
+  const handleStatusChange = useCallback(
+    async (userId: string, newStatus: boolean) => {
+      try {
+        // Send the patch request to the backend
+        await api.patch(`/users/${userId}/status`, { is_active: newStatus });
+
+        // Refresh the list from the server to ensure the UI matches the DB
+        getUsers();
+      } catch (error) {
+        console.error("Failed to update status:", error);
+        alert("Could not update user status. Please try again.");
+      }
+    },
+    [getUsers],
+  );
+
+  // 3. Columns Definition (Memoized)
+  const columns = useMemo(
+    (): TableColumn<User>[] => [
+      {
+        header: "ID",
+        accessor: "id",
+        cellClassName: "text-xs text-gray-600 font-mono",
+        render: (value) => String(value).slice(0, 5),
+      },
+      {
+        header: "Organisation Name",
+        accessor: "organisation_name",
+        render: (value) => value || "N/A",
+      },
+      {
+        header: "Email Address",
+        accessor: "email",
+        cellClassName: "font-medium text-[#333333]",
+      },
+      {
+        header: "Status",
+        accessor: "is_active",
+        render: (isActive, row) => {
+          const statusKey = isActive ? "active" : "not_active";
+          const { statusStyle } = statusLabel(
+            statusKey,
+            userOrPartnerStatusStyles,
+          );
+
+          return (
+            <select
+              value={statusKey}
+              onChange={(e) =>
+                handleStatusChange(row.id, e.target.value === "active")
+              }
+              className={`cursor-pointer rounded-sm px-2 py-1 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-red-500 ${statusStyle}`}
+            >
+              <option value="active">Active</option>
+              <option value="not_active">Not active</option>
+            </select>
+          );
+        },
+      },
+    ],
+    [handleStatusChange],
+  ); // Only re-calculate if handleStatusChange changes
 
   useEffect(() => {
     if (activeForm === "none") {
@@ -84,14 +107,12 @@ const ManageUsersPage = () => {
 
   return (
     <section className="p-6">
-      {/* Sticky Header with reduced padding for density */}
       <div className="sticky top-0 z-20 bg-white px-8 pt-2 pb-1">
         <div className="flex items-start justify-between">
           <PageHeader
             title="Manage Users"
             description="All registered users for the various organizations"
           />
-
           <button
             type="button"
             onClick={() => setActiveForm("user")}
@@ -102,7 +123,6 @@ const ManageUsersPage = () => {
         </div>
       </div>
 
-      {/* Internal Scroll container */}
       <div className="mt-2 overflow-y-auto rounded-lg border border-gray-200 bg-white max-h-[calc(100vh-200px)]">
         {isLoading ? (
           <div className="p-10 text-center text-gray-500">Loading users...</div>
