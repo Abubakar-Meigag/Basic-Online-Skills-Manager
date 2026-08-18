@@ -23,6 +23,7 @@ import getCommercialCourseDetails from "./api/getCommercialCourseDetails";
 import getOutreachCourseDetails from "./api/getOutreachCourseDetails";
 import getUsers from "./api/getUsers";
 import getAuditLog from "./api/getAuditLog";
+import updateUserStatus from "./api/updateUserStatus";
 
 const app = express();
 
@@ -62,6 +63,11 @@ app.get(
   getOrganisations,
 );
 app.get("/users", authorizeRole(OrganizationType.CYF_STAFF), getUsers);
+app.patch(
+  "/users/:id/status",
+  authorizeRole(OrganizationType.CYF_STAFF),
+  updateUserStatus,
+);
 app.post("/addPartner", authorizeRole(OrganizationType.CYF_STAFF), addPartner);
 app.post(
   "/partners/:id/users",
