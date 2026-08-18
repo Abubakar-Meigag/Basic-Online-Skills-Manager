@@ -8,6 +8,16 @@ import AddPartnerForm from "./addPartner/AddPartnerForm";
 
 const columns: TableColumn<Organisation>[] = [
   {
+    header: "ID",
+    accessor: "id",
+    // Use font-mono for technical IDs and text-gray-400 to keep it subtle
+    cellClassName: "text-xs text-gray-600 font-mono",
+    render: (value) => {
+      const val = String(value);
+      return val.slice(0, 5);
+    },
+  },
+  {
     header: "Organisation Name",
 
     accessor: "organisation_name",
@@ -36,22 +46,6 @@ const columns: TableColumn<Organisation>[] = [
     header: "Email Domain",
 
     accessor: "email_domain",
-  },
-
-  {
-    header: "Actions",
-
-    accessor: "id",
-
-    render: (id) => (
-      <button
-        onClick={() => console.log("Edit ID:", id)}
-
-        className="text-blue-600 hover:underline"
-      >
-        View Details
-      </button>
-    ),
   },
 ];
 
