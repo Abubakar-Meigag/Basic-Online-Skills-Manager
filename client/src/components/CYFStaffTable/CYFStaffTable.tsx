@@ -1,6 +1,7 @@
 import { parseISO, format } from "date-fns";
 import tableHeaderStyle from "../../lib/constants/tableHeaderStyle";
 import statusLabel from "../../utils/statusLabel";
+import CourseDetailsModal from "../CourseDetailsModal/CourseDetailsModal";
 import type { CoursePipelineItem } from "../../data/dataType";
 
 const CYFStaffTable = ({ courses }: { courses: CoursePipelineItem[] }) => {
@@ -51,12 +52,7 @@ const CYFStaffTable = ({ courses }: { courses: CoursePipelineItem[] }) => {
                 {statusText}
               </td>
               <td className="py-4 text-sm px-4">
-                <button
-                  type="button"
-                  className="text-red-600 hover:text-red-800 font-medium"
-                >
-                  View Details
-                </button>
+                <CourseDetailsModal course={course} />
               </td>
             </tr>
           );
