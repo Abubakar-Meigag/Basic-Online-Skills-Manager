@@ -8,6 +8,7 @@ import { useState } from "react";
 import CourseDetail from "./CourseDetail/CourseDetail";
 import statusLabel from "../../utils/statusLabel";
 import CourseActionButton from "./CourseActionButton/CourseActionButton";
+import formatDate from "../../utils/formatDate";
 import { api } from "../../auth/authApi";
 import type { CoursePipelineItem } from "../../data/dataType";
 
@@ -81,7 +82,10 @@ const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
                   label="Outreach Partner"
                   detail={course.outreach_org}
                 />
-                <CourseDetail label="Start Date" detail={course.start_date} />
+                <CourseDetail
+                  label="Start Date"
+                  detail={formatDate(course.start_date)}
+                />
                 <CourseDetail
                   label="Trainee Target"
                   detail={course.trainee_target}
