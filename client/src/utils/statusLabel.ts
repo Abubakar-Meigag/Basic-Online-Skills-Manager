@@ -1,4 +1,3 @@
-// client/src/utils/statusLabel.ts
 import { statusStyles as defaultStyles } from "../lib/constants/statusStyles";
 
 const statusLabel = (status: string, customStyles?: Record<string, string>) => {

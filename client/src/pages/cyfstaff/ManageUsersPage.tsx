@@ -6,7 +6,7 @@ import type { TableColumn } from "../../components/DataTable";
 import type { User } from "../../data/dataType";
 import AddUserForm from "./addPartner/AddUserForm";
 import statusLabel from "../../utils/statusLabel";
-import { userOrPartnerStatusStyles } from "../../lib/constants/statusStyles";
+import { userOrPartnerStatusStyles } from "../../lib/constants/userOrPartnerStatusStyles";
 
 // 1. Define columns outside the component
 const columns: TableColumn<User>[] = [
