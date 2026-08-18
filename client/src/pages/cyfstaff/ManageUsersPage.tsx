@@ -20,7 +20,7 @@ const ManageUsersPage = () => {
 
       const orgName = (user.organisation_name || "N/A").toLowerCase();
       const emailName = (user.email || "N/A").toLowerCase();
-      const statusText = user.is_active ? "active" : "not active";
+      const statusText = user.is_active ? "active" : "Inactive";
 
       return (
         orgName.includes(search) ||
@@ -98,7 +98,7 @@ const ManageUsersPage = () => {
               className={`cursor-pointer rounded-sm px-2 py-1 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-red-500 ${statusStyle}`}
             >
               <option value="active">Active</option>
-              <option value="not_active">Not active</option>
+              <option value="not_active">Inactive</option>
             </select>
           );
         },

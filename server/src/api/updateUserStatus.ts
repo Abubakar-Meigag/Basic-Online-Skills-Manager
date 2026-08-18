@@ -6,7 +6,7 @@ import pool from "../data/connection";
  * /users/{id}/status:
  *   patch:
  *     summary: Update a user's active status (CYF Staff only)
- *     description: Toggles a user between 'Active' and 'Not active' states.
+ *     description: Toggles a user between 'Active' and 'Inactive' states.
  *     tags: [Users]
  *     parameters:
  *       - in: path
