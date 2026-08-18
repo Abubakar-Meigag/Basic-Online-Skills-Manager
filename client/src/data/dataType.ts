@@ -33,6 +33,8 @@ export type CourseStatus =
   | "course_running"
   | "course_completed";
 
+export type UserOrPartnerStatus = "active" | "not_active";
+
 export type Course = {
   id: string;
   course_name: string;
