@@ -7,13 +7,52 @@ import {
 import { useState } from "react";
 import CourseDetail from "./CourseDetail/CourseDetail";
 import statusLabel from "../../utils/statusLabel";
-import type { CoursePipelineItem } from "../../data/dataType";
 import CourseActionButton from "./CourseActionButton/CourseActionButton";
+import { api } from "../../auth/authApi";
+import type { CoursePipelineItem } from "../../data/dataType";
 
 const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [displayError, setDisplayError] = useState("");
   const status = course.status;
   const { statusStyle, statusText } = statusLabel(status);
+
+  const publishCourse = async () => {
+    try {
+      await api.patch(`/course/${course.id}/status`, {
+        status: "request_open",
+      });
+      setIsOpen(false);
+    } catch (error) {
+      console.error(error);
+      setDisplayError(`Error: ${error}`);
+      setTimeout(() => setDisplayError(""), 30000);
+    }
+  };
+
+  const rescheduleCourse = async () => {
+    try {
+      await api.patch(`/course/${course.id}/status`, {
+        status: "request_open",
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const confirmCourse = async () => {
+    try {
+      await api.patch(`/course/${course.id}/status`, {
+        status: "request_confirmed",
+      });
+    } catch (error) {
+      console.error(error);
+      setDisplayError(`Error: ${error}`);
+      setTimeout(() => setDisplayError(""), 30000);
+    }
+  };
+
+  const cancelCourse = () => {};
 
   return (
     <>
@@ -34,6 +73,7 @@ const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
             <DialogTitle className="font-bold text-xl">
               Course Details
             </DialogTitle>
+            {displayError && <p className="text-red-600">{displayError}</p>}
             <div className="flex justify-between mb-10">
               <div className="mr-25">
                 <CourseDetail label="ID" detail={course.id} />
@@ -75,19 +115,35 @@ const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
             </div>
             <div className="button-bank grid grid-cols-2 gap-5">
               {status === "request_pending" && (
-                <CourseActionButton text="Publish" colour="bg-blue-500" />
+                <CourseActionButton
+                  text="Publish"
+                  colour="bg-blue-500"
+                  action={publishCourse}
+                />
               )}
 
               {status !== "course_running" && status !== "course_completed" && (
-                <CourseActionButton text="Reschedule" colour="bg-yellow-500" />
+                <CourseActionButton
+                  text="Reschedule"
+                  colour="bg-yellow-500"
+                  action={rescheduleCourse}
+                />
               )}
 
               {status === "request_claimed" && (
-                <CourseActionButton text="Confirm" colour="bg-green-500" />
+                <CourseActionButton
+                  text="Confirm"
+                  colour="bg-green-500"
+                  action={confirmCourse}
+                />
               )}
 
               {status !== "course_running" && status !== "course_completed" && (
-                <CourseActionButton text="Cancel Course" colour="bg-red-500" />
+                <CourseActionButton
+                  text="Cancel Course"
+                  colour="bg-red-500"
+                  action={cancelCourse}
+                />
               )}
             </div>
           </DialogPanel>
