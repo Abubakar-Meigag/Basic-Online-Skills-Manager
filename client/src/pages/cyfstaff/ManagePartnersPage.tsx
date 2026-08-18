@@ -65,7 +65,7 @@ const ManagePartnersPage = () => {
   const filteredOrganisations = useMemo(() => {
     return organisations.filter((org) => {
       const search = searchTerm.toLowerCase();
-      
+
       const name = (org.organisation_name || "").toLowerCase();
       const city = (org.city || "").toLowerCase();
       const type = (org.type || "").toLowerCase();
@@ -115,7 +115,7 @@ const ManagePartnersPage = () => {
                 className="w-64 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
               />
               {searchTerm && (
-                <button 
+                <button
                   onClick={() => setSearchTerm("")}
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
@@ -137,13 +137,15 @@ const ManagePartnersPage = () => {
       {/* Table Container with Internal Scroll */}
       <div className="mt-2 overflow-y-auto rounded-lg border border-gray-200 bg-white max-h-[calc(100vh-200px)]">
         {isLoading ? (
-          <div className="p-10 text-center text-gray-500">Loading partners...</div>
+          <div className="p-10 text-center text-gray-500">
+            Loading partners...
+          </div>
         ) : filteredOrganisations.length > 0 ? (
           <DataTable data={filteredOrganisations} columns={columns} />
         ) : (
           <div className="p-10 text-center text-gray-500">
-            {searchTerm 
-              ? `No partners matching "${searchTerm}"` 
+            {searchTerm
+              ? `No partners matching "${searchTerm}"`
               : "No partners found."}
           </div>
         )}
