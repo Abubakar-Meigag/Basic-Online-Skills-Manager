@@ -12,8 +12,25 @@ const ManageUsersPage = () => {
   const [activeForm, setActiveForm] = useState<"none" | "user">("none");
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // 1. Fetch Users Logic
+  const filteredUsers = useMemo(() => {
+    return users.filter((user) => {
+      const search = searchTerm.toLowerCase();
+
+      const orgName = (user.organisation_name || "N/A").toLowerCase();
+      const emailName = (user.email || "N/A").toLowerCase();
+      const statusText = user.is_active ? "active" : "not active";
+
+      return (
+        orgName.includes(search) ||
+        emailName.includes(search) ||
+        statusText.includes(search)
+      );
+    });
+  }, [users, searchTerm]);
+
+  // Fetch Users Logic
   const getUsers = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -26,7 +43,7 @@ const ManageUsersPage = () => {
     }
   }, []);
 
-  // 2. Update Status Logic
+  // Update Status Logic
   const handleStatusChange = useCallback(
     async (userId: string, newStatus: boolean) => {
       try {
@@ -43,7 +60,7 @@ const ManageUsersPage = () => {
     [getUsers],
   );
 
-  // 3. Columns Definition (Memoized)
+  // Columns Definition (Memoized)
   const columns = useMemo(
     (): TableColumn<User>[] => [
       {
@@ -113,23 +130,51 @@ const ManageUsersPage = () => {
             title="Manage Users"
             description="All registered users for the various organizations"
           />
-          <button
-            type="button"
-            onClick={() => setActiveForm("user")}
-            className="rounded-md bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700"
-          >
-            Add User
-          </button>
+
+          {/* Wrap the search input and button in a flex container */}
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search by org, email or status..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-64 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+              />
+              {/* Clear button appears only when there is text */}
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setActiveForm("user")}
+              className="rounded-md bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700"
+            >
+              Add User
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="mt-2 overflow-y-auto rounded-lg border border-gray-200 bg-white max-h-[calc(100vh-200px)]">
         {isLoading ? (
           <div className="p-10 text-center text-gray-500">Loading users...</div>
-        ) : users.length > 0 ? (
-          <DataTable data={users} columns={columns} />
+        ) : filteredUsers.length > 0 ? (
+          <DataTable data={filteredUsers} columns={columns} />
         ) : (
-          <div className="p-10 text-center text-gray-500">No users found.</div>
+          /* show a different message if a search is active */
+          <div className="p-10 text-center text-gray-500">
+            {searchTerm
+              ? `No users matching "${searchTerm}"`
+              : "No users found."}
+          </div>
         )}
       </div>
     </section>
