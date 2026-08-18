@@ -12,6 +12,7 @@ export type User = {
   id: string;
   email: string;
   organisation_id: string;
+  organisation_name?: string;
   is_active: boolean;
   created_at: string;
   last_login_at: string | null;
