@@ -7,7 +7,7 @@ import {
 import { useState } from "react";
 import CourseDetail from "./CourseDetail/CourseDetail";
 import statusLabel from "../../utils/statusLabel";
-import CourseActionButton from "./CourseActionButton/CourseActionButton"
+import CourseActionButton from "./CourseActionButton/CourseActionButton";
 import { api } from "../../auth/authApi";
 import type { CoursePipelineItem } from "../../data/dataType";
 
