@@ -6,19 +6,32 @@ import {
   DialogTitle,
   DialogBackdrop,
 } from "@headlessui/react";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import CourseDetail from "./CourseDetail/CourseDetail";
 import statusLabel from "../../utils/statusLabel";
 import CourseActionButton from "./CourseActionButton/CourseActionButton";
 import formatDate from "../../utils/formatDate";
 import { api } from "../../auth/authApi";
-import type { CoursePipelineItem } from "../../data/dataType";
 
-const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
+const CourseDetailsModal = ({ id }: { id: string }) => {
+  const [course, setCourse] = useState<any>();
   const [isOpen, setIsOpen] = useState(false);
   const [displayError, setDisplayError] = useState("");
   const status = course.status;
   const { statusStyle, statusText } = statusLabel(status);
+
+  const fetchCourse = useCallback(async () => {
+    try {
+      const res = await api.get(`/course-details/staff/${id}`);
+      setCourse(res.data.data);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    fetchCourse();
+  }, [fetchCourse]);
 
   const publishCourse = async () => {
     try {
@@ -56,7 +69,7 @@ const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
   };
 
   // const cancelCourse = () => {};
-
+  console.log(course);
   return (
     <>
       <button
@@ -77,48 +90,50 @@ const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
               Course Details
             </DialogTitle>
             {displayError && <p className="text-red-600">{displayError}</p>}
-            <div className="flex justify-between mb-10">
-              <div className="mr-25">
-                <CourseDetail label="ID" detail={course.id} />
-                <CourseDetail
-                  label="Outreach Partner"
-                  detail={course.outreach_org}
-                />
-                <CourseDetail
-                  label="Start Date"
-                  detail={course.start_date && formatDate(course.start_date)}
-                />
-                <CourseDetail
-                  label="Trainee Target"
-                  detail={course.trainee_target}
-                />
-                <CourseDetail
-                  label="Venue Address"
-                  detail={course.venue_address}
-                />
-                <CourseDetail
-                  label="Contact Email"
-                  detail={course.contact_email}
-                />
+            {course && (
+              <div className="flex justify-between mb-10">
+                <div className="mr-25">
+                  <CourseDetail label="ID" detail={course.id} />
+                  <CourseDetail
+                    label="Outreach Partner"
+                    detail={course.outreach_org}
+                  />
+                  <CourseDetail
+                    label="Start Date"
+                    detail={course.start_date && formatDate(course.start_date)}
+                  />
+                  <CourseDetail
+                    label="Trainee Target"
+                    detail={course.trainee_target}
+                  />
+                  <CourseDetail
+                    label="Venue Address"
+                    detail={course.venue_address}
+                  />
+                  <CourseDetail
+                    label="Contact Email"
+                    detail={course.contact_email}
+                  />
+                </div>
+                <div>
+                  <CourseDetail
+                    label="Commercial Partner"
+                    detail={course.commercial_org}
+                  />
+                  <CourseDetail label="City" detail={course.city} />
+                  <CourseDetail label="Duration" detail="3 Weeks" />
+                  <CourseDetail
+                    label="Status"
+                    style={`${statusStyle} inline-flex rounded-sm px-2 py-1 text-xs font-semibold mt-3`}
+                    detail={statusText}
+                  />
+                  <CourseDetail
+                    label="Contact Person"
+                    detail={course.contact_name}
+                  />
+                </div>
               </div>
-              <div>
-                <CourseDetail
-                  label="Commercial Partner"
-                  detail={course.commercial_org}
-                />
-                <CourseDetail label="City" detail={course.city} />
-                <CourseDetail label="Duration" detail="3 Weeks" />
-                <CourseDetail
-                  label="Status"
-                  style={`${statusStyle} inline-flex rounded-sm px-2 py-1 text-xs font-semibold mt-3`}
-                  detail={statusText}
-                />
-                <CourseDetail
-                  label="Contact Person"
-                  detail={course.contact_name}
-                />
-              </div>
-            </div>
+            )}
             <div className="button-bank grid grid-cols-2 gap-5">
               {status === "request_pending" && (
                 <CourseActionButton

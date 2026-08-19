@@ -52,7 +52,7 @@ const CYFStaffTable = ({ courses }: { courses: CoursePipelineItem[] }) => {
                 {statusText}
               </td>
               <td className="py-4 text-sm px-4">
-                <CourseDetailsModal course={course} />
+                <CourseDetailsModal id={course.id} />
               </td>
             </tr>
           );
