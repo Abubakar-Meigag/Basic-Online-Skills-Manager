@@ -56,7 +56,7 @@ const Sidebar = () => {
           </div>
 
           <div className="flex flex-col">
-            <span className="text-sm font-semibold">{userEmail}</span>
+            <span className="text-sm font-semibold email-truncate">{userEmail}</span>
             <NavLink
               to="/login"
               className="text-xs text-gray-500"

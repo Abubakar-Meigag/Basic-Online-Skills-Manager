@@ -76,20 +76,20 @@ const OutreachDashboard = () => {
                 key={course.id}
                 className="border-b border-[#F3F3F3] hover:bg-[#F3F3F3] transition-colors"
               >
-                <td className="py-4 text-sm text-slate-500 pl-5">
+                <td className="py-4 text-sm text-center text-slate-500 pl-5">
                   {course.id.slice(-5)}
                 </td>
-                <td className="py-4 text-sm text-slate-600 px-4">
+                <td className="py-4 text-sm text-center text-slate-600 px-4">
                   {course.commercial_org}
                 </td>
-                <td className="py-4 text-sm text-slate-600 px-4">
+                <td className="py-4 text-sm text-center text-slate-600 px-4">
                   {course.city}
                 </td>
-                <td className="py-4 text-sm text-slate-600 px-14">
+                <td className="py-4 text-sm text-center text-slate-600 px-14">
                   {course.trainee_target}
                 </td>
-                <td className="py-4 text-sm text-slate-600 px-4">3 Weeks</td>
-                <td className="py-4 text-sm text-slate-600 px-4">
+                <td className="py-4 text-sm text-center text-slate-600 px-4">3 Weeks</td>
+                <td className="py-4 text-sm text-center text-slate-600 px-4">
                   {format(parseISO(course.deadline), "dd/MM/yyyy")}
                 </td>
                 <td className="py-4 text-sm px-4">

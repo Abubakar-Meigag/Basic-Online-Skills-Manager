@@ -156,12 +156,12 @@ const ClaimOpportunity = ({
       >
         ← Opportunity Board
       </button>
-      <h1 className="text-2xl font-bold text-gray-900">Claim This Course</h1>
+      <h1 className="text-2xl font-bold text-gray-900">Claim This Opportunity</h1>
 
       <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6">
         <div className="mb-4 flex items-center justify-between border-b border-gray-100 pb-3">
           <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-            Original Request
+            Opportunity Details
           </span>
           <span className="rounded-md bg-green-50 px-2 py-1 text-xs font-semibold text-green-700">
             ● OPEN
