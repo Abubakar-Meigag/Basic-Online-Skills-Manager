@@ -12,12 +12,13 @@ import statusLabel from "../../utils/statusLabel";
 import CourseActionButton from "./CourseActionButton/CourseActionButton";
 import formatDate from "../../utils/formatDate";
 import { api } from "../../auth/authApi";
+import type { CoursePipelineItem } from "../../data/dataType";
 
 const CourseDetailsModal = ({ id }: { id: string }) => {
-  const [course, setCourse] = useState<any>();
+  const [course, setCourse] = useState<CoursePipelineItem>();
   const [isOpen, setIsOpen] = useState(false);
   const [displayError, setDisplayError] = useState("");
-  const status = course && course.status;
+  const status = course?.status ?? "";
   const { statusStyle, statusText } = statusLabel(status);
 
   const fetchCourse = useCallback(async () => {
@@ -30,10 +31,12 @@ const CourseDetailsModal = ({ id }: { id: string }) => {
   }, [id]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchCourse();
   }, [fetchCourse]);
 
   const publishCourse = async () => {
+    if (!course) return;
     window.location.reload();
     try {
       await api.patch(`/course/${course.id}/status`, {
@@ -57,6 +60,7 @@ const CourseDetailsModal = ({ id }: { id: string }) => {
   // };
 
   const confirmCourse = async () => {
+    if (!course) return;
     window.location.reload();
     try {
       await api.patch(`/course/${course.id}/status`, {
