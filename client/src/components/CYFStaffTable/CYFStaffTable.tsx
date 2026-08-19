@@ -55,12 +55,6 @@ const CYFStaffTable = ({ courses }: { courses: CoursePipelineItem[] }) => {
               </td>
               <td className="py-4 text-sm px-4">
                 <CourseDetailsModal id={course.id} />
-                <button
-                  type="button"
-                  className="text-red-600 text-center hover:text-red-800 font-medium"
-                >
-                  View Details
-                </button>
               </td>
             </tr>
           );
