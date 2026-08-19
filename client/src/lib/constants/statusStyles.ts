@@ -1,11 +1,18 @@
 import type { CourseStatus } from "../../data/dataType";
 
 export const statusStyles: Record<CourseStatus, string> = {
-  request_pending: "bg-yellow-50 text-yellow-700 border border-yellow-200",
-  request_open: "bg-yellow-50 text-yellow-700 border border-yellow-200",
-  request_claimed: "bg-yellow-50 text-yellow-700 border border-yellow-200",
-  request_confirmed: "bg-green-50 text-green-700 border border-green-200",
-  course_completed: "bg-green-50 text-green-700 border border-green-200",
-  course_running: "bg-blue-50 text-blue-700 border border-blue-200",
-  request_cancelled: "bg-red-50 text-red-700 border border-red-200",
+  request_pending:
+    "bg-amber-100 text-center text-amber-600 border-2 min-w-[120px]border-amber-300 rounded-lg",
+  request_open:
+    "bg-slate-100 text-center text-slate-800 border-2 min-w-[120px] border-slate-400 rounded-lg",
+  request_claimed:
+    "bg-yellow-50 text-center text-yellow-700 border-2 min-w-[120px] border-yellow-500 rounded-lg",
+  request_confirmed:
+    "bg-green-50 text-center text-green-700 border-2 min-w-[120px] border-green-300 rounded-lg",
+  course_completed:
+    "bg-stone-100 text-center text-stone-700 border-2 min-w-[120px] border-stone-400 rounded-lg",
+  course_running:
+    "bg-blue-100 text-center text-blue-700 border-2 min-w-[120px] border-blue-300 rounded-lg",
+  request_cancelled:
+    "bg-stone-50 text-center text-gray-700 border-2 min-w-[120px] border-gray-400 rounded-lg",
 };
