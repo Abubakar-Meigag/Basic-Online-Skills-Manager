@@ -3,7 +3,7 @@ import { format, parseISO } from "date-fns";
 import { api } from "../../auth/authApi";
 
 const tableHeaderStyle =
-  "py-3 text-sm font-semibold text-[#333333] uppercase tracking-wide";
+  "py-3 text-sm text-center font-semibold text-[#333333] uppercase tracking-wide";
 
 const ROWS_PER_PAGE = 30;
 
@@ -108,19 +108,19 @@ const AuditLogPage = () => {
                     key={entry.id}
                     className="border-b border-[#F3F3F3] hover:bg-[#F3F3F3] transition-colors"
                   >
-                    <td className="py-4 text-sm text-slate-500 pl-10">
+                    <td className="py-4 text-sm text-center text-slate-500 pl-10">
                       {entry.id.slice(-5)}
                     </td>
-                    <td className="py-4 text-sm text-slate-600 px-4">
+                    <td className="py-4 text-sm text-center text-slate-600 px-4">
                       {format(parseISO(entry.created_at), "yyyy-MM-dd HH:mm")}
                     </td>
-                    <td className="py-4 text-sm text-slate-600 px-4">
+                    <td className="py-4 text-sm text-center text-slate-600 px-4">
                       {entry.user_email}
                     </td>
-                    <td className="py-4 text-sm text-slate-600 px-4">
+                    <td className="py-4 text-sm text-center text-slate-600 px-4">
                       {entry.action}
                     </td>
-                    <td className="py-4 text-sm text-slate-600 px-4">
+                    <td className="py-4 text-sm text-center text-slate-600 px-4">
                       {entry.entity_type} - {entry.entity_id.slice(-5)}
                     </td>
                   </tr>

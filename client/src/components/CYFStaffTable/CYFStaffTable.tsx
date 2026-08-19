@@ -27,20 +27,22 @@ const CYFStaffTable = ({ courses }: { courses: CoursePipelineItem[] }) => {
               key={course.id}
               className="border-b border-[#F3F3F3] hover:bg-[#F3F3F3] transition-colors"
             >
-              <td className="py-4 text-sm text-slate-500 pl-5">
+              <td className="py-4 text-sm text-center text-slate-500 pl-5">
                 {course.id.slice(-5)}
               </td>
-              <td className="py-4 text-sm text-slate-600 px-4">
+              <td className="py-4 text-sm text-center text-slate-600 px-4">
                 {course.commercial_org}
               </td>
-              <td className="py-4 text-sm text-slate-600 px-4">
+              <td className="py-4 text-sm text-center text-slate-600 px-4">
                 {course.outreach_org ? course.outreach_org : "-"}
               </td>
-              <td className="py-4 text-sm text-slate-600 px-4">
+              <td className="py-4 text-sm text-center text-slate-600 px-4">
                 {course.city}
               </td>
-              <td className="py-4 text-sm text-slate-600 px-4">3 Weeks</td>
-              <td className="py-4 text-sm text-slate-600 px-4">
+              <td className="py-4 text-sm text-center text-slate-600 px-4">
+                3 Weeks
+              </td>
+              <td className="py-4 text-sm text-center text-slate-600 px-4">
                 {/* This formats the date from ISO string to local format*/}
                 {course.deadline &&
                   format(parseISO(course.deadline), "dd/MM/yyyy")}
@@ -53,7 +55,7 @@ const CYFStaffTable = ({ courses }: { courses: CoursePipelineItem[] }) => {
               <td className="py-4 text-sm px-4">
                 <button
                   type="button"
-                  className="text-red-600 hover:text-red-800 font-medium"
+                  className="text-red-600 text-center hover:text-red-800 font-medium"
                 >
                   View Details
                 </button>

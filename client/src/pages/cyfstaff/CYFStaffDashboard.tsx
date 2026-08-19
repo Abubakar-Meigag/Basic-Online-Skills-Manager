@@ -46,7 +46,10 @@ const CYFStaffDashboard = () => {
               count={courses.request_pending.length}
             />
             <CourseCount type="Open" count={courses.request_open.length} />
-            <CourseCount type="Claimed" count={courses.request_claimed.length} />
+            <CourseCount
+              type="Claimed"
+              count={courses.request_claimed.length}
+            />
             <CourseCount
               type="Confirmed"
               count={courses.request_confirmed.length}
@@ -57,27 +60,27 @@ const CYFStaffDashboard = () => {
               count={courses.course_completed.length}
             />
           </div>
-          <p className="bg-yellow-50 text-yellow-700 border-4 w-fit p-1 mb-2 font-bold border-yellow-200 rounded-lg">
+          <p className="bg-yellow-100 text-amber-600 border-2 w-fit p-1 mb-2 font-bold border-amber-300  rounded-lg">
             Request Pending
           </p>
           <CYFStaffTable courses={courses.request_pending} />
-          <p className="bg-yellow-50 text-yellow-600 border-4 w-fit p-1 mb-2 font-bold border-yellow-300 rounded-lg">
+          <p className="bg-slate-100 text-slate-800 border-2 w-fit p-1 mb-2 font-bold border-slate-400 rounded-lg">
             Request Open
           </p>
           <CYFStaffTable courses={courses.request_open} />
-          <p className="bg-yellow-50 text-yellow-700 border-4 w-fit p-1 mb-2 font-bold border-yellow-500 rounded-lg">
+          <p className="bg-yellow-50 text-yellow-700 border-2 w-fit p-1 mb-2 font-bold border-yellow-500 rounded-lg">
             Request Claimed
           </p>
           <CYFStaffTable courses={courses.request_claimed} />
-          <p className="bg-green-50 text-green-700 border-4 w-fit p-1 mb-2 font-bold border-green-300 rounded-lg">
+          <p className="bg-green-50 text-green-700 border-2 w-fit p-1 mb-2 font-bold border-green-300 rounded-lg">
             Request Confirmed
           </p>
           <CYFStaffTable courses={courses.request_confirmed} />
-          <p className="bg-blue-50 text-blue-700 border-4 w-fit p-1 mb-2 font-bold border-blue-300 rounded-lg">
+          <p className="bg-blue-100 text-blue-700 border-2 w-fit p-1 mb-2 font-bold border-blue-300 rounded-lg">
             Course Running
           </p>
           <CYFStaffTable courses={courses.course_running} />
-          <p className="bg-green-50 text-green-700 border-4 w-fit p-1 mb-2 font-bold border-green-500 rounded-lg">
+          <p className="bg-stone-100 text-shadow-olive-700 border-2 w-fit p-1 mb-2 font-bold border-stone-400 rounded-lg">
             Course Completed
           </p>
           <CYFStaffTable courses={courses.course_completed} />

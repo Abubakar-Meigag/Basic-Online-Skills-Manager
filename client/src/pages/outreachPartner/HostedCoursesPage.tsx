@@ -38,7 +38,7 @@ const STYLES = {
   tableHeaderRow: "bg-[#F3F3F3]",
   tableRow: "border-b border-[#F3F3F3] hover:bg-[#F3F3F3] transition-colors",
   cellMuted: "py-4 text-sm text-slate-500 pl-5",
-  cellText: "py-4 text-sm text-slate-600 px-4",
+  cellText: "py-4 text-sm text-center text-slate-600 px-4",
   cellTextBold: "py-4 text-sm font-semibold text-slate-900 px-4",
   cellTarget: "py-4 text-sm text-slate-600 px-14",
   badgeBase: "inline-flex rounded-sm px-2 py-1 text-xs font-semibold",
@@ -144,7 +144,7 @@ const HostedCoursesPage = () => {
               <th className={`${tableHeaderStyle} pl-5`}>Course Name</th>
               <th className={`${tableHeaderStyle} px-4`}>Commercial Partner</th>
               <th className={`${tableHeaderStyle} px-4`}>Venue / Location</th>
-              <th className={`${tableHeaderStyle} px-14`}>Trainee Target</th>
+              <th className={`${tableHeaderStyle} px-4`}>Trainee Target</th>
               <th className={`${tableHeaderStyle} px-4`}>Start Date</th>
               <th className={`${tableHeaderStyle} px-4`}>End Date</th>
               <th className={`${tableHeaderStyle} px-4`}>Status</th>
