@@ -1,3 +1,5 @@
+// There are some commented code in this file. These code can be used for future functionality.
+
 import {
   Dialog,
   DialogPanel,
@@ -31,15 +33,15 @@ const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
     }
   };
 
-  const rescheduleCourse = async () => {
-    try {
-      await api.patch(`/course/${course.id}/status`, {
-        status: "request_open",
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // const rescheduleCourse = async () => {
+  //   try {
+  //     await api.patch(`/course/${course.id}/status`, {
+  //       status: "request_open",
+  //     });
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   const confirmCourse = async () => {
     try {
@@ -53,7 +55,7 @@ const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
     }
   };
 
-  const cancelCourse = () => {};
+  // const cancelCourse = () => {};
 
   return (
     <>
@@ -84,7 +86,7 @@ const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
                 />
                 <CourseDetail
                   label="Start Date"
-                  detail={formatDate(course.start_date)}
+                  detail={course.start_date && formatDate(course.start_date)}
                 />
                 <CourseDetail
                   label="Trainee Target"
@@ -126,13 +128,13 @@ const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
                 />
               )}
 
-              {status !== "course_running" && status !== "course_completed" && (
+              {/* {status !== "course_running" && status !== "course_completed" && (
                 <CourseActionButton
                   text="Reschedule"
                   colour="bg-yellow-500"
                   action={rescheduleCourse}
                 />
-              )}
+              )} */}
 
               {status === "request_claimed" && (
                 <CourseActionButton
@@ -142,13 +144,13 @@ const CourseDetailsModal = ({ course }: { course: CoursePipelineItem }) => {
                 />
               )}
 
-              {status !== "course_running" && status !== "course_completed" && (
+              {/* {status !== "course_running" && status !== "course_completed" && (
                 <CourseActionButton
                   text="Cancel Course"
                   colour="bg-red-500"
                   action={cancelCourse}
                 />
-              )}
+              )} */}
             </div>
           </DialogPanel>
         </div>
