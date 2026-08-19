@@ -1,18 +1,25 @@
 import request from "supertest";
 import jwt from "jsonwebtoken";
 import app from "../app";
-import pool from "../data/connection";
 import { OrganizationType } from "../data/dataType";
 
+const mockClient = {
+  query: vi.fn(),
+  release: vi.fn(),
+};
+
 vi.mock("../data/connection", () => ({
-  default: { query: vi.fn() },
+  default: {
+    connect: vi.fn(() => Promise.resolve(mockClient)),
+    query: vi.fn(),
+  },
 }));
 
 process.env.JWT_SECRET = "test-secret";
 
 const staffToken = jwt.sign(
   {
-    id: "user-1",
+    id: "staff-999",
     email: "staff@codeyourfuture.io",
     orgType: OrganizationType.CYF_STAFF,
   },
@@ -21,13 +28,16 @@ const staffToken = jwt.sign(
 );
 
 describe("PATCH /users/:id/status", () => {
-  afterEach(() => {
+  beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("successfully updates a user's status and returns 200", async () => {
-    // Mock the result of the UPDATE ... RETURNING query
-    (pool.query as any).mockResolvedValueOnce({ rowCount: 1 });
+  it("successfully updates user status and inserts audit log", async () => {
+    mockClient.query
+      .mockResolvedValueOnce({}) // BEGIN
+      .mockResolvedValueOnce({ rowCount: 1, rows: [{ id: "u-123" }] }) // UPDATE
+      .mockResolvedValueOnce({}) // INSERT (audit log)
+      .mockResolvedValueOnce({}); // COMMIT
 
     const response = await request(app)
       .patch("/users/u-123/status")
@@ -35,16 +45,23 @@ describe("PATCH /users/:id/status", () => {
       .send({ is_active: false });
 
     expect(response.status).toBe(200);
-    expect(response.body.message).toMatch(/success/i);
+    expect(response.body.message).toMatch(/logged successfully/i);
 
-    // Verify the SQL parameters
-    const [query, params] = (pool.query as any).mock.calls[0];
-    expect(params).toEqual([false, "u-123"]);
+    const auditLogParams = mockClient.query.mock.calls[2]![1];
+
+    expect(auditLogParams[0]).toBe("staff-999");
+
+    expect(auditLogParams[1]).toMatch(/Inactive/);
+
+    expect(auditLogParams[3]).toBe("u-123");
+
+    expect(mockClient.release).toHaveBeenCalled();
   });
 
-  it("returns 404 when the user ID does not exist", async () => {
-    // rowCount 0 means the UPDATE query didn't find any row to change
-    (pool.query as any).mockResolvedValueOnce({ rowCount: 0 });
+  it("returns 404 and rolls back if user does not exist", async () => {
+    mockClient.query
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce({ rowCount: 0 });
 
     const response = await request(app)
       .patch("/users/fake-id/status")
@@ -53,10 +70,15 @@ describe("PATCH /users/:id/status", () => {
 
     expect(response.status).toBe(404);
     expect(response.body.error).toBe("User not found");
+
+    expect(mockClient.query).toHaveBeenCalledWith("ROLLBACK");
+    expect(mockClient.release).toHaveBeenCalled();
   });
 
-  it("returns 500 when database update fails", async () => {
-    (pool.query as any).mockRejectedValueOnce(new Error("Connection lost"));
+  it("returns 500 and rolls back on database error", async () => {
+    mockClient.query
+      .mockResolvedValueOnce({}) // BEGIN
+      .mockRejectedValueOnce(new Error("Connection lost")); // UPDATE CRASHES
 
     const response = await request(app)
       .patch("/users/u-123/status")
@@ -64,5 +86,45 @@ describe("PATCH /users/:id/status", () => {
       .send({ is_active: true });
 
     expect(response.status).toBe(500);
+    expect(mockClient.query).toHaveBeenCalledWith("ROLLBACK");
+    expect(mockClient.release).toHaveBeenCalled();
+  });
+
+  it("returns 401 when the performer ID is missing from the token", async () => {
+    const malformedToken = jwt.sign(
+      {
+        email: "staff@codeyourfuture.io",
+        orgType: OrganizationType.CYF_STAFF,
+      },
+      process.env.JWT_SECRET as string,
+      { algorithm: "HS256" },
+    );
+
+    const response = await request(app)
+      .patch("/users/u-123/status")
+      .set("Authorization", `Bearer ${malformedToken}`)
+      .send({ is_active: false });
+
+    expect(response.status).toBe(401);
+    expect(response.body.error).toMatch(/No performer ID found/i);
+  });
+
+  it("successfully updates a user's status to ACTIVE and returns 200", async () => {
+    mockClient.query
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce({ rowCount: 1 })
+      .mockResolvedValueOnce({ rowCount: 1 })
+      .mockResolvedValueOnce({});
+
+    const response = await request(app)
+      .patch("/users/u-123/status")
+      .set("Authorization", `Bearer ${staffToken}`)
+      .send({ is_active: true });
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toMatch(/logged successfully/i);
+
+    expect(mockClient.query).toHaveBeenCalledWith("COMMIT");
+    expect(mockClient.release).toHaveBeenCalled();
   });
 });

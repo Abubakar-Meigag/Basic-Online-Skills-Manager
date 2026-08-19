@@ -37,10 +37,9 @@ import pool from "../data/connection";
  *         description: Internal server error
  */
 const updateUserStatus = async (req: Request, res: Response): Promise<void> => {
-  const { id: targetUserId } = req.params; // The user being changed
+  const { id: targetUserId } = req.params;
   const { is_active } = req.body;
 
-  // The ID of the staff member performing the action
   const performerUserId = (req as any).user?.id;
 
   if (!performerUserId) {
@@ -48,14 +47,11 @@ const updateUserStatus = async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
-  // Get a client from the pool to run a transaction
   const client = await pool.connect();
 
   try {
-    // Start the transaction
     await client.query("BEGIN");
 
-    // Update the user status
     const updateQuery =
       "UPDATE users SET is_active = $1 WHERE id = $2 RETURNING id";
     const updateResult = await client.query(updateQuery, [
@@ -64,15 +60,11 @@ const updateUserStatus = async (req: Request, res: Response): Promise<void> => {
     ]);
 
     if (updateResult.rowCount === 0) {
-      // If user doesn't exist, rollback and exit
       await client.query("ROLLBACK");
       res.status(404).json({ error: "User not found" });
       return;
     }
 
-    // Insert into audit_log
-    // Mapping to your schema:
-    // user_id = The staff member / action = description / entity_type = 'user' / entity_id = targetUserId
     const logQuery = `
       INSERT INTO audit_log (user_id, action, entity_type, entity_id)
       VALUES ($1, $2, $3, $4)
@@ -80,25 +72,22 @@ const updateUserStatus = async (req: Request, res: Response): Promise<void> => {
     const actionText = `Updated status to ${is_active ? "Active" : "Inactive"}`;
 
     await client.query(logQuery, [
-      performerUserId, // person doing the action
-      actionText, // action description
-      "user", // entity_type
-      targetUserId, // entity_id
+      performerUserId,
+      actionText,
+      "user",
+      targetUserId,
     ]);
 
-    // Commit the transaction
     await client.query("COMMIT");
 
     res
       .status(200)
       .json({ message: "User status updated and logged successfully" });
   } catch (error) {
-    // If any error occurs, rollback all changes
     await client.query("ROLLBACK");
     console.error("Database error in updateUserStatus:", error);
     res.status(500).json({ error: "Internal Server Error" });
   } finally {
-    // Release the client back to the pool
     client.release();
   }
 };
