@@ -156,7 +156,9 @@ const ClaimOpportunity = ({
       >
         ← Opportunity Board
       </button>
-      <h1 className="text-2xl font-bold text-gray-900">Claim This Opportunity</h1>
+      <h1 className="text-2xl font-bold text-gray-900">
+        Claim This Opportunity
+      </h1>
 
       <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6">
         <div className="mb-4 flex items-center justify-between border-b border-gray-100 pb-3">

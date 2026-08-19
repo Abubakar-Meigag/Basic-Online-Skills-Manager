@@ -39,7 +39,9 @@ const CYFStaffTable = ({ courses }: { courses: CoursePipelineItem[] }) => {
               <td className="py-4 text-sm text-center text-slate-600 px-4">
                 {course.city}
               </td>
-              <td className="py-4 text-sm text-center text-slate-600 px-4">3 Weeks</td>
+              <td className="py-4 text-sm text-center text-slate-600 px-4">
+                3 Weeks
+              </td>
               <td className="py-4 text-sm text-center text-slate-600 px-4">
                 {/* This formats the date from ISO string to local format*/}
                 {course.deadline &&

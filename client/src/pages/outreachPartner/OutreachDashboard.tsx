@@ -88,7 +88,9 @@ const OutreachDashboard = () => {
                 <td className="py-4 text-sm text-center text-slate-600 px-14">
                   {course.trainee_target}
                 </td>
-                <td className="py-4 text-sm text-center text-slate-600 px-4">3 Weeks</td>
+                <td className="py-4 text-sm text-center text-slate-600 px-4">
+                  3 Weeks
+                </td>
                 <td className="py-4 text-sm text-center text-slate-600 px-4">
                   {format(parseISO(course.deadline), "dd/MM/yyyy")}
                 </td>
