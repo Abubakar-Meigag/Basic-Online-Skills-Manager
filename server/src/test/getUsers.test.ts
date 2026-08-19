@@ -4,14 +4,12 @@ import app from "../app";
 import pool from "../data/connection";
 import { OrganizationType } from "../data/dataType";
 
-// Mock the database connection
 vi.mock("../data/connection", () => ({
   default: { query: vi.fn() },
 }));
 
 process.env.JWT_SECRET = "test-secret";
 
-// A valid CYF-staff token
 const staffToken = jwt.sign(
   {
     id: "user-1",
@@ -22,7 +20,6 @@ const staffToken = jwt.sign(
   { algorithm: "HS256", expiresIn: "1h" },
 );
 
-// A valid Partner token (to test authorization failure)
 const partnerToken = jwt.sign(
   {
     id: "user-2",

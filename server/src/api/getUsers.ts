@@ -40,8 +40,6 @@ import pool from "../data/connection";
  */
 const getUsers = async (_req: Request, res: Response): Promise<void> => {
   try {
-    // We use a LEFT JOIN so that users without an organisation
-    // are still included in the list.
     const query = await pool.query(
       `SELECT 
         u.id, 

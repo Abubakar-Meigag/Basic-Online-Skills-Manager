@@ -6,7 +6,6 @@ import type { TableColumn } from "../../components/DataTable";
 import type { Organisation } from "../../data/dataType";
 import AddPartnerForm from "./addPartner/AddPartnerForm";
 
-// Define columns outside the component to prevent re-creation on render
 const columns: TableColumn<Organisation>[] = [
   {
     header: "ID",
@@ -61,7 +60,6 @@ const ManagePartnersPage = () => {
     }
   }, []);
 
-  // Memoized Filter Logic
   const filteredOrganisations = useMemo(() => {
     return organisations.filter((org) => {
       const search = searchTerm.toLowerCase();
@@ -97,7 +95,6 @@ const ManagePartnersPage = () => {
 
   return (
     <section className="p-6">
-      {/* Sticky Header with Search and status Button */}
       <div className="sticky top-0 z-20 bg-white px-8 pt-2 pb-1">
         <div className="flex items-start justify-between">
           <PageHeader
@@ -134,7 +131,6 @@ const ManagePartnersPage = () => {
         </div>
       </div>
 
-      {/* Table Container with Internal Scroll */}
       <div className="mt-2 overflow-y-auto rounded-lg border border-gray-200 bg-white max-h-[calc(100vh-200px)]">
         {isLoading ? (
           <div className="p-10 text-center text-gray-500">

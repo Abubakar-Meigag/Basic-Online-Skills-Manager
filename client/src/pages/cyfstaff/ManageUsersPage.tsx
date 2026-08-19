@@ -30,7 +30,6 @@ const ManageUsersPage = () => {
     });
   }, [users, searchTerm]);
 
-  // Fetch Users Logic
   const getUsers = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -43,14 +42,11 @@ const ManageUsersPage = () => {
     }
   }, []);
 
-  // Update Status Logic
   const handleStatusChange = useCallback(
     async (userId: string, newStatus: boolean) => {
       try {
-        // Send the patch request to the backend
         await api.patch(`/users/${userId}/status`, { is_active: newStatus });
 
-        // Refresh the list from the server to ensure the UI matches the DB
         getUsers();
       } catch (error) {
         console.error("Failed to update status:", error);
@@ -60,7 +56,6 @@ const ManageUsersPage = () => {
     [getUsers],
   );
 
-  // Columns Definition (Memoized)
   const columns = useMemo(
     (): TableColumn<User>[] => [
       {
@@ -105,7 +100,7 @@ const ManageUsersPage = () => {
       },
     ],
     [handleStatusChange],
-  ); // Only re-calculate if handleStatusChange changes
+  );
 
   useEffect(() => {
     if (activeForm === "none") {
@@ -131,7 +126,6 @@ const ManageUsersPage = () => {
             description="All registered users for the various organizations"
           />
 
-          {/* Wrap the search input and button in a flex container */}
           <div className="flex items-center gap-3">
             <div className="relative">
               <input
@@ -141,7 +135,7 @@ const ManageUsersPage = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-64 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
               />
-              {/* Clear button appears only when there is text */}
+
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm("")}
@@ -169,7 +163,6 @@ const ManageUsersPage = () => {
         ) : filteredUsers.length > 0 ? (
           <DataTable data={filteredUsers} columns={columns} />
         ) : (
-          /* show a different message if a search is active */
           <div className="p-10 text-center text-gray-500">
             {searchTerm
               ? `No users matching "${searchTerm}"`
