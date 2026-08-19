@@ -17,7 +17,7 @@ const CourseDetailsModal = ({ id }: { id: string }) => {
   const [course, setCourse] = useState<any>();
   const [isOpen, setIsOpen] = useState(false);
   const [displayError, setDisplayError] = useState("");
-  const status = course.status;
+  const status = course && course.status;
   const { statusStyle, statusText } = statusLabel(status);
 
   const fetchCourse = useCallback(async () => {
@@ -34,11 +34,11 @@ const CourseDetailsModal = ({ id }: { id: string }) => {
   }, [fetchCourse]);
 
   const publishCourse = async () => {
+    window.location.reload();
     try {
       await api.patch(`/course/${course.id}/status`, {
         status: "request_open",
       });
-      setIsOpen(false);
     } catch (error) {
       console.error(error);
       setDisplayError(`Error: ${error}`);
@@ -57,6 +57,7 @@ const CourseDetailsModal = ({ id }: { id: string }) => {
   // };
 
   const confirmCourse = async () => {
+    window.location.reload();
     try {
       await api.patch(`/course/${course.id}/status`, {
         status: "request_confirmed",
@@ -69,7 +70,7 @@ const CourseDetailsModal = ({ id }: { id: string }) => {
   };
 
   // const cancelCourse = () => {};
-  console.log(course);
+
   return (
     <>
       <button
