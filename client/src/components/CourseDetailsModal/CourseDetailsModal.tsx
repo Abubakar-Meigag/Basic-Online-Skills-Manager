@@ -96,11 +96,13 @@ const CourseDetailsModal = ({ id }: { id: string }) => {
                   <CourseDetail label="ID" detail={course.id} />
                   <CourseDetail
                     label="Outreach Partner"
-                    detail={course.outreach_org}
+                    detail={course.outreach_org || "TBC"}
                   />
                   <CourseDetail
                     label="Start Date"
-                    detail={course.start_date && formatDate(course.start_date)}
+                    detail={
+                      course.start_date ? formatDate(course.start_date) : "TBC"
+                    }
                   />
                   <CourseDetail
                     label="Trainee Target"
@@ -108,11 +110,11 @@ const CourseDetailsModal = ({ id }: { id: string }) => {
                   />
                   <CourseDetail
                     label="Venue Address"
-                    detail={course.venue_address}
+                    detail={course.venue_address || "TBC"}
                   />
                   <CourseDetail
                     label="Contact Email"
-                    detail={course.contact_email}
+                    detail={course.contact_email || "TBC"}
                   />
                 </div>
                 <div>
@@ -129,7 +131,7 @@ const CourseDetailsModal = ({ id }: { id: string }) => {
                   />
                   <CourseDetail
                     label="Contact Person"
-                    detail={course.contact_name}
+                    detail={course.contact_name || "TBC"}
                   />
                 </div>
               </div>
