@@ -113,21 +113,23 @@ const CourseDetailsModal = ({ id }: { id: string }) => {
                   </div>
 
                   <div className="button-bank flex gap-3">
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-semibold text-[#333333]">Action:</span>
-                      {status === "request_pending" && (
-                        <CourseActionButton text="Publish" colour="bg-amber-600 min-w-[220px] cursor-pointer" action={publishCourse} />
-                      )}
-                      {status === "request_claimed" && (
-                        <CourseActionButton text="Confirm" colour="bg-green-500 min-w-[220px] cursor-pointer" action={confirmCourse} />
-                      )}
-                      {status === "request_confirmed" && (
-                        <CourseActionButton text="Running" colour="bg-blue-700 min-w-[220px] cursor-pointer" action={courseRunning} />
-                      )}
-                      {status === "course_running" && (
-                        <CourseActionButton text="Complete" colour="bg-gray-700 min-w-[220px] cursor-pointer" action={courseCompleted} />
-                      )}
-                    </div>
+                    {status !== "request_open" && status !== "course_completed" && (
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-semibold text-[#333333]">Action:</span>
+                        {status === "request_pending" && (
+                          <CourseActionButton text="Publish" colour="bg-amber-600 min-w-[220px] cursor-pointer" action={publishCourse} />
+                        )}
+                        {status === "request_claimed" && (
+                          <CourseActionButton text="Confirm" colour="bg-green-500 min-w-[220px] cursor-pointer" action={confirmCourse} />
+                        )}
+                        {status === "request_confirmed" && (
+                          <CourseActionButton text="Running" colour="bg-blue-700 min-w-[220px] cursor-pointer" action={courseRunning} />
+                        )}
+                        {status === "course_running" && (
+                          <CourseActionButton text="Complete" colour="bg-gray-700 min-w-[220px] cursor-pointer" action={courseCompleted} />
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 
