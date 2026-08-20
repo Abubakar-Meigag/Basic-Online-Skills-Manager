@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../auth/authApi";
 import type { AxiosError } from "axios";
+import PageHeader from "../../components/PageHeader"; // 1. Import the component
 
 const DASHBOARD_ROUTE = "/commercial-partner/requested-courses";
 
@@ -68,7 +69,6 @@ const RequestNewCourse = () => {
         deadline, // YYYY-MM-DD
       });
 
-      // go back to the dashboard
       navigate(DASHBOARD_ROUTE);
     } catch (err) {
       const axiosErr = err as AxiosError<{
@@ -79,7 +79,6 @@ const RequestNewCourse = () => {
 
       const data = axiosErr.response?.data;
 
-      // Middleware sends redirectRoute on auth failures (401/403)
       if (
         (axiosErr.response?.status === 401 ||
           axiosErr.response?.status === 403) &&
@@ -105,7 +104,6 @@ const RequestNewCourse = () => {
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-8">
       <div className="mx-auto max-w-xl">
-        {/* Header */}
         <button
           type="button"
           onClick={handleCancel}
@@ -113,14 +111,15 @@ const RequestNewCourse = () => {
         >
           ← Back to Dashboard
         </button>
-        <h1 className="text-2xl font-bold text-gray-900">Request New Course</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Complete the form below to submit a new training course request.
-        </p>
+
+        <PageHeader
+          title="Request New Course"
+          description="Complete the form below to submit a new training course request."
+        />
 
         <form
           onSubmit={handleSubmit}
-          className="mt-6 rounded-lg border border-gray-200 bg-white p-6"
+          className="mt-4 rounded-lg border border-gray-200 bg-white p-6"
         >
           {error && (
             <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
