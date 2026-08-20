@@ -12,10 +12,10 @@ import statusLabel from "../../utils/statusLabel";
 import CourseActionButton from "./CourseActionButton/CourseActionButton";
 import formatDate from "../../utils/formatDate";
 import { api } from "../../auth/authApi";
-import type { CoursePipelineItem } from "../../data/dataType";
+import type { Course } from "../../data/dataType";
 
 const CourseDetailsModal = ({ id }: { id: string }) => {
-  const [course, setCourse] = useState<CoursePipelineItem>();
+  const [course, setCourse] = useState<Course>();
   const [isOpen, setIsOpen] = useState(false);
   const [displayError, setDisplayError] = useState("");
   const status = course?.status ?? "";
@@ -37,35 +37,21 @@ const CourseDetailsModal = ({ id }: { id: string }) => {
 
   const publishCourse = async () => {
     if (!course) return;
-    window.location.reload();
     try {
-      await api.patch(`/course/${course.id}/status`, {
-        status: "request_open",
-      });
+      await api.patch(`/course/${course.id}/status`, { status: "request_open" });
+      window.location.reload();
     } catch (error) {
       console.error(error);
       setDisplayError(`Error: ${error}`);
       setTimeout(() => setDisplayError(""), 30000);
     }
   };
-
-  // const rescheduleCourse = async () => {
-  //   try {
-  //     await api.patch(`/course/${course.id}/status`, {
-  //       status: "request_open",
-  //     });
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
 
   const confirmCourse = async () => {
     if (!course) return;
-    window.location.reload();
     try {
-      await api.patch(`/course/${course.id}/status`, {
-        status: "request_confirmed",
-      });
+      await api.patch(`/course/${course.id}/status`, { status: "request_confirmed" });
+      window.location.reload();
     } catch (error) {
       console.error(error);
       setDisplayError(`Error: ${error}`);
@@ -73,7 +59,29 @@ const CourseDetailsModal = ({ id }: { id: string }) => {
     }
   };
 
-  // const cancelCourse = () => {};
+  const courseRunning = async () => {
+    if (!course) return;
+    try {
+      await api.patch(`/course/${course.id}/status`, { status: "course_running" });
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+      setDisplayError(`Error: ${error}`);
+      setTimeout(() => setDisplayError(""), 30000);
+    }
+  };
+
+  const courseCompleted = async () => {
+    if (!course) return;
+    try {
+      await api.patch(`/course/${course.id}/status`, { status: "course_completed" });
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+      setDisplayError(`Error: ${error}`);
+      setTimeout(() => setDisplayError(""), 30000);
+    }
+  };
 
   return (
     <>
@@ -90,90 +98,65 @@ const CourseDetailsModal = ({ id }: { id: string }) => {
       >
         <DialogBackdrop className="fixed inset-0 bg-black/30" />
         <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
-          <DialogPanel className="max-w-lg space-y-4 border bg-white p-12 border-[#E3E3E3]">
-            <DialogTitle className="font-bold text-xl">
-              Course Details
-            </DialogTitle>
+          <DialogPanel className="w-4xl space-y-6 border bg-white p-12 border-[#b99898] max-h-[90vh] overflow-y-auto">
+            <DialogTitle className="font-bold text-xl">Course Details</DialogTitle>
             {displayError && <p className="text-red-600">{displayError}</p>}
+
             {course && (
-              <div className="flex justify-between mb-10">
-                <div className="mr-25">
-                  <CourseDetail label="ID" detail={course.id} />
-                  <CourseDetail
-                    label="Outreach Partner"
-                    detail={course.outreach_org || "TBC"}
-                  />
-                  <CourseDetail
-                    label="Start Date"
-                    detail={
-                      course.start_date ? formatDate(course.start_date) : "TBC"
-                    }
-                  />
-                  <CourseDetail
-                    label="Trainee Target"
-                    detail={course.trainee_target}
-                  />
-                  <CourseDetail
-                    label="Venue Address"
-                    detail={course.venue_address || "TBC"}
-                  />
-                  <CourseDetail
-                    label="Contact Email"
-                    detail={course.contact_email || "TBC"}
-                  />
+              <>
+                <div className="flex items-center justify-between pb-4 border-b border-[#E3E3E3]">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-[#333333]">Status:</span>
+                    <span className={`${statusStyle} inline-flex rounded-sm px-2 py-1 text-xs font-semibold`}>
+                      {statusText}
+                    </span>
+                  </div>
+
+                  <div className="button-bank flex gap-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-semibold text-[#333333]">Action:</span>
+                      {status === "request_pending" && (
+                        <CourseActionButton text="Publish" colour="bg-amber-600 min-w-[220px] cursor-pointer" action={publishCourse} />
+                      )}
+                      {status === "request_claimed" && (
+                        <CourseActionButton text="Confirm" colour="bg-green-500 min-w-[220px] cursor-pointer" action={confirmCourse} />
+                      )}
+                      {status === "request_confirmed" && (
+                        <CourseActionButton text="Running" colour="bg-blue-700 min-w-[220px] cursor-pointer" action={courseRunning} />
+                      )}
+                      {status === "course_running" && (
+                        <CourseActionButton text="Complete" colour="bg-gray-700 min-w-[220px] cursor-pointer" action={courseCompleted} />
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <CourseDetail
-                    label="Commercial Partner"
-                    detail={course.commercial_org}
-                  />
+
+                <div className="grid grid-cols-2 gap-x-16 gap-y-1">
+                  {/* Left column */}
+                  <CourseDetail label="ID" detail={course.id.slice(-5)} />
+                  <CourseDetail label="Commercial Partner" detail={course.commercial_org} />
+                  <CourseDetail label="Account Name" detail={course.account_name || " - "} />
+                  <CourseDetail label="Contract Name" detail={course.contract_name || " - "} />
                   <CourseDetail label="City" detail={course.city} />
-                  <CourseDetail label="Duration" detail="3 Weeks" />
-                  <CourseDetail
-                    label="Status"
-                    style={`${statusStyle} inline-flex rounded-sm px-2 py-1 text-xs font-semibold mt-3`}
-                    detail={statusText}
-                  />
-                  <CourseDetail
-                    label="Contact Person"
-                    detail={course.contact_name || "TBC"}
-                  />
+                  <CourseDetail label="Trainee Target" detail={String(course.trainee_target)} />
+                  <CourseDetail label="Deadline" detail={formatDate(course.deadline)} />
+                  <CourseDetail label="Start Date" detail={course.start_date ? formatDate(course.start_date) : " - "} />
+                  <CourseDetail label="Outreach Partner" detail={course.outreach_org || " - "} />
+                  <CourseDetail label="Venue Address" detail={course.venue_address || " - "} />
+
+                  {/* Right column */}
+                  <CourseDetail label="Contact Person" detail={course.contact_name || " - "} />
+                  <CourseDetail label="Contact Email" detail={course.contact_email || " - "} />
+                  <CourseDetail label="Client Group" detail={course.client_group_description || " - "} />
+                  <CourseDetail label="Tech Level" detail={course.tech_level || " - "} />
+                  <CourseDetail label="Goal" detail={course.goal || " - "} />
+                  <CourseDetail label="Lunch Arrangement" detail={course.lunch_arrangement || " - "} />
+                  <CourseDetail label="Expenses Notes" detail={course.expenses_notes || " - "} />
+                  <CourseDetail label="Note" detail={course.note || " - "} />
                 </div>
-              </div>
+              </>
             )}
-            <div className="button-bank grid grid-cols-2 gap-5">
-              {status === "request_pending" && (
-                <CourseActionButton
-                  text="Publish"
-                  colour="bg-blue-500"
-                  action={publishCourse}
-                />
-              )}
 
-              {/* {status !== "course_running" && status !== "course_completed" && (
-                <CourseActionButton
-                  text="Reschedule"
-                  colour="bg-yellow-500"
-                  action={rescheduleCourse}
-                />
-              )} */}
-
-              {status === "request_claimed" && (
-                <CourseActionButton
-                  text="Confirm"
-                  colour="bg-green-500"
-                  action={confirmCourse}
-                />
-              )}
-
-              {/* {status !== "course_running" && status !== "course_completed" && (
-                <CourseActionButton
-                  text="Cancel Course"
-                  colour="bg-red-500"
-                  action={cancelCourse}
-                />
-              )} */}
-            </div>
           </DialogPanel>
         </div>
       </Dialog>
