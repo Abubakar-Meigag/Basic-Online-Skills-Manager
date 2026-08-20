@@ -42,7 +42,7 @@ export async function sendMagicLinkEmail(
 
   try {
     await sesClient.send(command);
-    console.log(`Magic link email successfully sent to ${email}`);
+    console.log(`Magic link email successfully sent to ${safeEmail}`);
   } catch (error) {
     console.error("Failed to send email via AWS SES:", error);
     throw new Error("Could not deliver magic link email.");
