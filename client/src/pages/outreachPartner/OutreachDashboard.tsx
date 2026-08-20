@@ -115,7 +115,7 @@ const OutreachDashboard = () => {
         />
       </div>
 
-      <div className="mx-8 mt-2 overflow-y-auto rounded-lg border border-gray-200 bg-white max-h-[calc(100vh-200px)]">
+      <div className="mx-8 mt-2 overflow-y-auto rounded-lg border border-gray-200 bg-white max-h-[calc(100vh-150px)]">
         <DataTable data={courses} columns={columns} />
       </div>
     </section>
