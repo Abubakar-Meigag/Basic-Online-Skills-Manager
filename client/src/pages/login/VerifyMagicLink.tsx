@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { verifyMagicLink } from "../../auth/authApi";
+import axios from "axios";
 
 const styles = {
   container: "min-h-screen bg-gray-50 flex items-center justify-center p-6",
@@ -19,28 +20,32 @@ export default function VerifyMagicLink() {
 
   useEffect(() => {
     const token = searchParams.get("token");
-
     if (!token) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setError("Invalid or missing verification link.");
       return;
     }
-
     verifyMagicLink(token)
       .then((data) => {
-        // Save JWT session token & user info in localStorage
-        if (data.token) {
-          localStorage.setItem("sessionToken", data.token);
-          localStorage.setItem("user", JSON.stringify(data.user));
+        if (
+          typeof data.token !== "string" ||
+          !data.token ||
+          !data.user?.id ||
+          !data.user?.email ||
+          !data.user?.orgType
+        ) {
+          setError("Invalid session data received. Please try again.");
+          return;
         }
-
-        // Redirect to the route returned by backend
+        localStorage.setItem("sessionToken", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
         navigate(data.redirectRoute || "/");
       })
-      .catch((err: any) => {
-        setError(
-          err.response?.data?.message ||
-            "Verification failed or link has expired.",
-        );
+      .catch((err: unknown) => {
+        const message = axios.isAxiosError(err)
+          ? err.response?.data?.message
+          : undefined;
+        setError(message || "Verification failed or link has expired.");
       });
   }, [searchParams, navigate]);
 
