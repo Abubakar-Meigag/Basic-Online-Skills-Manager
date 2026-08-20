@@ -2,7 +2,8 @@
 export type Organisation = {
   id: string;
   organisation_name: string;
-  type: "cyf_staff" | "commercial" | "outreach";
+  city: string;
+  type: OrganizationType;
   email_domain: string;
   created_at: string;
 };
@@ -11,6 +12,7 @@ export type User = {
   id: string;
   email: string;
   organisation_id: string;
+  organisation_name?: string;
   is_active: boolean;
   created_at: string;
   last_login_at: string | null;

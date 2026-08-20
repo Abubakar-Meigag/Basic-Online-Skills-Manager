@@ -16,6 +16,7 @@ import {
 } from "./pages/outreachPartner/index.ts";
 import {
   CYFStaffDashboard,
+  ManageUsersPage,
   ManagePartnersPage,
   AuditLogPage,
 } from "./pages/cyfstaff/index.ts";
@@ -84,6 +85,7 @@ const App = () => {
           <Route path="/cyf-staff">
             <Route index element={<Navigate to="request-pipeline" replace />} />
             <Route path="request-pipeline" element={<CYFStaffDashboard />} />
+            <Route path="manage-users" element={<ManageUsersPage />} />
             <Route path="manage-partners" element={<ManagePartnersPage />} />
             <Route path="audit-log" element={<AuditLogPage />} />
           </Route>

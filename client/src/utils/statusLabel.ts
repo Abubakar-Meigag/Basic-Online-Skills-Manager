@@ -1,9 +1,11 @@
-import { statusStyles } from "../lib/constants/statusStyles";
+import { statusStyles as defaultStyles } from "../lib/constants/statusStyles";
 
-const statusLabel = (status: string) => {
-  const statusKey = String(status) as keyof typeof statusStyles;
-  const statusStyle = statusStyles[statusKey] ?? "bg-slate-100 text-slate-700";
-  const statusText = String(status).replace(/_/g, " ");
+const statusLabel = (status: string, customStyles?: Record<string, string>) => {
+  const styles = (customStyles || defaultStyles) as Record<string, string>;
+
+  const statusKey = String(status);
+  const statusStyle = styles[statusKey] ?? "bg-slate-100 text-slate-700";
+  const statusText = statusKey.replace(/_/g, " ");
 
   return { statusStyle, statusText };
 };
