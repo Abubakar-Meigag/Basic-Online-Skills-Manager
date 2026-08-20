@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { AxiosError } from "axios";
 import { api } from "../../../auth/authApi";
-
+import PageHeader from "../../../components/PageHeader";
 type Organisation = {
   id: string;
   organisation_name: string;
@@ -9,8 +9,8 @@ type Organisation = {
 };
 
 type AddUserFormProps = {
-  onBack: () => void; // return to the Manage Users table (cancel)
-  onCreated: () => void; // called after a user is successfully created
+  onBack: () => void;
+  onCreated: () => void;
 };
 
 const AddUserForm = ({ onBack, onCreated }: AddUserFormProps) => {
@@ -21,7 +21,6 @@ const AddUserForm = ({ onBack, onCreated }: AddUserFormProps) => {
   const [loadingOrgs, setLoadingOrgs] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  // Fetch the list of organisations for the dropdown on mount.
   useEffect(() => {
     const loadOrganisations = async () => {
       try {
@@ -42,7 +41,6 @@ const AddUserForm = ({ onBack, onCreated }: AddUserFormProps) => {
     e.preventDefault();
     setError(null);
 
-    // Both fields required
     if (!orgId) {
       setError("Please select an organisation.");
       return;
@@ -52,7 +50,6 @@ const AddUserForm = ({ onBack, onCreated }: AddUserFormProps) => {
       return;
     }
 
-    // Basic email format check
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email.trim())) {
       setError("Please enter a valid email address.");
@@ -96,14 +93,15 @@ const AddUserForm = ({ onBack, onCreated }: AddUserFormProps) => {
       >
         ← Back to Manage Users
       </button>
-      <h1 className="text-2xl font-bold text-gray-900">Add User</h1>
-      <p className="mt-1 text-sm text-gray-500">
-        Add a login user to an existing organisation.
-      </p>
+
+      <PageHeader
+        title="Add User"
+        description="Add a login user to an existing organisation."
+      />
 
       <form
         onSubmit={handleSubmit}
-        className="mt-6 rounded-lg border border-gray-200 bg-white p-6"
+        className="mt-4 rounded-lg border border-gray-200 bg-white p-6"
       >
         {error && (
           <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
