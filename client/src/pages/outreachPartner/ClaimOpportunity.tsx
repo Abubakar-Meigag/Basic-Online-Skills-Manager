@@ -5,7 +5,7 @@ import { api } from "../../auth/authApi";
 import type { Course } from "../../data/dataType";
 import PageHeader from "../../components/PageHeader";
 
-const COURSE_DURATION_DAYS = 21; // 3 weeks
+const COURSE_DURATION_DAYS = 21;
 const COURSE_TITLE = "Basic Online Skills";
 const COURSE_DURATION_LABEL = "3 weeks";
 
