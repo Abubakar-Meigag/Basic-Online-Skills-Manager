@@ -70,6 +70,10 @@ export type CoursePipelineItem = {
   created_at: string;
   commercial_org: string;
   outreach_org: string | null;
+  trainee_target: string | null;
+  venue_address: string | null;
+  contact_email: string | null;
+  contact_name: string | null;
 };
 
 export type AuditLogEntry = {
