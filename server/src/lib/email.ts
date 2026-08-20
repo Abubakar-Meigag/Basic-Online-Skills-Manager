@@ -10,13 +10,13 @@ export async function sendMagicLinkEmail(
 ): Promise<void> {
   const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
   const magicLink = `${clientUrl}/verify?token=${token}`;
+  const safeEmail = email.replace(/[\n\r]/g, "_");
 
   // development Log to terminal
   if (process.env.NODE_ENV !== "production") {
-    console.log(`MAGIC LINK GENERATED FOR: ${email}`);
+    console.log(`MAGIC LINK GENERATED FOR: ${safeEmail}`);
     console.log(`CLICK TO LOGIN: ${magicLink}`);
     console.log("EXPIRES IN: 5 min");
-
     return;
   }
 
