@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { parseISO, format } from "date-fns";
-import tableHeaderStyle from "../../lib/constants/tableHeaderStyle";
+import PageHeader from "../../components/PageHeader";
+import DataTable, { type TableColumn } from "../../components/DataTable";
 import type { Course } from "../../data/dataType";
 import { api } from "../../auth/authApi";
 import ClaimOpportunity from "./ClaimOpportunity";
@@ -23,23 +24,78 @@ const OutreachDashboard = () => {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     getCourses();
   }, [getCourses]);
 
-  // Return to the board (cancel).
+  const columns = useMemo(
+    (): TableColumn<Course>[] => [
+      {
+        header: "ID",
+        accessor: "id",
+        headerClassName: "text-center pr-15",
+        cellClassName: "text-center text-slate-500 font-mono pr-10",
+        render: (val) => String(val).slice(0, 5),
+      },
+      {
+        header: "Commercial Partner",
+        accessor: "commercial_org",
+        headerClassName: "text-center",
+        cellClassName: "text-center text-slate-600",
+      },
+      {
+        header: "Location",
+        accessor: "city",
+        headerClassName: "text-center",
+        cellClassName: "text-center text-slate-600",
+      },
+      {
+        header: "Trainee Target",
+        accessor: "trainee_target",
+        headerClassName: "text-center",
+        cellClassName: "text-center text-slate-600",
+      },
+      {
+        header: "Duration",
+        accessor: "id",
+        headerClassName: "text-center",
+        cellClassName: "text-center text-slate-600",
+        render: () => "3 Weeks",
+      },
+      {
+        header: "Deadline",
+        accessor: "deadline",
+        headerClassName: "text-center",
+        cellClassName: "text-center text-slate-600",
+        render: (val) => format(parseISO(String(val)), "dd/MM/yyyy"),
+      },
+      {
+        header: "Actions",
+        accessor: "id",
+        headerClassName: "text-center",
+        cellClassName: "text-center",
+        render: (_, row) => (
+          <button
+            type="button"
+            onClick={() => setSelectedCourse(row)}
+            className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
+          >
+            View Details
+          </button>
+        ),
+      },
+    ],
+    [],
+  );
+
   const handleBack = () => {
     setSelectedCourse(null);
   };
 
-  // After a successful claim leave the form and refresh the list so the
-  // claimed course drops off the open-opportunities board.
   const handleClaimed = () => {
     setSelectedCourse(null);
     getCourses();
   };
 
-  // Show the claim form for the selected course.
   if (selectedCourse) {
     return (
       <ClaimOpportunity
@@ -51,64 +107,18 @@ const OutreachDashboard = () => {
   }
 
   return (
-    <div className="find-opportunities">
-      <div className="discovery-header flex justify-between mt-10 mb-20 mx-12">
-        <h2 className="text-3xl font-bold text-[#333333]">
-          Available Opportunities
-        </h2>
+    <section className="p-6">
+      <div className="sticky top-0 z-20 bg-white px-8 pt-2 pb-1">
+        <PageHeader
+          title="Available Opportunities"
+          description="Browse and claim open course requests in your area."
+        />
       </div>
-      <table className="find-opportunities-table w-full text-left border border-[#E3E3E3] border-collapse">
-        <thead>
-          <tr className="bg-[#F3F3F3]">
-            <th className={`${tableHeaderStyle} pl-10`}>ID</th>
-            <th className={`${tableHeaderStyle} px-4`}>Commercial Partner</th>
-            <th className={`${tableHeaderStyle} px-4`}>Location</th>
-            <th className={`${tableHeaderStyle} px-4`}>Trainee Target</th>
-            <th className={`${tableHeaderStyle} px-4`}>Duration</th>
-            <th className={`${tableHeaderStyle} px-4`}>Deadline</th>
-            <th className={`${tableHeaderStyle} px-4`}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {courses.map((course) => {
-            return (
-              <tr
-                key={course.id}
-                className="border-b border-[#F3F3F3] hover:bg-[#F3F3F3] transition-colors"
-              >
-                <td className="py-4 text-sm text-center text-slate-500 pl-5">
-                  {course.id.slice(-5)}
-                </td>
-                <td className="py-4 text-sm text-center text-slate-600 px-4">
-                  {course.commercial_org}
-                </td>
-                <td className="py-4 text-sm text-center text-slate-600 px-4">
-                  {course.city}
-                </td>
-                <td className="py-4 text-sm text-center text-slate-600 px-14">
-                  {course.trainee_target}
-                </td>
-                <td className="py-4 text-sm text-center text-slate-600 px-4">
-                  3 Weeks
-                </td>
-                <td className="py-4 text-sm text-center text-slate-600 px-4">
-                  {format(parseISO(course.deadline), "dd/MM/yyyy")}
-                </td>
-                <td className="py-4 text-sm px-4">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedCourse(course)}
-                    className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
-                  >
-                    View Details
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+
+      <div className="mx-8 mt-2 overflow-y-auto rounded-lg border border-gray-200 bg-white max-h-[calc(100vh-150px)]">
+        <DataTable data={courses} columns={columns} />
+      </div>
+    </section>
   );
 };
 

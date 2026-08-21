@@ -1,9 +1,8 @@
 import { useState } from "react";
 import type { AxiosError } from "axios";
 import { api } from "../../../auth/authApi";
+import PageHeader from "../../../components/PageHeader";
 
-// The three organisation types stored in the DB. Labels are friendly;
-// the values are what actually get submitted.
 const ORG_TYPE_OPTIONS = [
   { value: "cyf_staff", label: "CYF Staff" },
   { value: "commercial", label: "Commercial" },
@@ -11,8 +10,8 @@ const ORG_TYPE_OPTIONS = [
 ];
 
 type AddPartnerFormProps = {
-  onBack: () => void; // return to the Manage Partners table (cancel)
-  onCreated: () => void; // called after a successful create
+  onBack: () => void;
+  onCreated: () => void;
 };
 
 type FormState = {
@@ -49,7 +48,6 @@ const AddPartnerForm = ({ onBack, onCreated }: AddPartnerFormProps) => {
 
     const { organisation_name, type, email_domain, city } = form;
 
-    // All fields required
     if (
       !organisation_name.trim() ||
       !type ||
@@ -100,12 +98,16 @@ const AddPartnerForm = ({ onBack, onCreated }: AddPartnerFormProps) => {
       >
         ← Back to Manage Partners
       </button>
-      <h1 className="text-2xl font-bold text-gray-900">Add Partner</h1>
-      <p className="mt-1 text-sm text-gray-500">Create a new organisation.</p>
+
+      {/* 2. Replaced manual h1 and p with PageHeader */}
+      <PageHeader
+        title="Add Partner"
+        description="Create a new organisation."
+      />
 
       <form
         onSubmit={handleSubmit}
-        className="mt-6 rounded-lg border border-gray-200 bg-white p-6"
+        className="mt-4 rounded-lg border border-gray-200 bg-white p-6"
       >
         {error && (
           <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -114,7 +116,6 @@ const AddPartnerForm = ({ onBack, onCreated }: AddPartnerFormProps) => {
         )}
 
         <div className="space-y-5">
-          {/* Organisation Name */}
           <div>
             <label htmlFor="organisation_name" className={labelClass}>
               Organisation Name
@@ -167,7 +168,6 @@ const AddPartnerForm = ({ onBack, onCreated }: AddPartnerFormProps) => {
             />
           </div>
 
-          {/* City */}
           <div>
             <label htmlFor="city" className={labelClass}>
               City
@@ -184,7 +184,6 @@ const AddPartnerForm = ({ onBack, onCreated }: AddPartnerFormProps) => {
           </div>
         </div>
 
-        {/* Buttons */}
         <div className="mt-6 flex gap-3">
           <button
             type="submit"
