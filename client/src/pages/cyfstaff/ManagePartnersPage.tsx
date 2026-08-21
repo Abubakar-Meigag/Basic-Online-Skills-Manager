@@ -131,7 +131,7 @@ const ManagePartnersPage = () => {
         </div>
       </div>
 
-      <div className="mt-2 overflow-y-auto rounded-lg border border-gray-200 bg-white max-h-[calc(100vh-200px)]">
+      <div className="mt-2 overflow-y-auto rounded-lg border border-gray-200 bg-white max-h-[calc(100vh-150px)]">
         {isLoading ? (
           <div className="p-10 text-center text-gray-500">
             Loading partners...

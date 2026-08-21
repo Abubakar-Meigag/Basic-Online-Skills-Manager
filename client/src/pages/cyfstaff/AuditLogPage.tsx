@@ -1,13 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { format, parseISO } from "date-fns";
 import { api } from "../../auth/authApi";
-
-const tableHeaderStyle =
-  "py-3 text-sm text-center font-semibold text-[#333333] uppercase tracking-wide";
+import PageHeader from "../../components/PageHeader";
+import DataTable, { type TableColumn } from "../../components/DataTable";
 
 const ROWS_PER_PAGE = 30;
 
-interface AuditEntry {
+type AuditEntry = {
   id: string;
   user_id: string;
   user_email: string;
@@ -15,7 +14,47 @@ interface AuditEntry {
   entity_type: string;
   entity_id: string;
   created_at: string;
-}
+};
+
+const columns: TableColumn<AuditEntry>[] = [
+  {
+    header: "Entry ID",
+    accessor: "id",
+    headerClassName: "text-center pr-10",
+    cellClassName: "text-center text-slate-600 font-mono pr-10",
+    render: (val) => String(val).slice(0, 5),
+  },
+  {
+    header: "Timestamp",
+    accessor: "created_at",
+    headerClassName: "text-center",
+    cellClassName: "text-center text-slate-600",
+    render: (val) => format(parseISO(String(val)), "yyyy-MM-dd HH:mm"),
+  },
+  {
+    header: "User",
+    accessor: "user_email",
+    headerClassName: "text-center",
+    cellClassName: "text-center text-slate-600",
+  },
+  {
+    header: "Action",
+    accessor: "action",
+    headerClassName: "text-center",
+    cellClassName: "text-center text-slate-600",
+    render: (val) => {
+      const cleanText = String(val).replace(/[._]/g, " ");
+      return cleanText.charAt(0).toUpperCase() + cleanText.slice(1);
+    },
+  },
+  {
+    header: "Entity",
+    accessor: "entity_id",
+    headerClassName: "text-center",
+    cellClassName: "text-center text-slate-600",
+    render: (_, row) => `${row.entity_type} - ${row.entity_id.slice(0, 5)}`,
+  },
+];
 
 const AuditLogPage = () => {
   const [entries, setEntries] = useState<AuditEntry[]>([]);
@@ -36,7 +75,6 @@ const AuditLogPage = () => {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     getAuditLog();
   }, [getAuditLog]);
 
@@ -45,88 +83,29 @@ const AuditLogPage = () => {
   const pageEntries = entries.slice(start, start + ROWS_PER_PAGE);
 
   return (
-    <div className="audit-log">
-      <div className="discovery-header flex justify-between mt-10 mb-8 mx-12">
-        <div>
-          <h2 className="text-3xl font-bold text-[#333333]">Audit Log</h2>
-          <p className="text-sm text-slate-500 mt-2">
-            Full history of status changes and actions across the system
-          </p>
-        </div>
+    <section className="p-6">
+      <div className="sticky top-0 z-20 bg-white pt-2 px-12">
+        <PageHeader
+          title="Audit Log"
+          description="Full history of status changes and actions across the system"
+        />
       </div>
 
       <div className="mx-12">
-        <div className="max-h-[70vh] overflow-y-auto border border-[#E3E3E3]">
-          <table className="audit-log-table w-full text-left border-collapse">
-            <thead className="sticky top-0 z-10">
-              <tr className="bg-[#F3F3F3]">
-                <th className={`${tableHeaderStyle} pl-10`}>Entry ID</th>
-                <th className={`${tableHeaderStyle} px-4`}>Timestamp</th>
-                <th className={`${tableHeaderStyle} px-4`}>User</th>
-                <th className={`${tableHeaderStyle} px-4`}>Action</th>
-                <th className={`${tableHeaderStyle} px-4`}>Entity</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading && (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="py-8 text-center text-sm text-slate-500"
-                  >
-                    Loading audit entries…
-                  </td>
-                </tr>
-              )}
-
-              {!loading && error && (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="py-8 text-center text-sm text-red-600"
-                  >
-                    {error}
-                  </td>
-                </tr>
-              )}
-
-              {!loading && !error && entries.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="py-8 text-center text-sm text-slate-500"
-                  >
-                    No audit entries yet.
-                  </td>
-                </tr>
-              )}
-
-              {!loading &&
-                !error &&
-                pageEntries.map((entry) => (
-                  <tr
-                    key={entry.id}
-                    className="border-b border-[#F3F3F3] hover:bg-[#F3F3F3] transition-colors"
-                  >
-                    <td className="py-4 text-sm text-center text-slate-500 pl-10">
-                      {entry.id.slice(-5)}
-                    </td>
-                    <td className="py-4 text-sm text-center text-slate-600 px-4">
-                      {format(parseISO(entry.created_at), "yyyy-MM-dd HH:mm")}
-                    </td>
-                    <td className="py-4 text-sm text-center text-slate-600 px-4">
-                      {entry.user_email}
-                    </td>
-                    <td className="py-4 text-sm text-center text-slate-600 px-4">
-                      {entry.action}
-                    </td>
-                    <td className="py-4 text-sm text-center text-slate-600 px-4">
-                      {entry.entity_type} - {entry.entity_id.slice(-5)}
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+        <div className="max-h-[calc(100vh-180px)] overflow-y-auto border border-[#E3E3E3] mt-2">
+          {loading ? (
+            <div className="py-8 text-center text-sm text-slate-500">
+              Loading audit entries…
+            </div>
+          ) : error ? (
+            <div className="py-8 text-center text-sm text-red-600">{error}</div>
+          ) : entries.length === 0 ? (
+            <div className="py-8 text-center text-sm text-slate-500">
+              No audit entries yet.
+            </div>
+          ) : (
+            <DataTable<AuditEntry> data={pageEntries} columns={columns} />
+          )}
         </div>
 
         {!loading && !error && entries.length > 0 && (
@@ -160,7 +139,7 @@ const AuditLogPage = () => {
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 };
 

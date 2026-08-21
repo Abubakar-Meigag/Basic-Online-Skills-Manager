@@ -69,6 +69,10 @@ const App = () => {
               element={<Navigate to="find-opportunities" replace />}
             />
             <Route
+              index
+              element={<Navigate to="find-opportunities" replace />}
+            />
+            <Route
               path="find-opportunities"
               element={<OutreachPartnerDashboard />}
             />

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import CYFStaffTable from "../../components/CYFStaffTable/CYFStaffTable";
 import CourseCount from "../../components/CourseCount/CourseCount";
+import PageHeader from "../../components/PageHeader";
 import type { CoursePipelineItem } from "../../data/dataType";
 import { api } from "../../auth/authApi";
 
@@ -26,20 +27,20 @@ const CYFStaffDashboard = () => {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     getCourses();
   }, [getCourses]);
 
-  console.log(courses);
-
   return (
-    <div className="request-pipeline">
-      <div className="mt-10 mb-10 mx-12">
-        <h2 className="text-3xl font-bold text-[#333333]">Request Pipeline</h2>
-        <p className="text-gray-500">Courses grouped by their current stage</p>
+    <section className="p-6">
+      <div className="sticky top-0 z-20 bg-white px-8 pt-2 pb-1">
+        <PageHeader
+          title="Request Pipeline"
+          description="Courses grouped by their current stage"
+        />
       </div>
+
       {courses && (
-        <div className="m-10">
+        <div className="mx-8 mt-4">
           <div className="courses-count flex justify-between w-4xl mb-10">
             <CourseCount
               type="Pending Review"
@@ -60,33 +61,39 @@ const CYFStaffDashboard = () => {
               count={courses.course_completed.length}
             />
           </div>
-          <p className="bg-yellow-100 text-amber-600 border-2 w-fit p-1 mb-2 font-bold border-amber-300  rounded-lg">
+
+          <p className="bg-yellow-100 text-amber-600 border-2 w-fit p-1 mb-2 font-bold border-amber-300 rounded-lg">
             Request Pending
           </p>
           <CYFStaffTable courses={courses.request_pending} />
-          <p className="bg-slate-100 text-slate-800 border-2 w-fit p-1 mb-2 font-bold border-slate-400 rounded-lg">
+
+          <p className="bg-slate-100 text-slate-800 border-2 w-fit p-1 mb-2 font-bold border-slate-400 rounded-lg mt-8">
             Request Open
           </p>
           <CYFStaffTable courses={courses.request_open} />
-          <p className="bg-yellow-50 text-yellow-700 border-2 w-fit p-1 mb-2 font-bold border-yellow-500 rounded-lg">
+
+          <p className="bg-yellow-50 text-yellow-700 border-2 w-fit p-1 mb-2 font-bold border-yellow-500 rounded-lg mt-8">
             Request Claimed
           </p>
           <CYFStaffTable courses={courses.request_claimed} />
-          <p className="bg-green-50 text-green-700 border-2 w-fit p-1 mb-2 font-bold border-green-300 rounded-lg">
+
+          <p className="bg-green-50 text-green-700 border-2 w-fit p-1 mb-2 font-bold border-green-300 rounded-lg mt-8">
             Request Confirmed
           </p>
           <CYFStaffTable courses={courses.request_confirmed} />
-          <p className="bg-blue-100 text-blue-700 border-2 w-fit p-1 mb-2 font-bold border-blue-300 rounded-lg">
+
+          <p className="bg-blue-100 text-blue-700 border-2 w-fit p-1 mb-2 font-bold border-blue-300 rounded-lg mt-8">
             Course Running
           </p>
           <CYFStaffTable courses={courses.course_running} />
-          <p className="bg-stone-100 text-shadow-olive-700 border-2 w-fit p-1 mb-2 font-bold border-stone-400 rounded-lg">
+
+          <p className="bg-stone-100 text-shadow-olive-700 border-2 w-fit p-1 mb-2 font-bold border-stone-400 rounded-lg mt-8">
             Course Completed
           </p>
           <CYFStaffTable courses={courses.course_completed} />
         </div>
       )}
-    </div>
+    </section>
   );
 };
 

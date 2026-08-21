@@ -3,23 +3,23 @@ import { parseISO, format, addDays } from "date-fns";
 import type { AxiosError } from "axios";
 import { api } from "../../auth/authApi";
 import type { Course } from "../../data/dataType";
+import PageHeader from "../../components/PageHeader";
 
-// Fixed course duration for a Basic Online Skills course.
-const COURSE_DURATION_DAYS = 21; // 3 weeks
+const COURSE_DURATION_DAYS = 21;
 const COURSE_TITLE = "Basic Online Skills";
 const COURSE_DURATION_LABEL = "3 weeks";
 
 type ClaimOpportunityProps = {
   course: Course;
-  onBack: () => void; // return to the board (cancel)
-  onClaimed: () => void; // called after a successful claim
+  onBack: () => void;
+  onClaimed: () => void;
 };
 
 type FormState = {
   contact_name: string;
   contact_email: string;
   venue_address: string;
-  start_date: string; // YYYY-MM-DD
+  start_date: string;
   lunch_arrangement: string;
   client_group_description: string;
   tech_level: string;
@@ -57,8 +57,6 @@ const ClaimOpportunity = ({
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Calculated end date preview (start + 3 weeks). Display only
-  // the backend sets the stored end_date, so this is never sent.
   const calculatedEndDate = form.start_date
     ? format(
         addDays(parseISO(form.start_date), COURSE_DURATION_DAYS),
@@ -80,7 +78,6 @@ const ClaimOpportunity = ({
       lunch_arrangement,
     } = form;
 
-    // Required fields
     if (
       !contact_name.trim() ||
       !contact_email.trim() ||
@@ -88,13 +85,10 @@ const ClaimOpportunity = ({
       !start_date ||
       !lunch_arrangement.trim()
     ) {
-      setError(
-        "Please fill in all required fields: contact name, contact email, venue address, start date, and lunch arrangement.",
-      );
+      setError("Please fill in all required fields.");
       return;
     }
 
-    // Basic email format check
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(contact_email.trim())) {
       setError("Please enter a valid contact email address.");
@@ -149,18 +143,21 @@ const ClaimOpportunity = ({
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-8">
-      <button
-        type="button"
-        onClick={onBack}
-        className="mb-4 text-xs font-semibold uppercase tracking-wide text-gray-500 hover:text-gray-700"
-      >
-        ← Opportunity Board
-      </button>
-      <h1 className="text-2xl font-bold text-gray-900">
-        Claim This Opportunity
-      </h1>
+      <div className="sticky top-0 z-20 bg-white px-6 pt-2 pb-1">
+        <button
+          type="button"
+          onClick={onBack}
+          className="mb-4 text-xs font-semibold uppercase tracking-wide text-gray-500 hover:text-gray-700"
+        >
+          ← Opportunity Board
+        </button>
+        <PageHeader
+          title="Claim This Opportunity"
+          description="Provide your organisation's details to host this training course."
+        />
+      </div>
 
-      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6">
+      <div className="mt-4 rounded-lg border border-gray-200 bg-white p-6">
         <div className="mb-4 flex items-center justify-between border-b border-gray-100 pb-3">
           <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
             Opportunity Details
@@ -264,14 +261,17 @@ const ClaimOpportunity = ({
           </div>
 
           <div className="rounded-md border border-gray-200 bg-gray-50 px-4 py-3">
-            <span className="text-xs font-semibold  tracking-wide text-gray-500">
-              Automation shows up after choosing Start Date
+            <span className="text-xs font-semibold tracking-wide text-gray-500">
+              Projected End Date
             </span>
             <p className="mt-1 text-sm text-gray-600">
-              End Date:{" "}
-              <span className="font-medium text-gray-900">
-                {calculatedEndDate ?? " "}
-              </span>
+              {calculatedEndDate ? (
+                <span className="font-medium text-gray-900">
+                  {calculatedEndDate}
+                </span>
+              ) : (
+                "Will be calculated after choosing Start Date"
+              )}
             </p>
           </div>
 
@@ -388,7 +388,6 @@ const ClaimOpportunity = ({
   );
 };
 
-// Small read-only label/value pair for the summary grid.
 const SummaryItem = ({ label, value }: { label: string; value: string }) => (
   <div>
     <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
