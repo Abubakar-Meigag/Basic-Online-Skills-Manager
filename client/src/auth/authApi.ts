@@ -7,6 +7,7 @@ const API_BASE_URL =
 // Create an Axios Instance
 export const api = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true,
 });
 
 // Add Request Interceptor to automatically attach token
@@ -62,7 +63,7 @@ export async function requestMagicLink(
   email: string,
 ): Promise<RequestMagicLinkResponse> {
   const response = await api.post<RequestMagicLinkResponse>(
-    `${API_BASE_URL}/auth/magic-link`,
+    `/auth/magic-link`,
     { email },
   );
   return response.data;
@@ -74,7 +75,7 @@ export async function verifyMagicLink(
   token: string,
 ): Promise<VerifyMagicLinkResponse> {
   const response = await api.post<VerifyMagicLinkResponse>(
-    `${API_BASE_URL}/auth/verify`,
+    `/auth/verify`,
     { token },
   );
   return response.data;

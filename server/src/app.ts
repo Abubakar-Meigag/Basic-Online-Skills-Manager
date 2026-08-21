@@ -26,8 +26,15 @@ import getAuditLog from "./api/getAuditLog";
 import updateUserStatus from "./api/updateUserStatus";
 
 const app = express();
+app.disable("x-powered-by");
 
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true,
+  }),
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));

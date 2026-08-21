@@ -19,8 +19,10 @@ export async function handleRequestMagicLink(
       });
     }
 
+    const sanitisedEmail = email.trim().toLowerCase().replace(/[\n\r]/g, "_");
+
     // Call service layer to query user, store hashed token, and dispatch email/log
-    await requestMagicLink(email.trim().toLowerCase());
+    await requestMagicLink(sanitisedEmail);
 
     // return 200 OK to prevent email enumeration
     return res.status(200).json({
