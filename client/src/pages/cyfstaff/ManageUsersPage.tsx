@@ -218,9 +218,23 @@ const ManageUsersPage = () => {
       } catch (error) {
         console.error("Failed to update status:", error);
         alert("Could not update user status. Please try again.");
+        // Explanation: The error handler.
+    // Why: If the database update fails (maybe the database is locked or the user has no permission), we show an alert to the user so they know their change wasn't saved.
       }
     },
     [getUsers],
+    // The [getUsers] at the end: This tells React: "This function depends on the getUsers function. If getUsers ever changes, recreate this function too."
+    // To understand why [getUsers] is in the "watching list" (dependency array) of handleStatusChange, let's use an analogy.
+    // The "Phone Number" Analogy
+    // Imagine you have a personal assistant named "HandleStatusChange." You tell this assistant: "Whenever you finish updating a user's status, I want you to call the GetUsers department to refresh the list."
+    // The Reference: To do this, the assistant needs the phone number for the "GetUsers" department.
+    // The Change: Now, imagine the "GetUsers" department gets a brand new phone number (the function is recreated in React).
+    // The Problem: If the assistant keeps using the old phone number, they might be calling a dead line, or an old version of the department that doesn't work correctly anymore.
+    // The Dependency: By putting [getUsers] in the dependency array, you are telling React: "If the 'GetUsers' department ever changes its number, give my assistant the new number immediately."
+    // If we left the array empty [], handleStatusChange would "capture" the version of getUsers that existed the very first time the page loaded. If getUsers was ever updated later (maybe to include new security logic), handleStatusChange wouldn't know. 
+    // It would still be using the old version of the function.
+    // In professional programming, we follow a rule: If you use a variable or a function inside a hook, you MUST list it in the dependencies.
+    // Even if it doesn't change today, someone (maybe even you!) might change the code tomorrow to make it more dynamic. If you forgot to list the dependency, the app would have a "Stale Closure" bug—it would keep trying to fetch the old data instead of the new filtered data.
   );
 
   const columns = useMemo(
