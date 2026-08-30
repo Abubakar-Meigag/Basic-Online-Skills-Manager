@@ -235,20 +235,46 @@ const ManageUsersPage = () => {
     // It would still be using the old version of the function.
     // In professional programming, we follow a rule: If you use a variable or a function inside a hook, you MUST list it in the dependencies.
     // Even if it doesn't change today, someone (maybe even you!) might change the code tomorrow to make it more dynamic. If you forgot to list the dependency, the app would have a "Stale Closure" bug—it would keep trying to fetch the old data instead of the new filtered data.
+
+    
+    // In React, the word "Hook" is the family name for a whole group of special functions.
+    // Both useMemo and useCallback are hooks, but so are useState and useEffect.
+    // How to spot a Hook:
+    // In React, you can almost always identify a hook because its name starts with the word "use". This is a strict naming rule in the industry.
+    // Here is the list of hooks currently in your ManageUsersPage.tsx:
+    // useState: The "Memory Hook."
+    // useEffect: The "Action Hook" (used for things that happen outside the component, like fetching data).
+    // useMemo: The "Value Memory Hook" (remembers a calculated result).
+    // useCallback: The "Function Memory Hook" (remembers a function itself).
+    // Why do we call them "Hooks"?
+    // Before hooks were invented, React components were much more complicated to write. These functions allow you to "hook into" React's internal systems.
+    // useState lets you hook into React's memory system.
+    // useEffect lets you hook into the moment the page appears or disappears from the screen.
+    // The "Rule of Hooks" (Important for your notes!)
+    // Whenever you use a hook that has a Dependency Array (the [] at the end), the rule applies to all of them.
+    // Whether it is useEffect, useMemo, or useCallback, if you use a variable inside that hook, you must "hook" that variable into the dependency array so React can keep track of it.
   );
+
 
   const columns = useMemo(
     (): TableColumn<User>[] => [
+      // Explanation: We use useMemo to define our column setup.
+      // Why: Just like the search logic, we don't want to recreate this blueprint or instruction every time the user types a single letter in the search bar. We only redo it if the "action" (handleStatusChange) changes.
       {
         header: "ID",
         accessor: "id",
         cellClassName: "text-xs text-gray-600 font-mono",
         render: (value) => String(value).slice(0, 5),
+        // header: The title at the top of the column.
+        // accessor: The Key. This tells the table: "Look for the property named id inside the user object."
+        // render: This is a "Formatter."
+        // Why: Database IDs are often long and ugly (like 507f1f77b...). This line says: "Take the value, turn it into a string, and only show the first 5 characters so it looks neat."
       },
       {
         header: "Organisation Name",
         accessor: "organisation_name",
         render: (value) => value || "N/A",
+        // Why value || "N/A"? This is a "Fallback." If a user doesn't have an organization name (it's null or empty), it will show "N/A" instead of just a blank white space.
       },
       {
         header: "Email Address",
@@ -259,11 +285,13 @@ const ManageUsersPage = () => {
         header: "Status",
         accessor: "is_active",
         render: (isActive, row) => {
+          // Explanation: This is the most complex column. Instead of just showing "True" or "False," we are rendering a Dropdown Menu.
+          // row: This gives us access to the entire user object for that specific line, which is how we know which ID to update.
           const statusKey = isActive ? "active" : "not_active";
           const { statusStyle } = statusLabel(
             statusKey,
             userOrPartnerStatusStyles,
-          );
+          ); // Explanation: This calls your "Utility" functions to get the right CSS colors (like green for active, gray for inactive).
 
           return (
             <select
@@ -276,6 +304,8 @@ const ManageUsersPage = () => {
               <option value="active">Active</option>
               <option value="not_active">Inactive</option>
             </select>
+            // Explanation: This creates the actual HTML <select> element.
+            // onChange: When the staff member clicks a different option, it triggers the handleStatusChange function we discussed earlier. It passes the User's ID and the New Choice.
           );
         },
       },
@@ -283,11 +313,18 @@ const ManageUsersPage = () => {
     [handleStatusChange],
   );
 
+  //This is where everything we've talked about finally "shows up" on the user's screen.
   useEffect(() => {
     if (activeForm === "none") {
       getUsers();
     }
   }, [getUsers, activeForm]);
+  // Step A (The Alarm): When the page first "wakes up" (mounts), the useEffect alarm goes off.
+  // Step B (The Check): It checks: "Is activeForm equal to 'none'?"
+  // Since it starts as "none", the answer is Yes.
+  // Step C (The Action): It calls getUsers().
+  // Step D (The Fetch): getUsers calls the Backend, gets the data, and puts it in the users bucket.
+  // Step E (The Re-render): Because the users bucket changed, React re-runs the whole function to update the screen.
 
   if (activeForm === "user") {
     return (
