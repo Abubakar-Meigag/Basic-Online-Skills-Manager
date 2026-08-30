@@ -16,7 +16,7 @@ import PageHeader from "../../components/PageHeader";
 import type { TableColumn } from "../../components/DataTable";
 import type { User } from "../../data/dataType";
 // What it is: These are not "actions," they are definitions. Notice the word type.
-// Why: They act like a dictionary. They tell the computer: "A User must have an ID, an Email, and a Name." 
+// Why: They act like a dictionary. They tell the computer: "A User must have an ID, an Email, and a Name."
 // If you try to use a property that doesn't exist (like user.phoneNumber), TypeScript will give you a red underline to prevent a bug.
 import AddUserForm from "./addPartner/AddUserForm";
 // What it is: A separate file that contains the form for creating a new user.
@@ -28,7 +28,6 @@ import { userOrPartnerStatusStyles } from "../../lib/constants/userOrPartnerStat
 // statusLabel: A function that decides: "If the status is 'active', use the green color logic."
 // userOrPartnerStatusStyles: A file that actually holds the specific CSS colors.
 
-
 // The State Variables. These lines are the "memory" of your component.
 const ManageUsersPage = () => {
   // Explanation: This starts the definition of your page. In React, a page is just a big function that returns some HTML.
@@ -38,7 +37,7 @@ const ManageUsersPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   // Explanation: This is an empty "bucket" waiting to be filled with people from the database.
   // Why: We start with an empty list []. Once the backend sends us the data, we use setUsers to put that data into this bucket.
- 
+
   // Imagine you order a "Memory Kit" from the React store (useState). When the
   // package arrives at your door, you open it and find exactly two things inside:
 
@@ -122,7 +121,6 @@ const ManageUsersPage = () => {
 
   // Think carefully! (Hint: Look at the [] in the type definition User[]).
 
-
   const [isLoading, setIsLoading] = useState(true);
   // Explanation: This tracks if we are currently waiting for the backend to answer.
   // Why: It starts as true. We use this to show a "Loading..." message on the screen so the user knows the app hasn't crashed while waiting for the internet.
@@ -130,16 +128,15 @@ const ManageUsersPage = () => {
   // Explanation: This remembers exactly what the user has typed into the search bar.
   // Why: Every time you press a key in the search box, this "memory" updates so we can filter the list of users.
 
-
   // The Search Logic (useMemo). This is how we take the big list of users and show only the ones the user is looking for.
   const filteredUsers = useMemo(() => {
     // Explanation: useMemo is like a "Smart Save Button."
-    // Why: Filtering a long list of users can be hard work for a computer. 
+    // Why: Filtering a long list of users can be hard work for a computer.
     // useMemo tells React: "Calculate this filtered list once, and remember it. Don't do the work again unless the users list or the searchTerm changes."
     return users.filter((user) => {
       const search = searchTerm.toLowerCase();
       // Explanation: We turn the user's search text into lowercase letters.
-      // Why: Computers are picky! To a computer, "CYF" and "cyf" are different. By making everything lowercase, 
+      // Why: Computers are picky! To a computer, "CYF" and "cyf" are different. By making everything lowercase,
       // it doesn't matter if the user types with capital letters or not; the search will still work.
 
       const orgName = (user.organisation_name || "N/A").toLowerCase();
@@ -164,7 +161,6 @@ const ManageUsersPage = () => {
   // The computer runs filteredUsers.
   // Based on the code above, will "Alice" show up in the results? Why or why not?
   // Answer: Because you used .toLowerCase(), "Alice" becomes "alice", and since "alice" includes "ali", she stays on the screen. Great job.
-
 
   // This is how the frontend actually asks the backend for data.
   const getUsers = useCallback(async () => {
@@ -219,7 +215,7 @@ const ManageUsersPage = () => {
         console.error("Failed to update status:", error);
         alert("Could not update user status. Please try again.");
         // Explanation: The error handler.
-    // Why: If the database update fails (maybe the database is locked or the user has no permission), we show an alert to the user so they know their change wasn't saved.
+        // Why: If the database update fails (maybe the database is locked or the user has no permission), we show an alert to the user so they know their change wasn't saved.
       }
     },
     [getUsers],
@@ -231,12 +227,11 @@ const ManageUsersPage = () => {
     // The Change: Now, imagine the "GetUsers" department gets a brand new phone number (the function is recreated in React).
     // The Problem: If the assistant keeps using the old phone number, they might be calling a dead line, or an old version of the department that doesn't work correctly anymore.
     // The Dependency: By putting [getUsers] in the dependency array, you are telling React: "If the 'GetUsers' department ever changes its number, give my assistant the new number immediately."
-    // If we left the array empty [], handleStatusChange would "capture" the version of getUsers that existed the very first time the page loaded. If getUsers was ever updated later (maybe to include new security logic), handleStatusChange wouldn't know. 
+    // If we left the array empty [], handleStatusChange would "capture" the version of getUsers that existed the very first time the page loaded. If getUsers was ever updated later (maybe to include new security logic), handleStatusChange wouldn't know.
     // It would still be using the old version of the function.
     // In professional programming, we follow a rule: If you use a variable or a function inside a hook, you MUST list it in the dependencies.
     // Even if it doesn't change today, someone (maybe even you!) might change the code tomorrow to make it more dynamic. If you forgot to list the dependency, the app would have a "Stale Closure" bug—it would keep trying to fetch the old data instead of the new filtered data.
 
-    
     // In React, the word "Hook" is the family name for a whole group of special functions.
     // Both useMemo and useCallback are hooks, but so are useState and useEffect.
     // How to spot a Hook:
@@ -254,7 +249,6 @@ const ManageUsersPage = () => {
     // Whenever you use a hook that has a Dependency Array (the [] at the end), the rule applies to all of them.
     // Whether it is useEffect, useMemo, or useCallback, if you use a variable inside that hook, you must "hook" that variable into the dependency array so React can keep track of it.
   );
-
 
   const columns = useMemo(
     (): TableColumn<User>[] => [
