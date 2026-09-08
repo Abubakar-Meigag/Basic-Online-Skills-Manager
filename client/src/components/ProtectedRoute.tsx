@@ -42,12 +42,39 @@ export const ProtectedRoute = ({
 
   // Not logged in? Go to login
   if (!user) return <Navigate to="/login" replace />;
+  // What it does: Checks if our user variable is a falsy value e.g. null
+  // If it is, the component immediately exits and renders a redirection to /login
+
+  // Why we need it: This is our first line of defense
+  // If there is no user object in the browser’s locker, the visitor is an unauthenticated guest trying to sneak into a private dashboard
+  // The guard kicks them out to the login screen
+
+  // Why the replace prop is vital: By default, navigating to a new page adds a new entry to the browser's history stack.
+  // If we didn't use replace, a kicked-out user could click their browser's "Back" arrow and trigger an infinite loop of loading and getting kicked out.
+  // replace overwrites their current history entry, ensuring a clean redirect
 
   // Wrong role? Go to root (HomePage.tsx will then send them to their own dashboard)
   if (!allowedRoles.includes(user.orgType)) {
     return <Navigate to="/" replace />;
+    // What it does: This line executes if the user is logged in, but asks: "Is your assigned organization type (user.orgType) on the permitted guest
+    // list (allowedRoles) for this specific page?" If her role is not on the list, she is redirected to the home route /
+
+    // Why we need it: This prevents cross-role sneaking
+    // Without this line, a Commercial Partner ("commercial") who is successfully logged in could manually type /cyf-staff/manage-users into their
+    // address bar and gain access to CYF Staff administrative lists
+
+    // Why we redirect to / instead of an error page: This is a brilliant structural design choice in your app. When a logged-in user gets
+    // sent to / (the root route), the root component HomePage.tsx intercepts them, reads their role from their active session token, and automatically
+    // redirects them to their own designated dashboard (e.g., directing a Commercial Partner back to /commercial-partner)
   }
 
   // Authorized? Show the content
   return <Outlet />;
+  // What it does: If the execution reaches this line, the user has passed both checkpoints
+  // The guard step-aside and renders the <Outlet /> component
+
+  // Why we need it: This opens the door
+  // It tells React Router to safely render whatever nested child pages are matched under this route layout
+  // For example, if Alice is a verified staff member visiting /cyf-staff/request-pipeline, the Outlet instantly
+  // resolves and loads the <CYFStaffDashboard /> page directly onto her screen
 };
