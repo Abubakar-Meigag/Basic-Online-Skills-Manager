@@ -1,5 +1,6 @@
 import { StrictMode } from "react";
-// This is like a Quality Control Inspector. It doesn't show up on the screen, but it checks your code in the background to make sure you aren't using old, buggy ways of doing things.
+// This is like a Quality Control Inspector. It doesn't show up on the screen, but it checks your code in the background to make sure you aren't using old,
+// buggy ways of doing things.
 import { createRoot } from "react-dom/client";
 // This is the Injection Tool. It is the specific tool designed to take a React app and "mount" it into an HTML page.
 import { BrowserRouter } from "react-router-dom";
