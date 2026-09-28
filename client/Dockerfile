@@ -23,7 +23,7 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 
 # SPA routing config (all routes -> index.html)
 RUN echo 'server { \
-    listen 80; \
+    listen 8080; \
     server_name _; \
     root /usr/share/nginx/html; \
     index index.html; \
@@ -39,6 +39,8 @@ RUN chown -R nginx:nginx /usr/share/nginx/html && \
     chown nginx:nginx /var/run/nginx.pid
 
 
-EXPOSE 80
+EXPOSE 8080
+
+USER nginx
 
 CMD ["nginx", "-g", "daemon off;"]
