@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Copy package files first (better layer caching)
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --ignore-scripts
 
 # Copy source and compile TypeScript
 COPY tsconfig.json ./
@@ -21,7 +21,7 @@ WORKDIR /app
 
 # Install only production dependencies
 COPY package*.json ./
-RUN npm ci --omit=dev && npm cache clean --force
+RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 
 # Copy compiled JS from builder stage
 COPY --from=builder /app/dist ./dist
