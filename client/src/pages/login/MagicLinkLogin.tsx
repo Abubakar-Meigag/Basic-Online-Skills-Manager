@@ -34,10 +34,10 @@ const styles = {
 
   // Primary Action Button
   submitButton:
-    "w-full mt-2 bg-[#EE2A24] hover:bg-[#d6211b] text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-150 cursor-pointer shadow-sm active:scale-[0.99]",
+    "w-full mt-2 bg-[#AC110C] hover:bg-[#d6211b] text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-150 cursor-pointer shadow-sm active:scale-[0.99]",
 
   // Helper footer text inside form
-  helperText: "text-xs text-gray-400 text-center mt-3 leading-relaxed",
+  helperText: "text-xs text-gray-600 text-center mt-3 leading-relaxed",
 
   // Success state styles
   backButton:
