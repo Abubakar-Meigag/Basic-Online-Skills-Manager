@@ -25,7 +25,13 @@ const Sidebar = () => {
   return (
     <div className="sidebar flex flex-col h-screen shrink-0 sticky top-0 self-start border-r border-[#E3E3E3] overflow-hidden">
       <div className="p-5">
-        <img className="mb-5" src={CYFLogo} width="120" height="120" />
+        <img
+          className="mb-5"
+          src={CYFLogo}
+          alt="CodeYourFuture Logo"
+          width="120"
+          height="120"
+        />
       </div>
 
       <nav className="px-5">
@@ -38,7 +44,7 @@ const Sidebar = () => {
                   to={link.path}
                   className={({ isActive }) =>
                     isActive
-                      ? "flex items-center p-3 bg-red-50 text-[#EE2A24] border-l-4 border-[#EE2A24] rounded-r-lg"
+                      ? "flex items-center p-3 bg-red-50 text-[#A2100B] border-l-4 border-[#EE2A24] rounded-r-lg"
                       : "flex items-center p-3 text-gray-700"
                   }
                 >

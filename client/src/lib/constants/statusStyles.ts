@@ -2,7 +2,7 @@ import type { CourseStatus } from "../../data/dataType";
 
 export const statusStyles: Record<CourseStatus, string> = {
   request_pending:
-    "bg-amber-100 text-center text-amber-600 border-2 min-w-[120px]border-amber-300 rounded-lg",
+    "bg-amber-100 text-center text-amber-800 border-2 min-w-[120px]border-amber-300 rounded-lg",
   request_open:
     "bg-slate-100 text-center text-slate-800 border-2 min-w-[120px] border-slate-400 rounded-lg",
   request_claimed:
