@@ -62,7 +62,7 @@ const CYFStaffDashboard = () => {
             />
           </div>
 
-          <p className="bg-yellow-100 text-amber-600 border-2 w-fit p-1 mb-2 font-bold border-amber-300 rounded-lg">
+          <p className="bg-yellow-100 text-amber-800 border-2 w-fit p-1 mb-2 font-bold border-amber-300 rounded-lg">
             Request Pending
           </p>
           <CYFStaffTable courses={courses.request_pending} />

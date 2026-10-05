@@ -90,6 +90,7 @@ const ManageUsersPage = () => {
               onChange={(e) =>
                 handleStatusChange(row.id, e.target.value === "active")
               }
+              aria-label={`Change status for ${row.email}`}
               className={`cursor-pointer rounded-sm px-2 py-1 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-red-500 ${statusStyle}`}
             >
               <option value="active">Active</option>
