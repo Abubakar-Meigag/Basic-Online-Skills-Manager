@@ -137,8 +137,7 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
     await client.query("COMMIT");
 
     res.status(201).json({ organisation: newOrg });
-  
-  } catch (error: unknown) {
+  } catch (error) {
     await client.query("ROLLBACK");
 
     // Handle unique constraint violation for organisation_name or email_domain
