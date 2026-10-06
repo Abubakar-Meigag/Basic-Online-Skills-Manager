@@ -120,8 +120,17 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
     await client.query("COMMIT");
 
     res.status(201).json({ organisation: newOrg });
-  } catch (error) {
+  } catch (error: any) {
     await client.query("ROLLBACK");
+
+    // Handle unique constraint violation (duplicate organisation name or email domain)
+    if (error.code === "23505") {
+      res
+        .status(409)
+        .json({ error: "An organisation with this name or email domain already exists." })
+      return;
+    }
+
     console.error("Database error creating organisation:", error);
     res.status(500).json({ error: "Internal Server Error" });
   } finally {
