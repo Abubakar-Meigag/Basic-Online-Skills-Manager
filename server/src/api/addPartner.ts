@@ -74,7 +74,9 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
   }
 
   if (typeof organisation_name !== "string") {
-    res.status(400).json({ error: "Organisation name must be a String" });
+    res
+      .status(400)
+      .json({ error: "Organisation name must be String"})
     return;
   }
 
@@ -87,9 +89,9 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
   }
 
   const normalisedDomain = email_domain.toLowerCase();
-  const normalisedOrganistionName = organisation_name.trim().toLowerCase();
-
-  if (!normalisedOrganistionName) {
+  const normalisedName = organisation_name.trim().toLowerCase();
+  
+  if (!normalisedName) {
     res
       .status(400)
       .json({ error: "organisation_name cannot be empty or whitespace" });
@@ -100,6 +102,21 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
 
   try {
     await client.query("BEGIN");
+
+    // Reject if an org with this name or email_domain already exists.
+    const existingOrg = await client.query(
+      `SELECT id FROM organisations
+       WHERE organisation_name = $1 OR email_domain = $2`,
+      [organisation_name, normalisedDomain],
+    );
+
+    if (existingOrg.rows.length > 0) {
+      await client.query("ROLLBACK");
+      res.status(409).json({
+        error: "An organisation with this name or email domain already exists.",
+      });
+      return;
+    }
 
     const result = await client.query(
       `INSERT INTO organisations (organisation_name, type, email_domain, city)
