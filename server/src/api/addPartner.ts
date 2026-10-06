@@ -72,9 +72,7 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
   }
 
   if (typeof organisation_name !== "string") {
-    res
-      .status(400)
-      .json({ error: "Organisation name must be String"})
+    res.status(400).json({ error: "Organisation name must be String" });
     return;
   }
 
@@ -88,7 +86,7 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
 
   const normalisedDomain = email_domain.toLowerCase();
   const normalisedName = organisation_name.trim().toLowerCase();
-  
+
   if (!normalisedName) {
     res
       .status(400)
@@ -100,7 +98,7 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
 
   try {
     await client.query("BEGIN");
-    
+
     const result = await client.query(
       `INSERT INTO organisations (organisation_name, type, email_domain, city)
        VALUES ($1, $2, $3, $4)
@@ -127,7 +125,10 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
     if (error.code === "23505") {
       res
         .status(409)
-        .json({ error: "An organisation with this name or email domain already exists." })
+        .json({
+          error:
+            "An organisation with this name or email domain already exists.",
+        });
       return;
     }
 
