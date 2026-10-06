@@ -72,7 +72,7 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
   }
 
   if (typeof organisation_name !== "string") {
-    res.status(400).json({ error: "Organisation name must be String" });
+    res.status(400).json({ error: "Organisation name must be a String" });
     return;
   }
 
