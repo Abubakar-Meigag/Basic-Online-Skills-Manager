@@ -74,8 +74,9 @@ export async function requestMagicLink(
 export async function verifyMagicLink(
   token: string,
 ): Promise<VerifyMagicLinkResponse> {
-  const response = await api.post<VerifyMagicLinkResponse>(`/auth/verify`, {
-    token,
-  });
+  const response = await api.post<VerifyMagicLinkResponse>(
+    `/auth/verify`,
+    { token },
+  );
   return response.data;
 }
