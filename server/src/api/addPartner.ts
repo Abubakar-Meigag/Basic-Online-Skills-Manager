@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import pool from "../data/connection";
 import { ORGANISATION_TYPE, PARTNER_TYPES } from ".././constants/organisations";
 import { DatabaseError } from "pg";
+import { PG_UNIQUE_VIOLATION } from "@drdgvhbh/postgres-error-codes";
 
 const DOMAIN_REGEX =
   /^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i;
@@ -123,8 +124,8 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
   } catch (error: unknown) {
     await client.query("ROLLBACK");
 
-    // Handle unique constraint violation (duplicate organisation name or email domain)
-    if (error instanceof DatabaseError && error.code === "23505") {
+    // Handle unique constraint violation for organisation_name or email_domain
+    if (error instanceof DatabaseError && error.code === PG_UNIQUE_VIOLATION) {
       res
         .status(409)
         .json({
