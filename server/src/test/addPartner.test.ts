@@ -81,7 +81,6 @@ describe("POST /addPartner", () => {
       city: "London",
     });
 
-    // second call is the INSERT; its params array is the 2nd arg
     const insertParams = (pool.query as any).mock.calls[2][1];
     expect(insertParams).toContain("deloitte.com");
   });
