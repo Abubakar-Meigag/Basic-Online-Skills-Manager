@@ -87,9 +87,9 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
   }
 
   const normalisedDomain = email_domain.toLowerCase();
-  const normalisedName = organisation_name.trim().toLowerCase();
+  const normalisedOrganistionName = organisation_name.trim().toLowerCase();
 
-  if (!normalisedName) {
+  if (!normalisedOrganistionName) {
     res
       .status(400)
       .json({ error: "organisation_name cannot be empty or whitespace" });
