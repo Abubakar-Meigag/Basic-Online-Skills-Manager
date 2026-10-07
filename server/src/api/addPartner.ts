@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import pool from "../data/connection";
 import { ORGANISATION_TYPE, PARTNER_TYPES } from ".././constants/organisations";
+import { DatabaseError } from "pg";
 
 const DOMAIN_REGEX =
   /^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i;
@@ -85,9 +86,9 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
   }
 
   const normalisedDomain = email_domain.toLowerCase();
-  const normalisedName = organisation_name.trim().toLowerCase();
+  const normalisedOrganistionName = organisation_name.trim().toLowerCase();
 
-  if (!normalisedName) {
+  if (!normalisedOrganistionName) {
     res
       .status(400)
       .json({ error: "organisation_name cannot be empty or whitespace" });
@@ -103,7 +104,7 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
       `INSERT INTO organisations (organisation_name, type, email_domain, city)
        VALUES ($1, $2, $3, $4)
        RETURNING id, organisation_name, type, email_domain, city, created_at`,
-      [normalisedName, type, normalisedDomain, city],
+      [normalisedOrganistionName, type, normalisedDomain, city],
     );
 
     const newOrg = result.rows[0];
@@ -118,11 +119,12 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
     await client.query("COMMIT");
 
     res.status(201).json({ organisation: newOrg });
-  } catch (error: any) {
+  
+  } catch (error: unknown) {
     await client.query("ROLLBACK");
 
     // Handle unique constraint violation (duplicate organisation name or email domain)
-    if (error.code === "23505") {
+    if (error instanceof DatabaseError && error.code === "23505") {
       res
         .status(409)
         .json({
