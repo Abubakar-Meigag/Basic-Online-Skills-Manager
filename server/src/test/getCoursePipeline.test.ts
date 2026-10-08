@@ -1,10 +1,27 @@
 import request from "supertest";
 import app from "../app";
 import pool from "../data/connection";
+import jwt from "jsonwebtoken";
 
 vi.mock("../data/connection", () => ({
   default: { query: vi.fn() },
 }));
+
+process.env.JWT_SECRET = "test-secret";
+
+const tokenFor = (user: object) =>
+  `Bearer ${jwt.sign(user, process.env.JWT_SECRET!, { algorithm: "HS256", expiresIn: "1h" })}`;
+
+const cyfUser = {
+  id: "staff-1",
+  email: "admin@codeyourfuture.io",
+  orgType: "cyf_staff",
+  organisationId: "9e27629b-5911-4858-b453-14a5d227afc6",
+};
+
+const getPipeline = () =>
+  request(app).get("/course-pipeline").set("Authorization", tokenFor(cyfUser));
+
 
 describe("GET /course-pipeline", () => {
   afterEach(() => {
@@ -13,7 +30,7 @@ describe("GET /course-pipeline", () => {
 
   it("returns all six status keys even when db is empty", async () => {
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
-    const response = await request(app).get("/course-pipeline");
+    const response = await getPipeline();
     expect(response.status).toBe(200);
     expect(Object.keys(response.body).sort()).toEqual([
       "course_completed",
@@ -27,7 +44,8 @@ describe("GET /course-pipeline", () => {
 
   it("returns every status as an empty array when db is empty", async () => {
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
-    const response = await request(app).get("/course-pipeline");
+    const response = await getPipeline();
+    expect(response.status).toBe(200);
     expect(response.body).toEqual({
       request_pending: [],
       request_open: [],
@@ -57,7 +75,7 @@ describe("GET /course-pipeline", () => {
     ];
 
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
-    const response = await request(app).get("/course-pipeline");
+    const response = await getPipeline();
     expect(response.status).toBe(200);
     expect(response.body.request_pending).toEqual([mockRows[0]]);
     expect(response.body.course_running).toEqual([mockRows[1]]);
@@ -75,7 +93,8 @@ describe("GET /course-pipeline", () => {
     ];
 
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
-    const response = await request(app).get("/course-pipeline");
+    const response = await getPipeline();
+    expect(response.status).toBe(200);
     expect(response.body.request_pending).toHaveLength(1);
     expect(response.body.course_completed).toEqual([]);
     expect(response.body.request_claimed).toEqual([]);
@@ -100,19 +119,20 @@ describe("GET /course-pipeline", () => {
     ];
 
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
-    const response = await request(app).get("/course-pipeline");
+    const response = await getPipeline();
+    expect(response.status).toBe(200);
     expect(response.body.request_pending).toHaveLength(2);
   });
 
   it("returns JSON content-type", async () => {
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
-    const response = await request(app).get("/course-pipeline");
+    const response = await getPipeline();
     expect(response.headers["content-type"]).toMatch(/application\/json/);
   });
 
   it("returns 500 when the query fails", async () => {
     (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
-    const response = await request(app).get("/course-pipeline");
+    const response = await getPipeline();
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");
   });

@@ -1,30 +1,20 @@
 import request from "supertest";
 import app from "../app";
 import pool from "../data/connection";
+import jwt from "jsonwebtoken";
 
-// Auth is handled by mocking the auth middleware (per tech lead): same `app`,
-// but the middleware is replaced so it injects a controllable req.user.
-//
-// >>> CHANGE THIS to match the real middleware once it's merged: <<<
-//   - the module path in vi.mock(...)      ("../middleware/requireAuth")
-//   - the exported function name           (requireAuth)
-//   - if a separate role guard exists (e.g. requireRole), mock it too.
-//   - confirm the field name is `orgType` (what our JWT signs), not
-//     `organization_type` — mockUser and the handler both use orgType.
 
 vi.mock("../data/connection", () => ({
   default: { connect: vi.fn() },
 }));
 
-// The user the mocked middleware puts on req.user. Each test sets this.
-let mockUser: Record<string, unknown> | null = null;
+process.env.JWT_SECRET = "test-secret";
 
-vi.mock("../api/middleware/requireAuth", () => ({
-  requireAuth: (req: any, _res: any, next: any) => {
-    req.user = mockUser;
-    next();
-  },
-}));
+const tokenFor = (user: object) =>
+  `Bearer ${jwt.sign(user, process.env.JWT_SECRET!, {
+    algorithm: "HS256",
+    expiresIn: "1h",
+  })}`;
 
 const makeClient = () => ({
   query: vi.fn(),
@@ -46,10 +36,6 @@ const commercialUser = {
 };
 
 describe("PATCH /course/:id/status", () => {
-  beforeEach(() => {
-    // Default: an authorised CYF staff user. Individual tests override.
-    mockUser = cyfUser;
-  });
 
   afterEach(() => {
     vi.clearAllMocks();
@@ -70,6 +56,7 @@ describe("PATCH /course/:id/status", () => {
 
     const response = await request(app)
       .patch("/course/course-1/status")
+      .set("Authorization", tokenFor(cyfUser))
       .send({ status: "request_open" });
 
     expect(response.status).toBe(200);
@@ -78,10 +65,10 @@ describe("PATCH /course/:id/status", () => {
   });
 
   it("returns 403 when the caller is not CYF staff", async () => {
-    mockUser = commercialUser;
 
     const response = await request(app)
       .patch("/course/course-1/status")
+      .set("Authorization", tokenFor(commercialUser))
       .send({ status: "request_open" });
 
     expect(response.status).toBe(403);
@@ -91,6 +78,7 @@ describe("PATCH /course/:id/status", () => {
   it("returns 400 when status is missing", async () => {
     const response = await request(app)
       .patch("/course/course-1/status")
+      .set("Authorization", tokenFor(cyfUser))
       .send({});
 
     expect(response.status).toBe(400);
@@ -101,6 +89,7 @@ describe("PATCH /course/:id/status", () => {
   it("returns 400 for a status outside the allowed CYF transitions", async () => {
     const response = await request(app)
       .patch("/course/course-1/status")
+      .set("Authorization", tokenFor(cyfUser))
       .send({ status: "request_cancelled" }); // out of scope, not allowed here
 
     expect(response.status).toBe(400);
@@ -111,6 +100,7 @@ describe("PATCH /course/:id/status", () => {
   it("returns 400 for request_pending / request_claimed (not CYF actions)", async () => {
     const response = await request(app)
       .patch("/course/course-1/status")
+      .set("Authorization", tokenFor(cyfUser))
       .send({ status: "request_claimed" });
 
     expect(response.status).toBe(400);
@@ -129,6 +119,7 @@ describe("PATCH /course/:id/status", () => {
 
     const response = await request(app)
       .patch("/course/missing/status")
+      .set("Authorization", tokenFor(cyfUser))
       .send({ status: "request_open" });
 
     expect(response.status).toBe(404);
@@ -151,6 +142,7 @@ describe("PATCH /course/:id/status", () => {
 
     await request(app)
       .patch("/course/course-1/status")
+      .set("Authorization", tokenFor(cyfUser))
       .send({ status: "course_running" });
 
     const auditCall = client.query.mock.calls.find(
@@ -177,6 +169,7 @@ describe("PATCH /course/:id/status", () => {
 
     const response = await request(app)
       .patch("/course/course-1/status")
+      .set("Authorization", tokenFor(cyfUser))
       .send({ status: "request_open" });
 
     expect(response.status).toBe(500);

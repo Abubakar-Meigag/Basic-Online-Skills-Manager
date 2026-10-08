@@ -4,11 +4,12 @@ import app from "../app";
 import pool from "../data/connection";
 import { OrganizationType } from "../data/dataType";
 
+const mockClient = vi.hoisted(() => ({ query: vi.fn(), release: vi.fn() }));
+
 vi.mock("../data/connection", () => ({
-  default: { query: vi.fn() },
+  default: { query: mockClient.query, connect: vi.fn().mockResolvedValue(mockClient) },
 }));
 
-// Middleware reads JWT_SECRET at verify time, so set it before any request runs.
 process.env.JWT_SECRET = "test-secret";
 
 // A valid CYF-staff token
@@ -28,10 +29,12 @@ const auth = `Bearer ${staffToken}`;
 describe("POST /addPartner", () => {
   afterEach(() => {
     vi.clearAllMocks();
+    (pool.connect as any).mockResolvedValue(mockClient);
   });
 
   it("creates an organisation and returns 201", async () => {
     (pool.query as any)
+      .mockResolvedValueOnce({})
       // duplicate-check query no existing org
       .mockResolvedValueOnce({ rows: [] })
       // insert query returns the new org
@@ -65,6 +68,7 @@ describe("POST /addPartner", () => {
 
   it("lowercases the email_domain before insert", async () => {
     (pool.query as any)
+      .mockResolvedValueOnce({})
       .mockResolvedValueOnce({ rows: [] })
       .mockResolvedValueOnce({
         rows: [{ id: "org-2", organisation_name: "Deloitte", city: "London" }],
@@ -77,8 +81,7 @@ describe("POST /addPartner", () => {
       city: "London",
     });
 
-    // second call is the INSERT; its params array is the 2nd arg
-    const insertParams = (pool.query as any).mock.calls[1][1];
+    const insertParams = (pool.query as any).mock.calls[2][1];
     expect(insertParams).toContain("deloitte.com");
   });
 
@@ -116,6 +119,7 @@ describe("POST /addPartner", () => {
 
   it("accepts cyf_staff as a valid type", async () => {
     (pool.query as any)
+      .mockResolvedValueOnce({})
       .mockResolvedValueOnce({ rows: [] })
       .mockResolvedValueOnce({
         rows: [
@@ -153,7 +157,9 @@ describe("POST /addPartner", () => {
   });
 
   it("returns 409 when the organisation name or email_domain already exists", async () => {
-    (pool.query as any).mockResolvedValueOnce({
+    (pool.query as any)
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce({
       rows: [{ id: "existing-org" }],
     });
 
@@ -172,7 +178,10 @@ describe("POST /addPartner", () => {
   });
 
   it("returns 500 when a query fails", async () => {
-    (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
+    (pool.query as any)
+      .mockResolvedValueOnce({})
+      .mockRejectedValueOnce(new Error("DB down"));
+      
 
     const response = await request(app)
       .post("/addPartner")

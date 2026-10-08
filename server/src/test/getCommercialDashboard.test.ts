@@ -1,12 +1,28 @@
 import request from "supertest";
 import app from "../app";
 import pool from "../data/connection";
+import jwt from "jsonwebtoken";
 
 vi.mock("../data/connection", () => ({
   default: { query: vi.fn() },
 }));
 
+process.env.JWT_SECRET = "test-secret";
+
+const tokenFor = (user: object) =>
+  `Bearer ${jwt.sign(user, process.env.JWT_SECRET!, { algorithm: "HS256", expiresIn: "1h" })}`;
+
+const commercialUser = {
+  id: "u2",
+  email: "partner@example.org",
+  orgType: "commercial",
+  organisationId: "60ea2b0f-e04e-4f9a-ac72-38bae06d98bc",
+};
+
 const ROUTE = "/commercial-dashboard";
+
+const getDashboard = () =>
+  request(app).get(ROUTE).set("Authorization", tokenFor(commercialUser));
 
 describe(`GET ${ROUTE}`, () => {
   afterEach(() => {
@@ -31,7 +47,7 @@ describe(`GET ${ROUTE}`, () => {
     ];
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
 
-    const response = await request(app).get(ROUTE);
+    const response = await getDashboard();
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ data: mockRows });
@@ -40,7 +56,7 @@ describe(`GET ${ROUTE}`, () => {
   it("returns an empty data array when db is empty", async () => {
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
 
-    const response = await request(app).get(ROUTE);
+    const response = await getDashboard();
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ data: [] });
@@ -57,8 +73,9 @@ describe(`GET ${ROUTE}`, () => {
     ];
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
 
-    const response = await request(app).get(ROUTE);
+    const response = await getDashboard();
 
+    expect(response.status).toBe(200);
     expect(response.body.data).toHaveLength(2);
     expect(response.body.data).toEqual(mockRows);
   });
@@ -69,25 +86,26 @@ describe(`GET ${ROUTE}`, () => {
     ];
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
 
-    const response = await request(app).get(ROUTE);
+    const response = await getDashboard();
 
+    expect(response.status).toBe(200);
     expect(response.body.data[0].outreach_partner).toBeNull();
   });
 
-  it("scopes the query to a single commercial org id", async () => {
+  it("scopes the query to the organisation id from the token", async () => {
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
 
-    await request(app).get(ROUTE);
+    await getDashboard();
 
     const callArgs = (pool.query as any).mock.calls[0];
     expect(callArgs[1]).toHaveLength(1);
-    expect(typeof callArgs[1][0]).toBe("string");
+    expect(callArgs[1][0]).toBe(commercialUser.organisationId);
   });
 
   it("returns JSON content-type", async () => {
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
 
-    const response = await request(app).get(ROUTE);
+    const response = await getDashboard();
 
     expect(response.headers["content-type"]).toMatch(/application\/json/);
   });
@@ -95,38 +113,27 @@ describe(`GET ${ROUTE}`, () => {
   it("returns 500 when the query fails", async () => {
     (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
 
-    const response = await request(app).get(ROUTE);
+    const response = await getDashboard();
 
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");
   });
 
-  // AUTH CASES — enable once login is ready.
+  it("returns 401 when there is no token", async () => {
+    const response = await request(app).get(ROUTE);
 
-  // it("returns 403 when there is no authenticated user", async () => {
-  //   const response = await request(app).get(ROUTE);
-  //   expect(response.status).toBe(403);
-  //   expect(response.body).toHaveProperty("error");
-  // });
+    expect(response.status).toBe(401);
+    expect(pool.query).not.toHaveBeenCalled();
+  });
 
-  // it("returns 403 when the user's org type is not 'commercial'", async () => {
-  //   const response = await request(app)
-  //     .get(ROUTE)
-  //     .set("x-test-user-type", "outreach"); // placeholder for however you inject auth
-  //   expect(response.status).toBe(403);
-  // });
+  it("returns 403 when the user's org type is not 'commercial'", async () => {
+    const response = await request(app)
+      .get(ROUTE)
+      .set("Authorization", tokenFor({ ...commercialUser, orgType: "outreach" }));
 
-  // it("uses the org id from the session, not from the client", async () => {
-  //   (pool.query as any).mockResolvedValueOnce({ rows: [] });
-  //   await request(app).get(ROUTE); // with an authenticated 'commercial' session
-  //   const callArgs = (pool.query as any).mock.calls[0];
-  //   expect(callArgs[1][0]).toBe("<the session's organisation_id>");
-  // });
+    expect(response.status).toBe(403);
+    expect(pool.query).not.toHaveBeenCalled();
+  });
 
-  // it("allows a 'commercial' user through and returns their courses", async () => {
-  //   (pool.query as any).mockResolvedValueOnce({ rows: [{ id: "course-1" }] });
-  //   const response = await request(app).get(ROUTE); // authenticated 'commercial'
-  //   expect(response.status).toBe(200);
-  //   expect(response.body.data).toHaveLength(1);
-  // });
+
 });
