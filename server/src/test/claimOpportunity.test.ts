@@ -3,16 +3,25 @@ import { Request, Response } from "express";
 import claimOpportunity from "../api/claimOpportunity";
 import pool from "../data/connection";
 
-vi.mock("../data/connection");
+vi.mock("../data/connection", () => ({
+  default: { connect: vi.fn(), query: vi.fn() },
+}));
+
+// TODO: these tests call the controller directly with a fake req/res,
+// bypassing authorizeRole. Refactor to use the real app + tokenFor() later.
 
 describe("claimOpportunity", () => {
   let req: Partial<Request>;
   let res: Partial<Response>;
   let statusMock: ReturnType<typeof vi.fn>;
   let jsonMock: ReturnType<typeof vi.fn>;
+  let client: { query: ReturnType<typeof vi.fn>; release: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
     vi.clearAllMocks();
+
+    client = { query: vi.fn(), release: vi.fn() };
+    vi.mocked(pool.connect).mockResolvedValue(client as any);
 
     jsonMock = vi.fn().mockReturnValue(undefined);
     statusMock = vi.fn().mockReturnValue({ json: jsonMock });
