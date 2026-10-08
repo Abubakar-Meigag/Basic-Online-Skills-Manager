@@ -15,3 +15,5 @@ jobs:
           cache-dependency-path: server/package-lock.json
       - run: npm ci
       - run: npx vitest run
+        env:
+          DATABASE_URL: postgres://test:test@localhost:5432/test
