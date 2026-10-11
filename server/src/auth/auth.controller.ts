@@ -19,7 +19,10 @@ export async function handleRequestMagicLink(
       });
     }
 
-    const sanitisedEmail = email.trim().toLowerCase().replace(/[\n\r]/g, "_");
+    const sanitisedEmail = email
+      .trim()
+      .toLowerCase()
+      .replace(/[\n\r]/g, "_");
 
     // Call service layer to query user, store hashed token, and dispatch email/log
     await requestMagicLink(sanitisedEmail);
@@ -54,9 +57,15 @@ export async function handleVerifyMagicLink(
     // Call verifyMagicLinkToken to validate token against db and return user details plus route
     const result = await verifyMagicLinkToken(token.trim());
 
+    res.cookie("token", result.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000, //24h
+    });
+
     return res.status(200).json({
       message: "Authentication successful.",
-      token: result.token,
       user: result.user,
       redirectRoute: result.redirectRoute,
     });
