@@ -1,6 +1,7 @@
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import CYFLogo from "../../assets/CYF-logo.png";
 import { navLinks } from "../../lib/constants/navLinks";
+import { logoutUser } from "../../auth/authApi";
 import { OrganizationType } from "../../data/dataType";
 import "./Sidebar.css";
 
@@ -12,6 +13,7 @@ const rolePathMap: Record<OrganizationType, string> = {
 
 // The sidebar is now "Smart" and self-sufficient.
 const Sidebar = () => {
+  const navigate = useNavigate();
   // Get the real user from localStorage
   const userString = localStorage.getItem("user");
   const user = userString ? JSON.parse(userString) : null;
@@ -21,6 +23,18 @@ const Sidebar = () => {
 
   const userEmail = user?.email || "";
   const userInitial = userEmail ? userEmail[0].toUpperCase() : "U";
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+    } catch (error) {
+      console.error("Server logout error:", error);
+    } finally {
+      // Clear localStorage
+      localStorage.removeItem("user");
+      // Redirect to the login page
+      navigate("/login");
+    }
+  };
 
   return (
     <div className="sidebar flex flex-col h-screen shrink-0 sticky top-0 self-start border-r border-[#E3E3E3] overflow-hidden">
@@ -65,13 +79,13 @@ const Sidebar = () => {
             <span className="text-sm font-semibold email-truncate">
               {userEmail}
             </span>
-            <NavLink
-              to="/login"
-              className="text-xs text-gray-500"
-              onClick={() => localStorage.clear()}
+            <button
+              type="button"
+              className="text-xs text-gray-500 hover:underline cursor-pointer bg-transparent border-none p-0"
+              onClick={handleLogout}
             >
               Logout
-            </NavLink>
+            </button>
           </div>
         </div>
       </div>

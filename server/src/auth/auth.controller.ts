@@ -56,12 +56,13 @@ export async function handleVerifyMagicLink(
 
     // Call verifyMagicLinkToken to validate token against db and return user details plus route
     const result = await verifyMagicLinkToken(token.trim());
+    const isProduction = process.env.NODE_ENV === "production";
 
     res.cookie("token", result.token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000, //24h
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
     });
 
     return res.status(200).json({
@@ -75,4 +76,17 @@ export async function handleVerifyMagicLink(
     // Return 400 with the error.
     return res.status(400).json({ error: error.message || "Invalid token." });
   }
+}
+
+export async function logout(req: Request, res: Response): Promise<void> {
+  // Clear the httpOnly cookie by clearing its value and setting maxAge to 0
+  res.cookie("token", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    expires: new Date(0),
+    maxAge: 0,
+  });
+
+  res.status(200).json({ message: "Logged out successfully" });
 }
