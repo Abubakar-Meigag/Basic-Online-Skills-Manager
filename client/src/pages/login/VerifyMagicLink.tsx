@@ -27,17 +27,10 @@ export default function VerifyMagicLink() {
     }
     verifyMagicLink(token)
       .then((data) => {
-        if (
-          typeof data.token !== "string" ||
-          !data.token ||
-          !data.user?.id ||
-          !data.user?.email ||
-          !data.user?.orgType
-        ) {
+        if (!data.user?.id || !data.user?.email || !data.user?.orgType) {
           setError("Invalid session data received. Please try again.");
           return;
         }
-        localStorage.setItem("sessionToken", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
         navigate(data.redirectRoute || "/");
       })
