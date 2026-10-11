@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 import { requestMagicLink } from "../../auth/authApi";
 const styles = {
@@ -76,9 +77,12 @@ export default function MagicLinkLogin() {
     try {
       await requestMagicLink(email);
       setIsSubmitted(true);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = axios.isAxiosError(err)
+        ? err.response?.data?.message
+        : undefined;
       setError(
-        err.response?.data?.message ||
+        message ||
           "Failed to request the Link, please check your connection and try again.",
       );
     } finally {

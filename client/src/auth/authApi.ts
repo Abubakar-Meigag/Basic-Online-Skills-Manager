@@ -61,3 +61,7 @@ export async function verifyMagicLink(
   });
   return response.data;
 }
+// call the logout route
+export async function logoutUser(): Promise<void> {
+  await api.post("/auth/logout");
+}
