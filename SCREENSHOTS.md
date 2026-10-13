@@ -6,7 +6,7 @@
 
 --- 
 
-## Commercial Dashboard 
+## Commercial Partner Dashboard 
 
 ### Requested Courses
 ![Commercial dashboard listing the courses a commercial partner has requested](./docs/screenshots/Requested%20Courses.png)
@@ -16,7 +16,7 @@
 
 --- 
 
-## Outreach Dashboard 
+## Outreach Partner Dashboard 
 
 ### Available Opportunities
 ![Outreach dashboard listing available course opportunities](./docs/screenshots/Available%20Opportunities.png)
@@ -29,7 +29,7 @@
 
 --- 
 
-## CYF Dashboard 
+## CYF Staff Dashboard 
 
 ### Request Pipeline
 ![CYF staff dashboard showing the request pipeline](./docs/screenshots/CYF%20dashboard.png)
