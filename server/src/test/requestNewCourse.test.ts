@@ -14,6 +14,20 @@ const tokenFor = (user: object) =>
 
 const makeClient = () => ({ query: vi.fn(), release: vi.fn() });
 
+// Answers each client.query by matching its SQL text, and throws "Unexpected query" for any query not listed.
+const mockQueries = (
+  client: { query: any },
+  responses: Record<string, unknown>,
+) => {
+  client.query.mockImplementation(async (sql: string) => {
+    const key = Object.keys(responses).find((k) => sql.includes(k));
+    if (key === undefined) throw new Error(`Unexpected query: ${sql}`);
+    const result = responses[key];
+    if (result instanceof Error) throw result;
+    return result;
+  });
+};
+
 const commercialUser = {
   id: "u2",
   email: "partner@example.org",
@@ -32,11 +46,13 @@ const validBody = {
 const mockSuccessfulClient = (course: Record<string, unknown>) => {
   const client = makeClient();
   (pool.connect as any).mockResolvedValueOnce(client);
-  client.query
-    .mockResolvedValueOnce(undefined) // BEGIN
-    .mockResolvedValueOnce({ rows: [course] }) // INSERT ... RETURNING
-    .mockResolvedValueOnce(undefined) // audit insert
-    .mockResolvedValueOnce(undefined); // COMMIT
+
+  mockQueries(client, {
+    BEGIN: undefined,
+    "INSERT INTO courses": { rows: [course] },
+    "INSERT INTO audit_log": undefined,
+    COMMIT: undefined,
+  });
   return client;
 };
 
@@ -61,6 +77,7 @@ describe("POST /commercial/requestedNewCourses", () => {
     expect(response.status).toBe(201);
     expect(response.body.status).toBe("request_pending");
     expect(response.body.city).toBe("Birmingham");
+    expect(client.query).toHaveBeenCalledWith("COMMIT"); 
     expect(client.release).toHaveBeenCalled();
   });
 
@@ -161,9 +178,12 @@ describe("POST /commercial/requestedNewCourses", () => {
   it("returns 500 and releases the client when the query fails", async () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
-    client.query
-      .mockResolvedValueOnce(undefined) // BEGIN
-      .mockRejectedValueOnce(new Error("DB down")); // INSERT throws
+  
+    mockQueries(client, {
+      BEGIN: undefined,
+      "INSERT INTO courses": new Error("DB down"), // INSERT throws
+      ROLLBACK: undefined, // the catch block rolls back
+    });
 
     const response = await request(app)
       .post("/commercial/requestedNewCourses")
@@ -172,6 +192,7 @@ describe("POST /commercial/requestedNewCourses", () => {
 
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");
+    expect(client.query).toHaveBeenCalledWith("ROLLBACK");
     expect(client.release).toHaveBeenCalled();
   });
 });
