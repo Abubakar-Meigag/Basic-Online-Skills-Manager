@@ -8,8 +8,8 @@ vi.mock("../data/connection", () => ({
   default: { connect: vi.fn() },
 }));
 
-// Middleware reads JWT_SECRET at verify time, so set it before any request runs.
-const JWT_SECRET = "test-secret";
+
+const JWT_SECRET = "test-secret"; 
 
 // A valid CYF-staff token
 const staffToken = jwt.sign(
@@ -30,6 +30,30 @@ const makeClient = () => ({
   release: vi.fn(),
 });
 
+// Answers each client.query by matching its SQL text, and throws "Unexpected query" for any query not listed.
+const mockQueries = (
+  client: { query: any },
+  responses: Record<string, unknown>,
+) => {
+  client.query.mockImplementation(async (sql: string) => {
+    const key = Object.keys(responses).find((k) => sql.includes(k));
+    if (key === undefined) throw new Error(`Unexpected query: ${sql}`);
+    const result = responses[key];
+    if (result instanceof Error) throw result;
+    return result;
+  });
+};
+
+// The normal successful sequence of queries for adding a user.
+const Path = (newUser: Record<string, unknown>, orgId: string) => ({
+  BEGIN: undefined,
+  "SELECT id FROM organisations": { rows: [{ id: orgId }] }, // org exists
+  "SELECT id FROM users": { rows: [] }, // email not taken
+  "INSERT INTO users": { rows: [newUser] },
+  "INSERT INTO audit_log": undefined,
+  COMMIT: undefined,
+});
+
 describe("POST /partners/:id/users", () => {
   afterEach(() => {
     vi.clearAllMocks();
@@ -39,21 +63,17 @@ describe("POST /partners/:id/users", () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
 
-    client.query
-      .mockResolvedValueOnce(undefined) // BEGIN
-      .mockResolvedValueOnce({ rows: [{ id: "org-1" }] }) // org exists
-      .mockResolvedValueOnce({ rows: [] }) // email not taken
-      .mockResolvedValueOnce({
-        rows: [
-          {
-            id: "user-1",
-            email: "second@capgemini.com",
-            organisation_id: "org-1",
-          },
-        ],
-      }) // INSERT user
-      .mockResolvedValueOnce(undefined) // audit_log
-      .mockResolvedValueOnce(undefined); // COMMIT
+    mockQueries(
+      client,
+      Path(
+        {
+          id: "user-1",
+          email: "second@capgemini.com",
+          organisation_id: "org-1",
+        },
+        "org-1",
+      ),
+    );
 
     const response = await request(app)
       .post("/partners/org-1/users")
@@ -63,6 +83,7 @@ describe("POST /partners/:id/users", () => {
     expect(response.status).toBe(201);
     expect(response.body.email).toBe("second@capgemini.com");
     expect(response.body.organisation_id).toBe("org-1");
+    expect(client.query).toHaveBeenCalledWith("COMMIT");
     expect(client.release).toHaveBeenCalled();
   });
 
@@ -70,21 +91,17 @@ describe("POST /partners/:id/users", () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
 
-    client.query
-      .mockResolvedValueOnce(undefined) // BEGIN
-      .mockResolvedValueOnce({ rows: [{ id: "org-from-path" }] }) // org exists
-      .mockResolvedValueOnce({ rows: [] }) // email not taken
-      .mockResolvedValueOnce({
-        rows: [
-          {
-            id: "user-1",
-            email: "new@capgemini.com",
-            organisation_id: "org-from-path",
-          },
-        ],
-      }) // INSERT user
-      .mockResolvedValueOnce(undefined) // audit_log
-      .mockResolvedValueOnce(undefined); // COMMIT
+    mockQueries(
+      client,
+      Path(
+        {
+          id: "user-1",
+          email: "new@capgemini.com",
+          organisation_id: "org-from-path",
+        },
+        "org-from-path",
+      ),
+    ); // here
 
     const response = await request(app)
       .post("/partners/org-from-path/users")
@@ -128,10 +145,11 @@ describe("POST /partners/:id/users", () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
 
-    client.query
-      .mockResolvedValueOnce(undefined) // BEGIN
-      .mockResolvedValueOnce({ rows: [] }) // org not found
-      .mockResolvedValueOnce(undefined); // ROLLBACK
+    mockQueries(client, {
+      BEGIN: undefined,
+      "SELECT id FROM organisations": { rows: [] }, // org not found
+      ROLLBACK: undefined,
+    });
 
     const response = await request(app)
       .post("/partners/missing-org/users")
@@ -140,6 +158,7 @@ describe("POST /partners/:id/users", () => {
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty("error");
+    expect(client.query).toHaveBeenCalledWith("ROLLBACK");
     expect(client.release).toHaveBeenCalled();
   });
 
@@ -147,11 +166,12 @@ describe("POST /partners/:id/users", () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
 
-    client.query
-      .mockResolvedValueOnce(undefined) // BEGIN
-      .mockResolvedValueOnce({ rows: [{ id: "org-1" }] }) // org exists
-      .mockResolvedValueOnce({ rows: [{ id: "existing-user" }] }) // email taken
-      .mockResolvedValueOnce(undefined); // ROLLBACK
+    mockQueries(client, {
+      BEGIN: undefined,
+      "SELECT id FROM organisations": { rows: [{ id: "org-1" }] }, // org exists
+      "SELECT id FROM users": { rows: [{ id: "existing-user" }] }, // email taken
+      ROLLBACK: undefined,
+    });
 
     const response = await request(app)
       .post("/partners/org-1/users")
@@ -160,6 +180,7 @@ describe("POST /partners/:id/users", () => {
 
     expect(response.status).toBe(409);
     expect(response.body).toHaveProperty("error");
+    expect(client.query).toHaveBeenCalledWith("ROLLBACK");
     expect(client.release).toHaveBeenCalled();
   });
 
@@ -167,9 +188,11 @@ describe("POST /partners/:id/users", () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
 
-    client.query
-      .mockResolvedValueOnce(undefined) // BEGIN
-      .mockRejectedValueOnce(new Error("DB down")); // org check throws
+    mockQueries(client, {
+      BEGIN: undefined,
+      "SELECT id FROM organisations": new Error("DB down"), // org check throws
+      ROLLBACK: undefined, // the catch block rolls back
+    });
 
     const response = await request(app)
       .post("/partners/org-1/users")
