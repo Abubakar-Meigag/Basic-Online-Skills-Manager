@@ -12,6 +12,26 @@ vi.mock("../data/connection", () => ({
 
 const JWT_SECRET = "test-secret";
 
+// Answers each client.query by matching its SQL text, and throws "Unexpected query" for any query not listed.
+const mockQueries = (responses: Record<string, unknown>) => {
+  mockClient.query.mockImplementation(async (sql: string) => {
+    const key = Object.keys(responses).find((k) => sql.includes(k));
+    if (key === undefined) throw new Error(`Unexpected query: ${sql}`);
+    const result = responses[key];
+    if (result instanceof Error) throw result;
+    return result;
+  });
+};
+
+// new helper. The normal successful sequence of queries for addPartner.
+const Path = (org: Record<string, unknown>) => ({
+  BEGIN: undefined,
+  "SELECT id FROM organisations": { rows: [] }, // no existing org
+  "INSERT INTO organisations": { rows: [org] },
+  "INSERT INTO audit_log": undefined,
+  COMMIT: undefined,
+});
+
 // A valid CYF-staff token
 const staffToken = jwt.sign(
   {
@@ -29,27 +49,22 @@ const auth = `Bearer ${staffToken}`;
 describe("POST /addPartner", () => {
   afterEach(() => {
     vi.clearAllMocks();
+    mockClient.query.mockReset(); // so a mockImplementation never leaks into the next test
     (pool.connect as any).mockResolvedValue(mockClient);
   });
 
   it("creates an organisation and returns 201", async () => {
-    (pool.query as any)
-      .mockResolvedValueOnce({})
-      // duplicate-check query no existing org
-      .mockResolvedValueOnce({ rows: [] })
-      // insert query returns the new org
-      .mockResolvedValueOnce({
-        rows: [
-          {
-            id: "org-1",
-            organisation_name: "Deloitte",
-            type: "commercial",
-            email_domain: "deloitte.com",
-            city: "London",
-            created_at: "2026-08-06T00:00:00.000Z",
-          },
-        ],
-      });
+
+    mockQueries(
+      Path({
+        id: "org-1",
+        organisation_name: "Deloitte",
+        type: "commercial",
+        email_domain: "deloitte.com",
+        city: "London",
+        created_at: "2026-08-06T00:00:00.000Z",
+      }),
+    );
 
     const response = await request(app)
       .post("/addPartner")
@@ -64,15 +79,13 @@ describe("POST /addPartner", () => {
     expect(response.status).toBe(201);
     expect(response.body.organisation.organisation_name).toBe("Deloitte");
     expect(response.body.organisation.city).toBe("London");
+    expect(mockClient.query).toHaveBeenCalledWith("COMMIT");
   });
 
   it("lowercases the email_domain before insert", async () => {
-    (pool.query as any)
-      .mockResolvedValueOnce({})
-      .mockResolvedValueOnce({ rows: [] })
-      .mockResolvedValueOnce({
-        rows: [{ id: "org-2", organisation_name: "Deloitte", city: "London" }],
-      });
+    mockQueries(
+      Path({ id: "org-2", organisation_name: "Deloitte", city: "London" }),
+    );
 
     await request(app).post("/addPartner").set("Authorization", auth).send({
       organisation_name: "Deloitte",
@@ -81,8 +94,11 @@ describe("POST /addPartner", () => {
       city: "London",
     });
 
-    const insertParams = (pool.query as any).mock.calls[2][1];
-    expect(insertParams).toContain("deloitte.com");
+    // find the INSERT by its SQL instead of mock.calls[2], which depended on call order
+    const insertCall = mockClient.query.mock.calls.find((c) =>
+      String(c[0]).includes("INSERT INTO organisations"),
+    );
+    expect(insertCall?.[1]).toContain("deloitte.com");
   });
 
   it("returns 400 when a required field is missing", async () => {
@@ -118,14 +134,13 @@ describe("POST /addPartner", () => {
   });
 
   it("accepts cyf_staff as a valid type", async () => {
-    (pool.query as any)
-      .mockResolvedValueOnce({})
-      .mockResolvedValueOnce({ rows: [] })
-      .mockResolvedValueOnce({
-        rows: [
-          { id: "org-3", organisation_name: "CodeYourFuture", city: "London" },
-        ],
-      });
+    mockQueries(
+      Path({
+        id: "org-3",
+        organisation_name: "CodeYourFuture",
+        city: "London",
+      }),
+    );
 
     const response = await request(app)
       .post("/addPartner")
@@ -157,10 +172,11 @@ describe("POST /addPartner", () => {
   });
 
   it("returns 409 when the organisation name or email_domain already exists", async () => {
-    (pool.query as any)
-      .mockResolvedValueOnce({})
-      .mockResolvedValueOnce({
-      rows: [{ id: "existing-org" }],
+
+    mockQueries({
+      BEGIN: undefined,
+      "SELECT id FROM organisations": { rows: [{ id: "existing-org" }] }, // org already exists
+      ROLLBACK: undefined, // the controller rolls back before returning 409
     });
 
     const response = await request(app)
@@ -175,13 +191,16 @@ describe("POST /addPartner", () => {
 
     expect(response.status).toBe(409);
     expect(response.body).toHaveProperty("error");
+    expect(mockClient.query).toHaveBeenCalledWith("ROLLBACK");
   });
 
   it("returns 500 when a query fails", async () => {
-    (pool.query as any)
-      .mockResolvedValueOnce({})
-      .mockRejectedValueOnce(new Error("DB down"));
-      
+
+    mockQueries({
+      BEGIN: undefined,
+      "SELECT id FROM organisations": new Error("DB down"),
+      ROLLBACK: undefined, // the catch block rolls back
+    });
 
     const response = await request(app)
       .post("/addPartner")
