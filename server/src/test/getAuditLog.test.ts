@@ -18,7 +18,7 @@ const makeToken = (orgType: string) =>
       orgType,
       organisationId: "org-1",
     },
-    JWT_SECRET as string,
+    JWT_SECRET,
     { algorithm: "HS256", expiresIn: "1h" },
   );
 
