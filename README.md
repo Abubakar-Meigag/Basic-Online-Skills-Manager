@@ -19,6 +19,10 @@ We used Figma to define our user journeys and dashboard designs for all three ro
 - [`server/`](./server/README.md) — Node + Express + TypeScript backend
 - [Project structure guide](./STRUCTURE.md)
 
+## Screenshots
+
+See [SCREENSHOTS.md](./SCREENSHOTS.md) for screenshots of the main screens and flows.
+
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for the branch, PR, and deployment rules.
