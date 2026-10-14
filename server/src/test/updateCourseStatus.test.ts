@@ -21,6 +21,20 @@ const makeClient = () => ({
   release: vi.fn(),
 });
 
+// Answers each client.query by matching its SQL text, and throws "Unexpected query" for any query not listed.
+const mockQueries = (
+  client: { query: any },
+  responses: Record<string, unknown>,
+) => {
+  client.query.mockImplementation(async (sql: string) => {
+    const key = Object.keys(responses).find((k) => sql.includes(k));
+    if (key === undefined) throw new Error(`Unexpected query: ${sql}`);
+    const result = responses[key];
+    if (result instanceof Error) throw result;
+    return result;
+  });
+};
+
 const cyfUser = {
   id: "staff-1",
   email: "admin@codeyourfuture.io",
@@ -45,14 +59,13 @@ describe("PATCH /course/:id/status", () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
 
-    client.query
-      .mockResolvedValueOnce(undefined) // BEGIN
-      .mockResolvedValueOnce({ rows: [{ id: "course-1" }] }) // course exists
-      .mockResolvedValueOnce({
-        rows: [{ id: "course-1", status: "request_open" }],
-      }) // UPDATE ... RETURNING
-      .mockResolvedValueOnce(undefined) // audit insert
-      .mockResolvedValueOnce(undefined); // COMMIT
+    mockQueries(client, {
+      BEGIN: undefined,
+      "SELECT id FROM courses": { rows: [{ id: "course-1" }] }, // course exists
+      "UPDATE courses": { rows: [{ id: "course-1", status: "request_open" }] },
+      "INSERT INTO audit_log": undefined,
+      COMMIT: undefined,
+    });
 
     const response = await request(app)
       .patch("/course/course-1/status")
@@ -61,6 +74,7 @@ describe("PATCH /course/:id/status", () => {
 
     expect(response.status).toBe(200);
     expect(response.body.status).toBe("request_open");
+    expect(client.query).toHaveBeenCalledWith("COMMIT");
     expect(client.release).toHaveBeenCalled();
   });
 
@@ -112,10 +126,11 @@ describe("PATCH /course/:id/status", () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
 
-    client.query
-      .mockResolvedValueOnce(undefined) // BEGIN
-      .mockResolvedValueOnce({ rows: [] }) // course not found
-      .mockResolvedValueOnce(undefined); // ROLLBACK
+    mockQueries(client, {
+      BEGIN: undefined,
+      "SELECT id FROM courses": { rows: [] }, // course not found
+      ROLLBACK: undefined,
+    });
 
     const response = await request(app)
       .patch("/course/missing/status")
@@ -124,6 +139,7 @@ describe("PATCH /course/:id/status", () => {
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty("error");
+    expect(client.query).toHaveBeenCalledWith("ROLLBACK");
     expect(client.release).toHaveBeenCalled();
   });
 
@@ -131,14 +147,13 @@ describe("PATCH /course/:id/status", () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
 
-    client.query
-      .mockResolvedValueOnce(undefined) // BEGIN
-      .mockResolvedValueOnce({ rows: [{ id: "course-1" }] }) // exists
-      .mockResolvedValueOnce({
-        rows: [{ id: "course-1", status: "course_running" }],
-      }) // UPDATE
-      .mockResolvedValueOnce(undefined) // audit
-      .mockResolvedValueOnce(undefined); // COMMIT
+    mockQueries(client, {
+      BEGIN: undefined,
+      "SELECT id FROM courses": { rows: [{ id: "course-1" }] }, // exists
+      "UPDATE courses": { rows: [{ id: "course-1", status: "course_running" }] },
+      "INSERT INTO audit_log": undefined,
+      COMMIT: undefined,
+    });
 
     await request(app)
       .patch("/course/course-1/status")
@@ -163,9 +178,11 @@ describe("PATCH /course/:id/status", () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
 
-    client.query
-      .mockResolvedValueOnce(undefined) // BEGIN
-      .mockRejectedValueOnce(new Error("DB down")); // existence check throws
+    mockQueries(client, {
+      BEGIN: undefined,
+      "SELECT id FROM courses": new Error("DB down"), // existence check throws
+      ROLLBACK: undefined, // the catch block rolls back
+    });
 
     const response = await request(app)
       .patch("/course/course-1/status")
@@ -174,6 +191,7 @@ describe("PATCH /course/:id/status", () => {
 
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");
+    expect(client.query).toHaveBeenCalledWith("ROLLBACK");
     expect(client.release).toHaveBeenCalled();
   });
 });
