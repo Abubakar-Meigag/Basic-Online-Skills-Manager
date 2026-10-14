@@ -1,21 +1,33 @@
 import request from "supertest";
 import jwt from "jsonwebtoken";
 import app from "../app";
+import pool from "../data/connection";
 import { OrganizationType } from "../data/dataType";
 
-const mockClient = {
-  query: vi.fn(),
-  release: vi.fn(),
-};
-
 vi.mock("../data/connection", () => ({
-  default: {
-    connect: vi.fn(() => Promise.resolve(mockClient)),
-    query: vi.fn(),
-  },
+  default: { connect: vi.fn() },
 }));
 
 const JWT_SECRET = "test-secret";
+
+const makeClient = () => ({
+  query: vi.fn(),
+  release: vi.fn(),
+});
+
+// Answers each client.query by matching its SQL text, and throws "Unexpected query" for any query not listed.
+const mockQueries = (
+  client: { query: any },
+  responses: Record<string, unknown>,
+) => {
+  client.query.mockImplementation(async (sql: string) => {
+    const key = Object.keys(responses).find((k) => sql.includes(k));
+    if (key === undefined) throw new Error(`Unexpected query: ${sql}`);
+    const result = responses[key];
+    if (result instanceof Error) throw result;
+    return result;
+  });
+};
 
 const staffToken = jwt.sign(
   {
@@ -33,11 +45,15 @@ describe("PATCH /users/:id/status", () => {
   });
 
   it("successfully updates user status and inserts audit log", async () => {
-    mockClient.query
-      .mockResolvedValueOnce({}) // BEGIN
-      .mockResolvedValueOnce({ rowCount: 1, rows: [{ id: "u-123" }] }) // UPDATE
-      .mockResolvedValueOnce({}) // INSERT (audit log)
-      .mockResolvedValueOnce({}); // COMMIT
+    const client = makeClient(); 
+    (pool.connect as any).mockResolvedValueOnce(client); 
+
+    mockQueries(client, {
+      BEGIN: {},
+      "UPDATE users": { rowCount: 1, rows: [{ id: "u-123" }] },
+      "INSERT INTO audit_log": {},
+      COMMIT: {},
+    });
 
     const response = await request(app)
       .patch("/users/u-123/status")
@@ -47,7 +63,12 @@ describe("PATCH /users/:id/status", () => {
     expect(response.status).toBe(200);
     expect(response.body.message).toMatch(/logged successfully/i);
 
-    const auditLogParams = mockClient.query.mock.calls[2]![1];
+    // find the audit INSERT by its SQL instead of mock.calls[2], which depended on call order
+    const auditCall = client.query.mock.calls.find((c: any[]) =>
+      String(c[0]).includes("INSERT INTO audit_log"),
+    );
+    expect(auditCall).toBeDefined(); 
+    const auditLogParams = auditCall![1];
 
     expect(auditLogParams[0]).toBe("staff-999");
 
@@ -55,13 +76,18 @@ describe("PATCH /users/:id/status", () => {
 
     expect(auditLogParams[3]).toBe("u-123");
 
-    expect(mockClient.release).toHaveBeenCalled();
+    expect(client.release).toHaveBeenCalled();
   });
 
   it("returns 404 and rolls back if user does not exist", async () => {
-    mockClient.query
-      .mockResolvedValueOnce({})
-      .mockResolvedValueOnce({ rowCount: 0 });
+    const client = makeClient(); 
+    (pool.connect as any).mockResolvedValueOnce(client); 
+
+    mockQueries(client, {
+      BEGIN: {},
+      "UPDATE users": { rowCount: 0 }, // no user matched
+      ROLLBACK: {},
+    });
 
     const response = await request(app)
       .patch("/users/fake-id/status")
@@ -71,14 +97,19 @@ describe("PATCH /users/:id/status", () => {
     expect(response.status).toBe(404);
     expect(response.body.error).toBe("User not found");
 
-    expect(mockClient.query).toHaveBeenCalledWith("ROLLBACK");
-    expect(mockClient.release).toHaveBeenCalled();
+    expect(client.query).toHaveBeenCalledWith("ROLLBACK");
+    expect(client.release).toHaveBeenCalled();
   });
 
   it("returns 500 and rolls back on database error", async () => {
-    mockClient.query
-      .mockResolvedValueOnce({}) // BEGIN
-      .mockRejectedValueOnce(new Error("Connection lost")); // UPDATE CRASHES
+    const client = makeClient();
+    (pool.connect as any).mockResolvedValueOnce(client);
+
+    mockQueries(client, {
+      BEGIN: {},
+      "UPDATE users": new Error("Connection lost"), // UPDATE crashes
+      ROLLBACK: {}, // the catch block rolls back
+    });
 
     const response = await request(app)
       .patch("/users/u-123/status")
@@ -86,8 +117,8 @@ describe("PATCH /users/:id/status", () => {
       .send({ is_active: true });
 
     expect(response.status).toBe(500);
-    expect(mockClient.query).toHaveBeenCalledWith("ROLLBACK");
-    expect(mockClient.release).toHaveBeenCalled();
+    expect(client.query).toHaveBeenCalledWith("ROLLBACK");
+    expect(client.release).toHaveBeenCalled();
   });
 
   it("returns 401 when the performer ID is missing from the token", async () => {
@@ -110,11 +141,15 @@ describe("PATCH /users/:id/status", () => {
   });
 
   it("successfully updates a user's status to ACTIVE and returns 200", async () => {
-    mockClient.query
-      .mockResolvedValueOnce({})
-      .mockResolvedValueOnce({ rowCount: 1 })
-      .mockResolvedValueOnce({ rowCount: 1 })
-      .mockResolvedValueOnce({});
+    const client = makeClient();
+    (pool.connect as any).mockResolvedValueOnce(client);
+
+    mockQueries(client, {
+      BEGIN: {},
+      "UPDATE users": { rowCount: 1 },
+      "INSERT INTO audit_log": { rowCount: 1 },
+      COMMIT: {},
+    });
 
     const response = await request(app)
       .patch("/users/u-123/status")
@@ -124,7 +159,7 @@ describe("PATCH /users/:id/status", () => {
     expect(response.status).toBe(200);
     expect(response.body.message).toMatch(/logged successfully/i);
 
-    expect(mockClient.query).toHaveBeenCalledWith("COMMIT");
-    expect(mockClient.release).toHaveBeenCalled();
+    expect(client.query).toHaveBeenCalledWith("COMMIT");
+    expect(client.release).toHaveBeenCalled();
   });
 });
