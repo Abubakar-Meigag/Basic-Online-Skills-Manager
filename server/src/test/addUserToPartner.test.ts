@@ -9,7 +9,7 @@ vi.mock("../data/connection", () => ({
 }));
 
 // Middleware reads JWT_SECRET at verify time, so set it before any request runs.
-process.env.JWT_SECRET = "test-secret";
+const JWT_SECRET = "test-secret";
 
 // A valid CYF-staff token
 const staffToken = jwt.sign(
@@ -19,7 +19,7 @@ const staffToken = jwt.sign(
     orgType: OrganizationType.CYF_STAFF,
     organisationId: "cyf-org",
   },
-  process.env.JWT_SECRET,
+  JWT_SECRET,
   { algorithm: "HS256", expiresIn: "1h" },
 );
 

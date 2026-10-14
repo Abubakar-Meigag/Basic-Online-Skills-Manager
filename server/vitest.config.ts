@@ -5,5 +5,6 @@ export default defineConfig({
     globals: true,
     environment: "node",
     exclude: [...configDefaults.exclude, "dist/**"],
+    env: { JWT_SECRET: "test-secret" },
   },
 });

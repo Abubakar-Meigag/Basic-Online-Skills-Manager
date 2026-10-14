@@ -15,7 +15,7 @@ vi.mock("../data/connection", () => ({
   },
 }));
 
-process.env.JWT_SECRET = "test-secret";
+const JWT_SECRET = "test-secret";
 
 const staffToken = jwt.sign(
   {
@@ -23,7 +23,7 @@ const staffToken = jwt.sign(
     email: "staff@codeyourfuture.io",
     orgType: OrganizationType.CYF_STAFF,
   },
-  process.env.JWT_SECRET,
+  JWT_SECRET,
   { algorithm: "HS256", expiresIn: "1h" },
 );
 
@@ -96,7 +96,7 @@ describe("PATCH /users/:id/status", () => {
         email: "staff@codeyourfuture.io",
         orgType: OrganizationType.CYF_STAFF,
       },
-      process.env.JWT_SECRET as string,
+      JWT_SECRET as string,
       { algorithm: "HS256" },
     );
 

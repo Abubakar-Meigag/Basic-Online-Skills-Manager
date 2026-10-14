@@ -10,7 +10,7 @@ vi.mock("../data/connection", () => ({
   default: { query: mockClient.query, connect: vi.fn().mockResolvedValue(mockClient) },
 }));
 
-process.env.JWT_SECRET = "test-secret";
+const JWT_SECRET = "test-secret";
 
 // A valid CYF-staff token
 const staffToken = jwt.sign(
@@ -20,7 +20,7 @@ const staffToken = jwt.sign(
     orgType: OrganizationType.CYF_STAFF,
     organisationId: "org-1",
   },
-  process.env.JWT_SECRET,
+  JWT_SECRET,
   { algorithm: "HS256", expiresIn: "1h" },
 );
 

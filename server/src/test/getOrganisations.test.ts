@@ -7,10 +7,10 @@ vi.mock("../data/connection", () => ({
   default: { query: vi.fn() },
 }));
 
-process.env.JWT_SECRET = "test-secret";
+const JWT_SECRET = "test-secret";
 
 const tokenFor = (user: object) =>
-  `Bearer ${jwt.sign(user, process.env.JWT_SECRET!, { algorithm: "HS256", expiresIn: "1h" })}`;
+  `Bearer ${jwt.sign(user, JWT_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`;
 
 const cyfUser = {
   id: "staff-1",
