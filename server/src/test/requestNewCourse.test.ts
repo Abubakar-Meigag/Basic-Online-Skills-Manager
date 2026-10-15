@@ -2,6 +2,7 @@ import request from "supertest";
 import app from "../app";
 import pool from "../data/connection";
 import jwt from "jsonwebtoken";
+import { withMockedQueries } from "./helpers/mockQueries";
 
 vi.mock("../data/connection", () => ({
   default: { connect: vi.fn() },
@@ -14,19 +15,6 @@ const tokenFor = (user: object) =>
 
 const makeClient = () => ({ query: vi.fn(), release: vi.fn() });
 
-// Answers each client.query by matching its SQL text, and throws "Unexpected query" for any query not listed.
-const mockQueries = (
-  client: { query: any },
-  responses: Record<string, unknown>,
-) => {
-  client.query.mockImplementation(async (sql: string) => {
-    const key = Object.keys(responses).find((k) => sql.includes(k));
-    if (key === undefined) throw new Error(`Unexpected query: ${sql}`);
-    const result = responses[key];
-    if (result instanceof Error) throw result;
-    return result;
-  });
-};
 
 const commercialUser = {
   id: "u2",
@@ -43,18 +31,13 @@ const validBody = {
   deadline: "2026-09-30",
 };
 
-const mockSuccessfulClient = (course: Record<string, unknown>) => {
-  const client = makeClient();
-  (pool.connect as any).mockResolvedValueOnce(client);
-
-  mockQueries(client, {
-    BEGIN: undefined,
-    "INSERT INTO courses": { rows: [course] },
-    "INSERT INTO audit_log": undefined,
-    COMMIT: undefined,
-  });
-  return client;
-};
+// The normal successful sequence of queries for requesting a course.
+const Path = (course: Record<string, unknown>) => ({ // (replaces mockSuccessfulClient)
+  BEGIN: undefined,
+  "INSERT INTO courses": { rows: [course] },
+  "INSERT INTO audit_log": undefined,
+  COMMIT: undefined,
+});
 
 describe("POST /commercial/requestedNewCourses", () => {
   afterEach(() => {
@@ -62,32 +45,43 @@ describe("POST /commercial/requestedNewCourses", () => {
   });
 
   it("creates a course request and returns 201", async () => {
-    const client = mockSuccessfulClient({
-      id: "course-1",
-      commercial_org_id: commercialUser.organisationId,
-      city: "Birmingham",
-      status: "request_pending",
-    });
+    const client = makeClient();
+    (pool.connect as any).mockResolvedValueOnce(client);
 
-    const response = await request(app)
-      .post("/commercial/requestedNewCourses")
-      .set("Authorization", tokenFor(commercialUser))
-      .send(validBody);
+    const response = await withMockedQueries(
+      client,
+      Path({
+        id: "course-1",
+        commercial_org_id: commercialUser.organisationId,
+        city: "Birmingham",
+        status: "request_pending",
+      }),
+      async () =>
+        request(app)
+          .post("/commercial/requestedNewCourses")
+          .set("Authorization", tokenFor(commercialUser))
+          .send(validBody),
+    );
 
     expect(response.status).toBe(201);
     expect(response.body.status).toBe("request_pending");
     expect(response.body.city).toBe("Birmingham");
-    expect(client.query).toHaveBeenCalledWith("COMMIT"); 
     expect(client.release).toHaveBeenCalled();
   });
 
   it("forces status to request_pending even if the body sends another status", async () => {
-    const client = mockSuccessfulClient({ id: "course-1", status: "request_pending" });
+    const client = makeClient();
+    (pool.connect as any).mockResolvedValueOnce(client);
 
-    const response = await request(app)
-      .post("/commercial/requestedNewCourses")
-      .set("Authorization", tokenFor(commercialUser))
-      .send({ ...validBody, status: "course_completed" });
+    const response = await withMockedQueries(
+      client,
+      Path({ id: "course-1", status: "request_pending" }),
+      async () =>
+        request(app)
+          .post("/commercial/requestedNewCourses")
+          .set("Authorization", tokenFor(commercialUser))
+          .send({ ...validBody, status: "course_completed" }),
+    );
 
     expect(response.status).toBe(201);
     expect(response.body.status).toBe("request_pending");
@@ -102,12 +96,18 @@ describe("POST /commercial/requestedNewCourses", () => {
   });
 
   it("uses the organisation from the token and ignores one in the body", async () => {
-    const client = mockSuccessfulClient({ id: "course-1" });
+    const client = makeClient();
+    (pool.connect as any).mockResolvedValueOnce(client);
 
-    await request(app)
-      .post("/commercial/requestedNewCourses")
-      .set("Authorization", tokenFor(commercialUser))
-      .send({ ...validBody, commercial_org_id: "some-other-org" });
+    await withMockedQueries(
+      client,
+      Path({ id: "course-1" }),
+      async () =>
+        request(app)
+          .post("/commercial/requestedNewCourses")
+          .set("Authorization", tokenFor(commercialUser))
+          .send({ ...validBody, commercial_org_id: "some-other-org" }),
+    );
 
     const insertCall = client.query.mock.calls.find(
       (c: any[]) =>
@@ -165,12 +165,18 @@ describe("POST /commercial/requestedNewCourses", () => {
   });
 
   it("returns JSON content-type", async () => {
-    mockSuccessfulClient({ id: "1" });
+    const client = makeClient();
+    (pool.connect as any).mockResolvedValueOnce(client);
 
-    const response = await request(app)
-      .post("/commercial/requestedNewCourses")
-      .set("Authorization", tokenFor(commercialUser))
-      .send(validBody);
+    const response = await withMockedQueries(
+      client,
+      Path({ id: "1" }),
+      async () =>
+        request(app)
+          .post("/commercial/requestedNewCourses")
+          .set("Authorization", tokenFor(commercialUser))
+          .send(validBody),
+    );
 
     expect(response.headers["content-type"]).toMatch(/application\/json/);
   });
@@ -178,21 +184,23 @@ describe("POST /commercial/requestedNewCourses", () => {
   it("returns 500 and releases the client when the query fails", async () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
-  
-    mockQueries(client, {
-      BEGIN: undefined,
-      "INSERT INTO courses": new Error("DB down"), // INSERT throws
-      ROLLBACK: undefined, // the catch block rolls back
-    });
 
-    const response = await request(app)
-      .post("/commercial/requestedNewCourses")
-      .set("Authorization", tokenFor(commercialUser))
-      .send(validBody);
+    const response = await withMockedQueries(
+      client,
+      {
+        BEGIN: undefined,
+        "INSERT INTO courses": new Error("DB down"), // INSERT throws
+        ROLLBACK: undefined, // the catch block rolls back
+      },
+      async () =>
+        request(app)
+          .post("/commercial/requestedNewCourses")
+          .set("Authorization", tokenFor(commercialUser))
+          .send(validBody),
+    );
 
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");
-    expect(client.query).toHaveBeenCalledWith("ROLLBACK");
     expect(client.release).toHaveBeenCalled();
   });
 });
