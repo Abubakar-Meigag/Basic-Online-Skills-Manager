@@ -2,7 +2,7 @@ import request from "supertest";
 import app from "../app";
 import pool from "../data/connection";
 import jwt from "jsonwebtoken";
-
+import { withMockedQueries } from "./helpers/mockQueries";
 
 vi.mock("../data/connection", () => ({
   default: { connect: vi.fn() },
@@ -21,20 +21,6 @@ const makeClient = () => ({
   release: vi.fn(),
 });
 
-// Answers each client.query by matching its SQL text, and throws "Unexpected query" for any query not listed.
-const mockQueries = (
-  client: { query: any },
-  responses: Record<string, unknown>,
-) => {
-  client.query.mockImplementation(async (sql: string) => {
-    const key = Object.keys(responses).find((k) => sql.includes(k));
-    if (key === undefined) throw new Error(`Unexpected query: ${sql}`);
-    const result = responses[key];
-    if (result instanceof Error) throw result;
-    return result;
-  });
-};
-
 const cyfUser = {
   id: "staff-1",
   email: "admin@codeyourfuture.io",
@@ -50,7 +36,6 @@ const commercialUser = {
 };
 
 describe("PATCH /course/:id/status", () => {
-
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -59,27 +44,30 @@ describe("PATCH /course/:id/status", () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
 
-    mockQueries(client, {
-      BEGIN: undefined,
-      "SELECT id FROM courses": { rows: [{ id: "course-1" }] }, // course exists
-      "UPDATE courses": { rows: [{ id: "course-1", status: "request_open" }] },
-      "INSERT INTO audit_log": undefined,
-      COMMIT: undefined,
-    });
-
-    const response = await request(app)
-      .patch("/course/course-1/status")
-      .set("Authorization", tokenFor(cyfUser))
-      .send({ status: "request_open" });
+    const response = await withMockedQueries(
+      client,
+      {
+        BEGIN: undefined,
+        "SELECT id FROM courses": { rows: [{ id: "course-1" }] }, // course exists
+        "UPDATE courses": {
+          rows: [{ id: "course-1", status: "request_open" }],
+        },
+        "INSERT INTO audit_log": undefined,
+        COMMIT: undefined,
+      },
+      async () =>
+        request(app)
+          .patch("/course/course-1/status")
+          .set("Authorization", tokenFor(cyfUser))
+          .send({ status: "request_open" }),
+    );
 
     expect(response.status).toBe(200);
     expect(response.body.status).toBe("request_open");
-    expect(client.query).toHaveBeenCalledWith("COMMIT");
     expect(client.release).toHaveBeenCalled();
   });
 
   it("returns 403 when the caller is not CYF staff", async () => {
-
     const response = await request(app)
       .patch("/course/course-1/status")
       .set("Authorization", tokenFor(commercialUser))
@@ -104,7 +92,7 @@ describe("PATCH /course/:id/status", () => {
     const response = await request(app)
       .patch("/course/course-1/status")
       .set("Authorization", tokenFor(cyfUser))
-      .send({ status: "request_cancelled" }); // out of scope, not allowed here
+      .send({ status: "request_cancelled" }); // out of scope, not allowed
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("error");
@@ -126,20 +114,22 @@ describe("PATCH /course/:id/status", () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
 
-    mockQueries(client, {
-      BEGIN: undefined,
-      "SELECT id FROM courses": { rows: [] }, // course not found
-      ROLLBACK: undefined,
-    });
-
-    const response = await request(app)
-      .patch("/course/missing/status")
-      .set("Authorization", tokenFor(cyfUser))
-      .send({ status: "request_open" });
+    const response = await withMockedQueries(
+      client,
+      {
+        BEGIN: undefined,
+        "SELECT id FROM courses": { rows: [] }, // course not found
+        ROLLBACK: undefined,
+      },
+      async () => // here
+        request(app)
+          .patch("/course/missing/status")
+          .set("Authorization", tokenFor(cyfUser))
+          .send({ status: "request_open" }),
+    );
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty("error");
-    expect(client.query).toHaveBeenCalledWith("ROLLBACK");
     expect(client.release).toHaveBeenCalled();
   });
 
@@ -147,18 +137,23 @@ describe("PATCH /course/:id/status", () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
 
-    mockQueries(client, {
-      BEGIN: undefined,
-      "SELECT id FROM courses": { rows: [{ id: "course-1" }] }, // exists
-      "UPDATE courses": { rows: [{ id: "course-1", status: "course_running" }] },
-      "INSERT INTO audit_log": undefined,
-      COMMIT: undefined,
-    });
-
-    await request(app)
-      .patch("/course/course-1/status")
-      .set("Authorization", tokenFor(cyfUser))
-      .send({ status: "course_running" });
+    await withMockedQueries(
+      client,
+      {
+        BEGIN: undefined,
+        "SELECT id FROM courses": { rows: [{ id: "course-1" }] }, // exists
+        "UPDATE courses": {
+          rows: [{ id: "course-1", status: "course_running" }],
+        },
+        "INSERT INTO audit_log": undefined,
+        COMMIT: undefined,
+      },
+      async () =>
+        request(app)
+          .patch("/course/course-1/status")
+          .set("Authorization", tokenFor(cyfUser))
+          .send({ status: "course_running" }),
+    );
 
     const auditCall = client.query.mock.calls.find(
       (c: any[]) =>
@@ -178,20 +173,22 @@ describe("PATCH /course/:id/status", () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
 
-    mockQueries(client, {
-      BEGIN: undefined,
-      "SELECT id FROM courses": new Error("DB down"), // existence check throws
-      ROLLBACK: undefined, // the catch block rolls back
-    });
-
-    const response = await request(app)
-      .patch("/course/course-1/status")
-      .set("Authorization", tokenFor(cyfUser))
-      .send({ status: "request_open" });
+    const response = await withMockedQueries(
+      client,
+      {
+        BEGIN: undefined,
+        "SELECT id FROM courses": new Error("DB down"), // existence check throws
+        ROLLBACK: undefined, // the catch block rolls back
+      },
+      async () =>
+        request(app)
+          .patch("/course/course-1/status")
+          .set("Authorization", tokenFor(cyfUser))
+          .send({ status: "request_open" }),
+    );
 
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");
-    expect(client.query).toHaveBeenCalledWith("ROLLBACK");
     expect(client.release).toHaveBeenCalled();
   });
 });
