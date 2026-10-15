@@ -15,7 +15,6 @@ const tokenFor = (user: object) =>
 
 const makeClient = () => ({ query: vi.fn(), release: vi.fn() });
 
-
 const commercialUser = {
   id: "u2",
   email: "partner@example.org",
@@ -32,7 +31,8 @@ const validBody = {
 };
 
 // The normal successful sequence of queries for requesting a course.
-const Path = (course: Record<string, unknown>) => ({ // (replaces mockSuccessfulClient)
+const Path = (course: Record<string, unknown>) => ({
+  // (replaces mockSuccessfulClient)
   BEGIN: undefined,
   "INSERT INTO courses": { rows: [course] },
   "INSERT INTO audit_log": undefined,
@@ -99,14 +99,11 @@ describe("POST /commercial/requestedNewCourses", () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
 
-    await withMockedQueries(
-      client,
-      Path({ id: "course-1" }),
-      async () =>
-        request(app)
-          .post("/commercial/requestedNewCourses")
-          .set("Authorization", tokenFor(commercialUser))
-          .send({ ...validBody, commercial_org_id: "some-other-org" }),
+    await withMockedQueries(client, Path({ id: "course-1" }), async () =>
+      request(app)
+        .post("/commercial/requestedNewCourses")
+        .set("Authorization", tokenFor(commercialUser))
+        .send({ ...validBody, commercial_org_id: "some-other-org" }),
     );
 
     const insertCall = client.query.mock.calls.find(

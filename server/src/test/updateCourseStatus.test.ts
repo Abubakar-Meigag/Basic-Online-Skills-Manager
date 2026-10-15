@@ -121,7 +121,7 @@ describe("PATCH /course/:id/status", () => {
         "SELECT id FROM courses": { rows: [] }, // course not found
         ROLLBACK: undefined,
       },
-      async () => // here
+      async () =>
         request(app)
           .patch("/course/missing/status")
           .set("Authorization", tokenFor(cyfUser))

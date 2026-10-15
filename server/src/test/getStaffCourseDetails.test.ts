@@ -12,7 +12,6 @@ const JWT_SECRET = "test-secret";
 const tokenFor = (user: object) =>
   `Bearer ${jwt.sign(user, JWT_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`;
 
-
 const staffUser = {
   id: "staff-1",
   email: "admin@codeyourfuture.io",
@@ -21,7 +20,6 @@ const staffUser = {
 };
 
 describe("GET /course-details/staff/:id", () => {
-
   afterEach(() => {
     vi.clearAllMocks();
   });

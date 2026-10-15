@@ -22,7 +22,6 @@ const outreachUser = {
 };
 
 describe("GET /course-details/outreach/:id", () => {
-
   afterEach(() => {
     vi.clearAllMocks();
   });

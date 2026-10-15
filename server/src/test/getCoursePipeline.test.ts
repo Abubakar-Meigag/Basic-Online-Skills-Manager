@@ -22,7 +22,6 @@ const cyfUser = {
 const getPipeline = () =>
   request(app).get("/course-pipeline").set("Authorization", tokenFor(cyfUser));
 
-
 describe("GET /course-pipeline", () => {
   afterEach(() => {
     vi.clearAllMocks();

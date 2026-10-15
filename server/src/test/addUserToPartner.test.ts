@@ -90,7 +90,10 @@ describe("POST /partners/:id/users", () => {
         request(app)
           .post("/partners/org-from-path/users")
           .set("Authorization", auth)
-          .send({ email: "new@capgemini.com", organisation_id: "attacker-org" }),
+          .send({
+            email: "new@capgemini.com",
+            organisation_id: "attacker-org",
+          }),
     );
 
     expect(response.status).toBe(201);

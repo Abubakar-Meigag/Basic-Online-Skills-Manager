@@ -22,7 +22,6 @@ const commercialUser = {
 };
 
 describe("GET /course-details/commercial/:id", () => {
-
   afterEach(() => {
     vi.clearAllMocks();
   });

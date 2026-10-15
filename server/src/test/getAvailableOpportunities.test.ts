@@ -21,8 +21,9 @@ const outreachUser = {
 };
 
 const getOpportunities = () =>
-  request(app).get("/opportunities").set("Authorization", tokenFor(outreachUser));
-
+  request(app)
+    .get("/opportunities")
+    .set("Authorization", tokenFor(outreachUser));
 
 describe("GET /opportunities", () => {
   afterEach(() => {

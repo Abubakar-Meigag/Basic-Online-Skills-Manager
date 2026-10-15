@@ -129,11 +129,12 @@ describe(`GET ${ROUTE}`, () => {
   it("returns 403 when the user's org type is not 'commercial'", async () => {
     const response = await request(app)
       .get(ROUTE)
-      .set("Authorization", tokenFor({ ...commercialUser, orgType: "outreach" }));
+      .set(
+        "Authorization",
+        tokenFor({ ...commercialUser, orgType: "outreach" }),
+      );
 
     expect(response.status).toBe(403);
     expect(pool.query).not.toHaveBeenCalled();
   });
-
-
 });

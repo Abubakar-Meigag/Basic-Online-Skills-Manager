@@ -8,7 +8,10 @@ import { withMockedQueries } from "./helpers/mockQueries";
 const mockClient = vi.hoisted(() => ({ query: vi.fn(), release: vi.fn() }));
 
 vi.mock("../data/connection", () => ({
-  default: { query: mockClient.query, connect: vi.fn().mockResolvedValue(mockClient) },
+  default: {
+    query: mockClient.query,
+    connect: vi.fn().mockResolvedValue(mockClient),
+  },
 }));
 
 const JWT_SECRET = "test-secret";
@@ -54,15 +57,12 @@ describe("POST /addPartner", () => {
         created_at: "2026-08-06T00:00:00.000Z",
       }),
       async () =>
-        request(app)
-          .post("/addPartner")
-          .set("Authorization", auth)
-          .send({
-            organisation_name: "Deloitte",
-            type: "commercial",
-            email_domain: "deloitte.com",
-            city: "London",
-          }),
+        request(app).post("/addPartner").set("Authorization", auth).send({
+          organisation_name: "Deloitte",
+          type: "commercial",
+          email_domain: "deloitte.com",
+          city: "London",
+        }),
     );
 
     expect(response.status).toBe(201);
@@ -131,15 +131,12 @@ describe("POST /addPartner", () => {
         city: "London",
       }),
       async () =>
-        request(app)
-          .post("/addPartner")
-          .set("Authorization", auth)
-          .send({
-            organisation_name: "CodeYourFuture",
-            type: "cyf_staff",
-            email_domain: "codeyourfuture.io",
-            city: "London",
-          }),
+        request(app).post("/addPartner").set("Authorization", auth).send({
+          organisation_name: "CodeYourFuture",
+          type: "cyf_staff",
+          email_domain: "codeyourfuture.io",
+          city: "London",
+        }),
     );
 
     expect(response.status).toBe(201);
@@ -170,15 +167,12 @@ describe("POST /addPartner", () => {
         ROLLBACK: undefined, // the controller rolls back before returning 409
       },
       async () =>
-        request(app)
-          .post("/addPartner")
-          .set("Authorization", auth)
-          .send({
-            organisation_name: "Capgemini",
-            type: "commercial",
-            email_domain: "capgemini.com",
-            city: "London",
-          }),
+        request(app).post("/addPartner").set("Authorization", auth).send({
+          organisation_name: "Capgemini",
+          type: "commercial",
+          email_domain: "capgemini.com",
+          city: "London",
+        }),
     );
 
     expect(response.status).toBe(409);
@@ -194,15 +188,12 @@ describe("POST /addPartner", () => {
         ROLLBACK: undefined, // the catch block rolls back
       },
       async () =>
-        request(app)
-          .post("/addPartner")
-          .set("Authorization", auth)
-          .send({
-            organisation_name: "Deloitte",
-            type: "commercial",
-            email_domain: "deloitte.com",
-            city: "London",
-          }),
+        request(app).post("/addPartner").set("Authorization", auth).send({
+          organisation_name: "Deloitte",
+          type: "commercial",
+          email_domain: "deloitte.com",
+          city: "London",
+        }),
     );
 
     expect(response.status).toBe(500);

@@ -14,15 +14,17 @@ vi.mock("../data/connection", () => ({
 // The controller reads the course with pool.query (outside the transaction),
 // and runs BEGIN/UPDATE/audit/COMMIT/ROLLBACK on the client.
 
-
-const COURSE_SELECT = "FROM courses c"; 
+const COURSE_SELECT = "FROM courses c";
 
 describe("claimOpportunity", () => {
   let req: Partial<Request>;
   let res: Partial<Response>;
   let statusMock: ReturnType<typeof vi.fn>;
   let jsonMock: ReturnType<typeof vi.fn>;
-  let client: { query: ReturnType<typeof vi.fn>; release: ReturnType<typeof vi.fn> };
+  let client: {
+    query: ReturnType<typeof vi.fn>;
+    release: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -88,15 +90,12 @@ describe("claimOpportunity", () => {
 
   describe("Course Validation", () => {
     it("should return 404 if course not found", async () => {
-      await withMockedQueries(
-        pool,
-        { [COURSE_SELECT]: { rows: [] } },
-        () =>
-          withMockedQueries(
-            client,
-            { BEGIN: undefined, ROLLBACK: undefined },
-            async () => claimOpportunity(req as Request, res as Response),
-          ),
+      await withMockedQueries(pool, { [COURSE_SELECT]: { rows: [] } }, () =>
+        withMockedQueries(
+          client,
+          { BEGIN: undefined, ROLLBACK: undefined },
+          async () => claimOpportunity(req as Request, res as Response),
+        ),
       );
 
       expect(statusMock).toHaveBeenCalledWith(404);
