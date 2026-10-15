@@ -19,7 +19,10 @@ export async function handleRequestMagicLink(
       });
     }
 
-    const sanitisedEmail = email.trim().toLowerCase().replace(/[\n\r]/g, "_");
+    const sanitisedEmail = email
+      .trim()
+      .toLowerCase()
+      .replace(/[\n\r]/g, "_");
 
     // Call service layer to query user, store hashed token, and dispatch email/log
     await requestMagicLink(sanitisedEmail);

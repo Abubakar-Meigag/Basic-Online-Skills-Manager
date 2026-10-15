@@ -8,7 +8,7 @@ vi.mock("../data/connection", () => ({
   default: { query: vi.fn() },
 }));
 
-process.env.JWT_SECRET = "test-secret";
+const JWT_SECRET = "test-secret";
 
 const makeToken = (orgType: string) =>
   jwt.sign(
@@ -18,7 +18,7 @@ const makeToken = (orgType: string) =>
       orgType,
       organisationId: "org-1",
     },
-    process.env.JWT_SECRET as string,
+    JWT_SECRET,
     { algorithm: "HS256", expiresIn: "1h" },
   );
 

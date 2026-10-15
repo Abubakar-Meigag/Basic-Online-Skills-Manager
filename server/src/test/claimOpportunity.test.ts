@@ -2,17 +2,36 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { Request, Response } from "express";
 import claimOpportunity from "../api/claimOpportunity";
 import pool from "../data/connection";
+import { withMockedQueries } from "./helpers/mockQueries";
 
-vi.mock("../data/connection");
+vi.mock("../data/connection", () => ({
+  default: { connect: vi.fn(), query: vi.fn() },
+}));
+
+// TODO: these tests call the controller directly with a fake req/res,
+// bypassing authorizeRole. Refactor to use the real app + tokenFor() later.
+
+// The controller reads the course with pool.query (outside the transaction),
+// and runs BEGIN/UPDATE/audit/COMMIT/ROLLBACK on the client.
+
+const COURSE_SELECT = "FROM courses c";
 
 describe("claimOpportunity", () => {
   let req: Partial<Request>;
   let res: Partial<Response>;
   let statusMock: ReturnType<typeof vi.fn>;
   let jsonMock: ReturnType<typeof vi.fn>;
+  let client: {
+    query: ReturnType<typeof vi.fn>;
+    release: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(pool.query).mockReset(); // so a mockImplementation never leaks into the next test
+
+    client = { query: vi.fn(), release: vi.fn() };
+    vi.mocked(pool.connect).mockResolvedValue(client as any);
 
     jsonMock = vi.fn().mockReturnValue(undefined);
     statusMock = vi.fn().mockReturnValue({ json: jsonMock });
@@ -71,26 +90,39 @@ describe("claimOpportunity", () => {
 
   describe("Course Validation", () => {
     it("should return 404 if course not found", async () => {
-      vi.mocked(pool.query).mockResolvedValue({ rows: [] } as any);
-
-      await claimOpportunity(req as Request, res as Response);
+      await withMockedQueries(pool, { [COURSE_SELECT]: { rows: [] } }, () =>
+        withMockedQueries(
+          client,
+          { BEGIN: undefined, ROLLBACK: undefined },
+          async () => claimOpportunity(req as Request, res as Response),
+        ),
+      );
 
       expect(statusMock).toHaveBeenCalledWith(404);
       expect(jsonMock).toHaveBeenCalledWith({ error: "Course not found" });
     });
 
     it("should return 409 if course already claimed", async () => {
-      vi.mocked(pool.query).mockResolvedValueOnce({
-        rows: [
-          {
-            id: "course-1",
-            outreach_org_id: "org-1",
-            status: "request_open",
+      await withMockedQueries(
+        pool,
+        {
+          [COURSE_SELECT]: {
+            rows: [
+              {
+                id: "course-1",
+                outreach_org_id: "org-1",
+                status: "request_open",
+              },
+            ],
           },
-        ],
-      } as any);
-
-      await claimOpportunity(req as Request, res as Response);
+        },
+        () =>
+          withMockedQueries(
+            client,
+            { BEGIN: undefined, ROLLBACK: undefined },
+            async () => claimOpportunity(req as Request, res as Response),
+          ),
+      );
 
       expect(statusMock).toHaveBeenCalledWith(409);
       expect(jsonMock).toHaveBeenCalledWith({
@@ -99,17 +131,26 @@ describe("claimOpportunity", () => {
     });
 
     it("should return 409 if course status is not request_open", async () => {
-      vi.mocked(pool.query).mockResolvedValueOnce({
-        rows: [
-          {
-            id: "course-1",
-            outreach_org_id: null,
-            status: "request_closed",
+      await withMockedQueries(
+        pool,
+        {
+          [COURSE_SELECT]: {
+            rows: [
+              {
+                id: "course-1",
+                outreach_org_id: null,
+                status: "request_closed",
+              },
+            ],
           },
-        ],
-      } as any);
-
-      await claimOpportunity(req as Request, res as Response);
+        },
+        () =>
+          withMockedQueries(
+            client,
+            { BEGIN: undefined, ROLLBACK: undefined },
+            async () => claimOpportunity(req as Request, res as Response),
+          ),
+      );
 
       expect(statusMock).toHaveBeenCalledWith(409);
       expect(jsonMock).toHaveBeenCalledWith({
@@ -128,12 +169,21 @@ describe("claimOpportunity", () => {
         outreach_org: null,
       };
 
-      vi.mocked(pool.query)
-        .mockResolvedValueOnce({ rows: [mockCourse] } as any)
-        .mockResolvedValueOnce({} as any)
-        .mockResolvedValueOnce({} as any);
-
-      await claimOpportunity(req as Request, res as Response);
+      await withMockedQueries(
+        pool,
+        { [COURSE_SELECT]: { rows: [mockCourse] } },
+        () =>
+          withMockedQueries(
+            client,
+            {
+              BEGIN: undefined,
+              "UPDATE courses SET": undefined,
+              "INSERT INTO audit_log": undefined,
+              COMMIT: undefined,
+            },
+            async () => claimOpportunity(req as Request, res as Response),
+          ),
+      );
 
       expect(statusMock).toHaveBeenCalledWith(201);
       expect(jsonMock).toHaveBeenCalledWith(mockCourse);
