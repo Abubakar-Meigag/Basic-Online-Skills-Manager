@@ -1,18 +1,15 @@
 import { expect } from "vitest";
 
 /**
- * 
  * Fakes database replies by matching each query's SQL text, not call order.
  * Throws if a query matches no key or more than one key.
- * After the callback runs, checks that every listed query was actually called.
- * 
+ * After the callback runs, checks that every listed query was called, and nothing else.
  */
-
-export const withMockedQueries = async (
+export const withMockedQueries = async <T>(
   client: { query: any },
   responses: Record<string, unknown>,
-  callback: () => Promise<void>,
-) => {
+  callback: () => Promise<T>,
+): Promise<T> => {
   client.query.mockImplementation(async (sql: string) => {
     const keys = Object.keys(responses).filter((k) => sql.includes(k));
     const key = keys[0];
@@ -29,7 +26,7 @@ export const withMockedQueries = async (
     return result;
   });
 
-  await callback();
+  const callbackResult = await callback();
 
   for (const key of Object.keys(responses)) {
     const wasCalled = client.query.mock.calls.some((c: unknown[]) =>
@@ -39,4 +36,8 @@ export const withMockedQueries = async (
       true,
     );
   }
+
+  expect(client.query.mock.calls.length).toBe(Object.keys(responses).length);
+
+  return callbackResult;
 };
