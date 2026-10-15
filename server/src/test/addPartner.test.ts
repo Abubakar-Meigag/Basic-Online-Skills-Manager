@@ -43,7 +43,7 @@ describe("POST /addPartner", () => {
   });
 
   it("creates an organisation and returns 201", async () => {
-    await withMockedQueries(
+    const response = await withMockedQueries(
       mockClient,
       Path({
         id: "org-1",
@@ -53,8 +53,8 @@ describe("POST /addPartner", () => {
         city: "London",
         created_at: "2026-08-06T00:00:00.000Z",
       }),
-      async () => {
-        const response = await request(app)
+      async () =>
+        request(app)
           .post("/addPartner")
           .set("Authorization", auth)
           .send({
@@ -62,33 +62,32 @@ describe("POST /addPartner", () => {
             type: "commercial",
             email_domain: "deloitte.com",
             city: "London",
-          });
-
-        expect(response.status).toBe(201);
-        expect(response.body.organisation.organisation_name).toBe("Deloitte");
-        expect(response.body.organisation.city).toBe("London");
-      },
+          }),
     );
+
+    expect(response.status).toBe(201);
+    expect(response.body.organisation.organisation_name).toBe("Deloitte");
+    expect(response.body.organisation.city).toBe("London");
   });
 
   it("lowercases the email_domain before insert", async () => {
     await withMockedQueries(
       mockClient,
       Path({ id: "org-2", organisation_name: "Deloitte", city: "London" }),
-      async () => {
-        await request(app).post("/addPartner").set("Authorization", auth).send({
+      async () =>
+        request(app).post("/addPartner").set("Authorization", auth).send({
           organisation_name: "Deloitte",
           type: "commercial",
           email_domain: "Deloitte.COM",
           city: "London",
-        });
-
-        const insertCall = mockClient.query.mock.calls.find((c) =>
-          String(c[0]).includes("INSERT INTO organisations"),
-        );
-        expect(insertCall?.[1]).toContain("deloitte.com");
-      },
+        }),
     );
+
+    // asserted after the helper returns; the calls are still recorded
+    const insertCall = mockClient.query.mock.calls.find((c) =>
+      String(c[0]).includes("INSERT INTO organisations"),
+    );
+    expect(insertCall?.[1]).toContain("deloitte.com");
   });
 
   it("returns 400 when a required field is missing", async () => {
@@ -124,15 +123,15 @@ describe("POST /addPartner", () => {
   });
 
   it("accepts cyf_staff as a valid type", async () => {
-    await withMockedQueries(
+    const response = await withMockedQueries(
       mockClient,
       Path({
         id: "org-3",
         organisation_name: "CodeYourFuture",
         city: "London",
       }),
-      async () => {
-        const response = await request(app)
+      async () =>
+        request(app)
           .post("/addPartner")
           .set("Authorization", auth)
           .send({
@@ -140,11 +139,10 @@ describe("POST /addPartner", () => {
             type: "cyf_staff",
             email_domain: "codeyourfuture.io",
             city: "London",
-          });
-
-        expect(response.status).toBe(201);
-      },
+          }),
     );
+
+    expect(response.status).toBe(201);
   });
 
   it("returns 400 for a malformed email_domain", async () => {
@@ -164,15 +162,15 @@ describe("POST /addPartner", () => {
   });
 
   it("returns 409 when the organisation name or email_domain already exists", async () => {
-    await withMockedQueries(
+    const response = await withMockedQueries(
       mockClient,
       {
         BEGIN: undefined,
         "SELECT id FROM organisations": { rows: [{ id: "existing-org" }] }, // org already exists
         ROLLBACK: undefined, // the controller rolls back before returning 409
       },
-      async () => {
-        const response = await request(app)
+      async () =>
+        request(app)
           .post("/addPartner")
           .set("Authorization", auth)
           .send({
@@ -180,24 +178,23 @@ describe("POST /addPartner", () => {
             type: "commercial",
             email_domain: "capgemini.com",
             city: "London",
-          });
-
-        expect(response.status).toBe(409);
-        expect(response.body).toHaveProperty("error");
-      },
+          }),
     );
+
+    expect(response.status).toBe(409);
+    expect(response.body).toHaveProperty("error");
   });
 
   it("returns 500 when a query fails", async () => {
-    await withMockedQueries(
+    const response = await withMockedQueries(
       mockClient,
       {
         BEGIN: undefined,
         "SELECT id FROM organisations": new Error("DB down"),
         ROLLBACK: undefined, // the catch block rolls back
       },
-      async () => {
-        const response = await request(app)
+      async () =>
+        request(app)
           .post("/addPartner")
           .set("Authorization", auth)
           .send({
@@ -205,12 +202,11 @@ describe("POST /addPartner", () => {
             type: "commercial",
             email_domain: "deloitte.com",
             city: "London",
-          });
-
-        expect(response.status).toBe(500);
-        expect(response.body).toHaveProperty("error");
-      },
+          }),
     );
+
+    expect(response.status).toBe(500);
+    expect(response.body).toHaveProperty("error");
   });
 
   it("returns 401 when no token is provided", async () => {
