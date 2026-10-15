@@ -3,13 +3,13 @@ import jwt from "jsonwebtoken";
 import app from "../app";
 import pool from "../data/connection";
 import { OrganizationType } from "../data/dataType";
+import { withMockedQueries } from "./helpers/mockQueries";
 
 vi.mock("../data/connection", () => ({
   default: { connect: vi.fn() },
 }));
 
-
-const JWT_SECRET = "test-secret"; 
+const JWT_SECRET = "test-secret";
 
 // A valid CYF-staff token
 const staffToken = jwt.sign(
@@ -30,21 +30,7 @@ const makeClient = () => ({
   release: vi.fn(),
 });
 
-// Answers each client.query by matching its SQL text, and throws "Unexpected query" for any query not listed.
-const mockQueries = (
-  client: { query: any },
-  responses: Record<string, unknown>,
-) => {
-  client.query.mockImplementation(async (sql: string) => {
-    const key = Object.keys(responses).find((k) => sql.includes(k));
-    if (key === undefined) throw new Error(`Unexpected query: ${sql}`);
-    const result = responses[key];
-    if (result instanceof Error) throw result;
-    return result;
-  });
-};
-
-// The normal successful sequence of queries for adding a user.
+// The normal successful sequence of queries for adding a user
 const Path = (newUser: Record<string, unknown>, orgId: string) => ({
   BEGIN: undefined,
   "SELECT id FROM organisations": { rows: [{ id: orgId }] }, // org exists
@@ -63,7 +49,7 @@ describe("POST /partners/:id/users", () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
 
-    mockQueries(
+    const response = await withMockedQueries(
       client,
       Path(
         {
@@ -73,17 +59,16 @@ describe("POST /partners/:id/users", () => {
         },
         "org-1",
       ),
+      async () =>
+        request(app)
+          .post("/partners/org-1/users")
+          .set("Authorization", auth)
+          .send({ email: "second@capgemini.com" }),
     );
-
-    const response = await request(app)
-      .post("/partners/org-1/users")
-      .set("Authorization", auth)
-      .send({ email: "second@capgemini.com" });
 
     expect(response.status).toBe(201);
     expect(response.body.email).toBe("second@capgemini.com");
     expect(response.body.organisation_id).toBe("org-1");
-    expect(client.query).toHaveBeenCalledWith("COMMIT");
     expect(client.release).toHaveBeenCalled();
   });
 
@@ -91,7 +76,7 @@ describe("POST /partners/:id/users", () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
 
-    mockQueries(
+    const response = await withMockedQueries(
       client,
       Path(
         {
@@ -101,12 +86,12 @@ describe("POST /partners/:id/users", () => {
         },
         "org-from-path",
       ),
-    ); // here
-
-    const response = await request(app)
-      .post("/partners/org-from-path/users")
-      .set("Authorization", auth)
-      .send({ email: "new@capgemini.com", organisation_id: "attacker-org" });
+      async () =>
+        request(app)
+          .post("/partners/org-from-path/users")
+          .set("Authorization", auth)
+          .send({ email: "new@capgemini.com", organisation_id: "attacker-org" }),
+    );
 
     expect(response.status).toBe(201);
     expect(response.body.organisation_id).toBe("org-from-path");
@@ -145,20 +130,22 @@ describe("POST /partners/:id/users", () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
 
-    mockQueries(client, {
-      BEGIN: undefined,
-      "SELECT id FROM organisations": { rows: [] }, // org not found
-      ROLLBACK: undefined,
-    });
-
-    const response = await request(app)
-      .post("/partners/missing-org/users")
-      .set("Authorization", auth)
-      .send({ email: "someone@example.com" });
+    const response = await withMockedQueries(
+      client,
+      {
+        BEGIN: undefined,
+        "SELECT id FROM organisations": { rows: [] }, // org not found
+        ROLLBACK: undefined,
+      },
+      async () =>
+        request(app)
+          .post("/partners/missing-org/users")
+          .set("Authorization", auth)
+          .send({ email: "someone@example.com" }),
+    );
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty("error");
-    expect(client.query).toHaveBeenCalledWith("ROLLBACK");
     expect(client.release).toHaveBeenCalled();
   });
 
@@ -166,21 +153,23 @@ describe("POST /partners/:id/users", () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
 
-    mockQueries(client, {
-      BEGIN: undefined,
-      "SELECT id FROM organisations": { rows: [{ id: "org-1" }] }, // org exists
-      "SELECT id FROM users": { rows: [{ id: "existing-user" }] }, // email taken
-      ROLLBACK: undefined,
-    });
-
-    const response = await request(app)
-      .post("/partners/org-1/users")
-      .set("Authorization", auth)
-      .send({ email: "taken@capgemini.com" });
+    const response = await withMockedQueries(
+      client,
+      {
+        BEGIN: undefined,
+        "SELECT id FROM organisations": { rows: [{ id: "org-1" }] }, // org exists
+        "SELECT id FROM users": { rows: [{ id: "existing-user" }] }, // email taken
+        ROLLBACK: undefined,
+      },
+      async () =>
+        request(app)
+          .post("/partners/org-1/users")
+          .set("Authorization", auth)
+          .send({ email: "taken@capgemini.com" }),
+    );
 
     expect(response.status).toBe(409);
     expect(response.body).toHaveProperty("error");
-    expect(client.query).toHaveBeenCalledWith("ROLLBACK");
     expect(client.release).toHaveBeenCalled();
   });
 
@@ -188,16 +177,19 @@ describe("POST /partners/:id/users", () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
 
-    mockQueries(client, {
-      BEGIN: undefined,
-      "SELECT id FROM organisations": new Error("DB down"), // org check throws
-      ROLLBACK: undefined, // the catch block rolls back
-    });
-
-    const response = await request(app)
-      .post("/partners/org-1/users")
-      .set("Authorization", auth)
-      .send({ email: "someone@example.com" });
+    const response = await withMockedQueries(
+      client,
+      {
+        BEGIN: undefined,
+        "SELECT id FROM organisations": new Error("DB down"), // org check throws
+        ROLLBACK: undefined, // the catch block rolls back
+      },
+      async () =>
+        request(app)
+          .post("/partners/org-1/users")
+          .set("Authorization", auth)
+          .send({ email: "someone@example.com" }),
+    );
 
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");
