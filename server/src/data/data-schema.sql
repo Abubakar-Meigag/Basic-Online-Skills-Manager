@@ -2,10 +2,10 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 CREATE TABLE organisations(
       id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      organisation_name  TEXT NOT NULL,
+      organisation_name  TEXT NOT NULL UNIQUE,
       city               TEXT NOT NULL,
       type               TEXT NOT NULL,
-      email_domain       TEXT NOT NULL,
+      email_domain       TEXT NOT NULL UNIQUE,
       created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

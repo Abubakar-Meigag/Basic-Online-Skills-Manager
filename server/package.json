@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.1100.0",
+    "@drdgvhbh/postgres-error-codes": "^0.0.6",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
