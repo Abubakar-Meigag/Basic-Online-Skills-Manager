@@ -43,4 +43,43 @@ describe("OutreachDashboard Component", () => {
 
     expect(screen.queryByText("Commercial Partner")).not.toBeInTheDocument();
   });
+
+  it("renders course data rows returned by the API", async () => {
+    // Arrange: mock API with our sample course
+    vi.mocked(api.get).mockResolvedValue({ data: mockCourses });
+
+    // Act
+    render(<OutreachDashboard />);
+
+    // Assert: findByText waits for the async data to render onto the screen
+    expect(await screen.findByText("Birmingham")).toBeInTheDocument();
+    expect(screen.getByText("3 Weeks")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /view details/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("switches to the Claim Opportunity view when 'View Details' is clicked", async () => {
+    // Arrange
+    const user = userEvent.setup();
+    vi.mocked(api.get).mockResolvedValue({ data: mockCourses });
+
+    render(<OutreachDashboard />);
+
+    // Wait for the course row to render
+    const viewDetailsButton = await screen.findByRole("button", {
+      name: /view details/i,
+    });
+
+    // Act: simulate the user clicking "View Details"
+    await user.click(viewDetailsButton);
+
+    // Assert: Claim Opportunity page header appears
+    expect(
+      await screen.findByRole("heading", { name: /claim this opportunity/i }),
+    ).toBeInTheDocument();
+
+    // Assert: Commercial Partner name is visible on the details page!
+    expect(screen.getByText("Capgemini")).toBeInTheDocument();
+  });
 });
