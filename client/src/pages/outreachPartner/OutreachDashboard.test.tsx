@@ -45,13 +45,10 @@ describe("OutreachDashboard Component", () => {
   });
 
   it("renders course data rows returned by the API", async () => {
-    // Arrange: mock API with our sample course
     vi.mocked(api.get).mockResolvedValue({ data: mockCourses });
 
-    // Act
     render(<OutreachDashboard />);
 
-    // Assert: findByText waits for the async data to render onto the screen
     expect(await screen.findByText("Birmingham")).toBeInTheDocument();
     expect(screen.getByText("3 Weeks")).toBeInTheDocument();
     expect(
@@ -60,26 +57,60 @@ describe("OutreachDashboard Component", () => {
   });
 
   it("switches to the Claim Opportunity view when 'View Details' is clicked", async () => {
-    // Arrange
     const user = userEvent.setup();
     vi.mocked(api.get).mockResolvedValue({ data: mockCourses });
 
     render(<OutreachDashboard />);
 
-    // Wait for the course row to render
     const viewDetailsButton = await screen.findByRole("button", {
       name: /view details/i,
     });
 
-    // Act: simulate the user clicking "View Details"
     await user.click(viewDetailsButton);
 
-    // Assert: Claim Opportunity page header appears
     expect(
       await screen.findByRole("heading", { name: /claim this opportunity/i }),
     ).toBeInTheDocument();
 
-    // Assert: Commercial Partner name is visible on the details page!
     expect(screen.getByText("Capgemini")).toBeInTheDocument();
+  });
+
+  it("handles network failure gracefully when fetching opportunities fails", async () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.mocked(api.get).mockRejectedValueOnce(new Error("Network Error"));
+
+    render(<OutreachDashboard />);
+
+    await waitFor(() => {
+      expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
+    });
+
+    expect(screen.getByText("Location")).toBeInTheDocument();
+    consoleSpy.mockRestore();
+  });
+
+  it("navigates back to the table when clicking the '← Opportunity Board' back button", async () => {
+    const user = userEvent.setup();
+    vi.mocked(api.get).mockResolvedValue({ data: mockCourses });
+
+    render(<OutreachDashboard />);
+
+    const viewDetailsButton = await screen.findByRole("button", {
+      name: /view details/i,
+    });
+    await user.click(viewDetailsButton);
+    expect(
+      await screen.findByRole("heading", { name: /claim this opportunity/i }),
+    ).toBeInTheDocument();
+
+    const backButton = screen.getByRole("button", {
+      name: /opportunity board/i,
+    });
+    await user.click(backButton);
+
+    expect(
+      await screen.findByText("Available Opportunities"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Location")).toBeInTheDocument();
   });
 });
