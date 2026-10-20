@@ -1,8 +1,10 @@
 import crypto from "node:crypto";
 import pool from "../data/connection";
 import jwt from "jsonwebtoken";
+import { PG_UNIQUE_VIOLATION } from "@drdgvhbh/postgres-error-codes";
 import { OrganizationType } from "../data/dataType";
 import { sendMagicLinkEmail } from "../lib/email";
+import { DatabaseError } from "pg";
 
 export interface UserPayload {
   id: string;
@@ -34,7 +36,6 @@ export async function requestMagicLink(email: string): Promise<void> {
   let inserted = false;
   let attempts = 0;
   const MAX_ATTEMPTS = 3;
-  const PG_UNIQUE_VIOLATION = "23505";
 
   // Expire in 5 min
   const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
@@ -55,7 +56,7 @@ export async function requestMagicLink(email: string): Promise<void> {
       // Send the email with the rawToken
       await sendMagicLinkEmail(email, rawToken);
     } catch (error: any) {
-      if (error.code === PG_UNIQUE_VIOLATION) {
+      if (error instanceof DatabaseError && error.code === PG_UNIQUE_VIOLATION) {
         attempts++;
         if (attempts >= MAX_ATTEMPTS) {
           throw new Error(
