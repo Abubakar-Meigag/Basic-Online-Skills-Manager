@@ -4,12 +4,11 @@ import app from "../app";
 import pool from "../data/connection";
 import { OrganizationType } from "../data/dataType";
 import { withMockedQueries } from "./helpers/mockQueries";
+import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
   default: { connect: vi.fn() },
 }));
-
-const JWT_SECRET = "test-secret";
 
 const makeClient = () => ({
   query: vi.fn(),
@@ -22,7 +21,7 @@ const staffToken = jwt.sign(
     email: "staff@codeyourfuture.io",
     orgType: OrganizationType.CYF_STAFF,
   },
-  JWT_SECRET,
+  JWT_TEST_SECRET,
   { algorithm: "HS256", expiresIn: "1h" },
 );
 
@@ -118,7 +117,7 @@ describe("PATCH /users/:id/status", () => {
         email: "staff@codeyourfuture.io",
         orgType: OrganizationType.CYF_STAFF,
       },
-      JWT_SECRET as string,
+      JWT_TEST_SECRET,
       { algorithm: "HS256" },
     );
 

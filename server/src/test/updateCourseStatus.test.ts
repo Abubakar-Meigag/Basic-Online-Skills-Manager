@@ -3,15 +3,14 @@ import app from "../app";
 import pool from "../data/connection";
 import jwt from "jsonwebtoken";
 import { withMockedQueries } from "./helpers/mockQueries";
+import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
   default: { connect: vi.fn() },
 }));
 
-const JWT_SECRET = "test-secret";
-
 const tokenFor = (user: object) =>
-  `Bearer ${jwt.sign(user, JWT_SECRET, {
+  `Bearer ${jwt.sign(user, JWT_TEST_SECRET, {
     algorithm: "HS256",
     expiresIn: "1h",
   })}`;

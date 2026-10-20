@@ -3,12 +3,11 @@ import jwt from "jsonwebtoken";
 import app from "../app";
 import pool from "../data/connection";
 import { OrganizationType } from "../data/dataType";
+import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
   default: { query: vi.fn() },
 }));
-
-const JWT_SECRET = "test-secret";
 
 const makeToken = (orgType: string) =>
   jwt.sign(
@@ -18,7 +17,7 @@ const makeToken = (orgType: string) =>
       orgType,
       organisationId: "org-1",
     },
-    JWT_SECRET,
+    JWT_TEST_SECRET,
     { algorithm: "HS256", expiresIn: "1h" },
   );
 

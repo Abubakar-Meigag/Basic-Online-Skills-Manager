@@ -4,6 +4,7 @@ import app from "../app";
 import pool from "../data/connection";
 import { OrganizationType } from "../data/dataType";
 import { withMockedQueries } from "./helpers/mockQueries";
+import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 const mockClient = vi.hoisted(() => ({ query: vi.fn(), release: vi.fn() }));
 
@@ -13,8 +14,6 @@ vi.mock("../data/connection", () => ({
     connect: vi.fn().mockResolvedValue(mockClient),
   },
 }));
-
-const JWT_SECRET = "test-secret";
 
 const Path = (org: Record<string, unknown>) => ({
   BEGIN: undefined,
@@ -32,7 +31,7 @@ const staffToken = jwt.sign(
     orgType: OrganizationType.CYF_STAFF,
     organisationId: "org-1",
   },
-  JWT_SECRET,
+  JWT_TEST_SECRET,
   { algorithm: "HS256", expiresIn: "1h" },
 );
 

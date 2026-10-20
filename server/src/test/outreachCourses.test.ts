@@ -6,6 +6,7 @@ import { OrganizationType } from "../data/dataType";
 import getOutreachCourses from "../api/outreachCourses";
 import jwt from "jsonwebtoken";
 import app from "../app";
+import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 // TODO: these 3 tests (200 list, 200 empty, 500) still use the fake testApp
 // and an injected req.user. Refactor them to use the real app + tokenFor()
@@ -17,10 +18,8 @@ vi.mock("../data/connection", () => ({
   },
 }));
 
-const JWT_SECRET = "test-secret";
-
 const tokenFor = (user: object) =>
-  `Bearer ${jwt.sign(user, JWT_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`;
+  `Bearer ${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`;
 
 const testApp = express();
 testApp.use(express.json());

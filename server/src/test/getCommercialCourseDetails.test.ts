@@ -2,15 +2,14 @@ import request from "supertest";
 import app from "../app";
 import pool from "../data/connection";
 import jwt from "jsonwebtoken";
+import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
   default: { query: vi.fn() },
 }));
 
-const JWT_SECRET = "test-secret";
-
 const tokenFor = (user: object) =>
-  `Bearer ${jwt.sign(user, JWT_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`;
+  `Bearer ${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`;
 
 const CAPGEMINI = "60ea2b0f-e04e-4f9a-ac72-38bae06d98bc";
 
