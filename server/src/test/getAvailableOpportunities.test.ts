@@ -1,10 +1,27 @@
 import request from "supertest";
 import app from "../app";
 import pool from "../data/connection";
+import jwt from "jsonwebtoken";
+import { OrganizationType } from "../data/dataType";
 
 vi.mock("../data/connection", () => ({
   default: { query: vi.fn() },
 }));
+
+process.env.JWT_SECRET = "test-secret";
+
+const outreachToken = jwt.sign(
+  {
+    id: "user-1",
+    email: "partner@example.com",
+    orgType: OrganizationType.OUTREACH_PARTNER,
+    organisationId: "org-1",
+  },
+  process.env.JWT_SECRET,
+  { algorithm: "HS256", expiresIn: "1h" },
+);
+
+const auth = `Bearer ${outreachToken}`;
 
 describe("GET /opportunities", () => {
   afterEach(() => {
@@ -13,7 +30,9 @@ describe("GET /opportunities", () => {
 
   it("returns an empty array when there are no open opportunities", async () => {
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
-    const response = await request(app).get("/opportunities");
+    const response = await request(app)
+      .get("/opportunities")
+      .set("Authorization", auth);
     expect(response.status).toBe(200);
     expect(response.body).toEqual([]);
   });
@@ -30,7 +49,9 @@ describe("GET /opportunities", () => {
       },
     ];
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
-    const response = await request(app).get("/opportunities");
+    const response = await request(app)
+      .get("/opportunities")
+      .set("Authorization", auth);
     expect(response.status).toBe(200);
     expect(response.body).toEqual(mockRows);
   });
@@ -47,19 +68,25 @@ describe("GET /opportunities", () => {
       },
     ];
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
-    const response = await request(app).get("/opportunities");
+    const response = await request(app)
+      .get("/opportunities")
+      .set("Authorization", auth);
     expect(response.body[0].commercial_org).toBe("Capgemini");
   });
 
   it("returns JSON content-type", async () => {
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
-    const response = await request(app).get("/opportunities");
+    const response = await request(app)
+      .get("/opportunities")
+      .set("Authorization", auth);
     expect(response.headers["content-type"]).toMatch(/application\/json/);
   });
 
   it("returns 500 when the query fails", async () => {
     (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
-    const response = await request(app).get("/opportunities");
+    const response = await request(app)
+      .get("/opportunities")
+      .set("Authorization", auth);
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");
   });
