@@ -68,7 +68,7 @@ describe("POST /partners/:id/users", () => {
     expect(response.status).toBe(201);
     expect(response.body.email).toBe("second@capgemini.com");
     expect(response.body.organisation_id).toBe("org-1");
-    expect(client.release).toHaveBeenCalled();
+    expect(client.release).toHaveBeenCalledTimes(1);
   });
 
   it("links the user to the org id from the path, not the body", async () => {
@@ -148,7 +148,7 @@ describe("POST /partners/:id/users", () => {
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty("error");
-    expect(client.release).toHaveBeenCalled();
+    expect(client.release).toHaveBeenCalledTimes(1);
   });
 
   it("returns 409 when the email already exists", async () => {
@@ -172,7 +172,7 @@ describe("POST /partners/:id/users", () => {
 
     expect(response.status).toBe(409);
     expect(response.body).toHaveProperty("error");
-    expect(client.release).toHaveBeenCalled();
+    expect(client.release).toHaveBeenCalledTimes(1);
   });
 
   it("returns 500 and releases the client when a query fails", async () => {
@@ -195,7 +195,7 @@ describe("POST /partners/:id/users", () => {
 
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");
-    expect(client.release).toHaveBeenCalled();
+    expect(client.release).toHaveBeenCalledTimes(1);
   });
 
   it("returns 401 when no token is provided", async () => {
