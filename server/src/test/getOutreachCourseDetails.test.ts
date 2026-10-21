@@ -1,18 +1,15 @@
 import request from "supertest";
 import app from "../app";
 import pool from "../data/connection";
+import jwt from "jsonwebtoken";
+import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
   default: { query: vi.fn() },
 }));
 
-let mockUser: Record<string, unknown> | null = null;
-vi.mock("./../middleware/authMiddleware", () => ({
-  authorizeRole: () => (req: any, _res: any, next: any) => {
-    req.user = mockUser;
-    next();
-  },
-}));
+const tokenFor = (user: object) =>
+  `Bearer ${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`;
 
 const NEW_BEGINNINGS = "5e51de52-9ea7-4809-ad21-8f4475e3b886";
 
@@ -24,10 +21,6 @@ const outreachUser = {
 };
 
 describe("GET /course-details/outreach/:id", () => {
-  beforeEach(() => {
-    mockUser = outreachUser;
-  });
-
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -43,9 +36,9 @@ describe("GET /course-details/outreach/:id", () => {
     };
     (pool.query as any).mockResolvedValueOnce({ rows: [mockCourse] });
 
-    const response = await request(app).get(
-      "/course-details/outreach/course-1",
-    );
+    const response = await request(app)
+      .get("/course-details/outreach/course-1")
+      .set("Authorization", tokenFor(outreachUser));
 
     expect(response.status).toBe(200);
     expect(response.body.data.id).toBe("course-1");
@@ -62,9 +55,9 @@ describe("GET /course-details/outreach/:id", () => {
     };
     (pool.query as any).mockResolvedValueOnce({ rows: [mockCourse] });
 
-    const response = await request(app).get(
-      "/course-details/outreach/course-1",
-    );
+    const response = await request(app)
+      .get("/course-details/outreach/course-1")
+      .set("Authorization", tokenFor(outreachUser));
 
     expect(response.status).toBe(200);
     expect(response.body.data.id).toBe("course-1");
@@ -81,9 +74,9 @@ describe("GET /course-details/outreach/:id", () => {
     };
     (pool.query as any).mockResolvedValueOnce({ rows: [mockCourse] });
 
-    const response = await request(app).get(
-      "/course-details/outreach/course-1",
-    );
+    const response = await request(app)
+      .get("/course-details/outreach/course-1")
+      .set("Authorization", tokenFor(outreachUser));
 
     expect(response.status).toBe(403);
     expect(response.body).toHaveProperty("error");
@@ -92,7 +85,9 @@ describe("GET /course-details/outreach/:id", () => {
   it("returns 404 when the course does not exist", async () => {
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
 
-    const response = await request(app).get("/course-details/outreach/missing");
+    const response = await request(app)
+      .get("/course-details/outreach/missing")
+      .set("Authorization", tokenFor(outreachUser));
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty("error");
@@ -101,9 +96,9 @@ describe("GET /course-details/outreach/:id", () => {
   it("returns 500 when the query fails", async () => {
     (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
 
-    const response = await request(app).get(
-      "/course-details/outreach/course-1",
-    );
+    const response = await request(app)
+      .get("/course-details/outreach/course-1")
+      .set("Authorization", tokenFor(outreachUser));
 
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");

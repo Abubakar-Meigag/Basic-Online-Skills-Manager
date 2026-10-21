@@ -3,12 +3,11 @@ import jwt from "jsonwebtoken";
 import app from "../app";
 import pool from "../data/connection";
 import { OrganizationType } from "../data/dataType";
+import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
   default: { query: vi.fn() },
 }));
-
-process.env.JWT_SECRET = "test-secret";
 
 const staffToken = jwt.sign(
   {
@@ -16,7 +15,7 @@ const staffToken = jwt.sign(
     email: "staff@codeyourfuture.io",
     orgType: OrganizationType.CYF_STAFF,
   },
-  process.env.JWT_SECRET,
+  JWT_TEST_SECRET,
   { algorithm: "HS256", expiresIn: "1h" },
 );
 
@@ -26,7 +25,7 @@ const partnerToken = jwt.sign(
     email: "partner@example.com",
     orgType: OrganizationType.COMMERCIAL_PARTNER,
   },
-  process.env.JWT_SECRET,
+  JWT_TEST_SECRET,
   { algorithm: "HS256", expiresIn: "1h" },
 );
 

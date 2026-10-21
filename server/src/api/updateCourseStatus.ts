@@ -4,7 +4,6 @@ import pool from "../data/connection";
 const ALLOWED_STATUSES = [
   "request_open",
   "request_confirmed",
-  "request_claimed",
   "course_running",
   "course_completed",
 ];
