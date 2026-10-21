@@ -67,6 +67,7 @@ describe("POST /addPartner", () => {
     expect(response.status).toBe(201);
     expect(response.body.organisation.organisation_name).toBe("Deloitte");
     expect(response.body.organisation.city).toBe("London");
+    expect(mockClient.release).toHaveBeenCalledTimes(1);
   });
 
   it("lowercases the email_domain before insert", async () => {
@@ -176,6 +177,7 @@ describe("POST /addPartner", () => {
 
     expect(response.status).toBe(409);
     expect(response.body).toHaveProperty("error");
+    expect(mockClient.release).toHaveBeenCalledTimes(1);
   });
 
   it("returns 500 when a query fails", async () => {
@@ -197,6 +199,7 @@ describe("POST /addPartner", () => {
 
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");
+    expect(mockClient.release).toHaveBeenCalledTimes(1);
   });
 
   it("returns 401 when no token is provided", async () => {
