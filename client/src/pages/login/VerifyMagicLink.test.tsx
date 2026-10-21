@@ -63,7 +63,7 @@ describe("VerifyMagicLink Component", () => {
       expect(authApi.verifyMagicLink).toHaveBeenCalledWith("valid-token");
 
       // LocalStorage correctly saved credentials
-      expect(localStorage.getItem("authToken")).toBe("mock-jwt-token");
+      expect(localStorage.getItem("sessionToken")).toBe("mock-jwt-token");
       expect(localStorage.getItem("user")).toBe(JSON.stringify(mockData.user));
 
       // User was redirected to the backend-provided route
@@ -74,6 +74,7 @@ describe("VerifyMagicLink Component", () => {
   it("should render error message when backend verification fails", async () => {
     // Arrange backend error rejection
     const mockError = {
+      isAxiosError: true,
       response: { data: { message: "Link has expired." } },
     };
     vi.spyOn(authApi, "verifyMagicLink").mockRejectedValue(mockError);
