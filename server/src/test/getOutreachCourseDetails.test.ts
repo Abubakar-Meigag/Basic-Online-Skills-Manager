@@ -8,8 +8,9 @@ vi.mock("../data/connection", () => ({
   default: { query: vi.fn() },
 }));
 
-const tokenFor = (user: object) =>
-  `Bearer ${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`;
+const tokenFor = (user: object) => [
+  `token=${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`,
+];
 
 const NEW_BEGINNINGS = "5e51de52-9ea7-4809-ad21-8f4475e3b886";
 
@@ -38,7 +39,7 @@ describe("GET /course-details/outreach/:id", () => {
 
     const response = await request(app)
       .get("/course-details/outreach/course-1")
-      .set("Authorization", tokenFor(outreachUser));
+      .set("Cookie", tokenFor(outreachUser));
 
     expect(response.status).toBe(200);
     expect(response.body.data.id).toBe("course-1");
@@ -57,7 +58,7 @@ describe("GET /course-details/outreach/:id", () => {
 
     const response = await request(app)
       .get("/course-details/outreach/course-1")
-      .set("Authorization", tokenFor(outreachUser));
+      .set("Cookie", tokenFor(outreachUser));
 
     expect(response.status).toBe(200);
     expect(response.body.data.id).toBe("course-1");
@@ -76,7 +77,7 @@ describe("GET /course-details/outreach/:id", () => {
 
     const response = await request(app)
       .get("/course-details/outreach/course-1")
-      .set("Authorization", tokenFor(outreachUser));
+      .set("Cookie", tokenFor(outreachUser));
 
     expect(response.status).toBe(403);
     expect(response.body).toHaveProperty("error");
@@ -87,7 +88,7 @@ describe("GET /course-details/outreach/:id", () => {
 
     const response = await request(app)
       .get("/course-details/outreach/missing")
-      .set("Authorization", tokenFor(outreachUser));
+      .set("Cookie", tokenFor(outreachUser));
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty("error");
@@ -98,7 +99,7 @@ describe("GET /course-details/outreach/:id", () => {
 
     const response = await request(app)
       .get("/course-details/outreach/course-1")
-      .set("Authorization", tokenFor(outreachUser));
+      .set("Cookie", tokenFor(outreachUser));
 
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");

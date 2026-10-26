@@ -22,7 +22,7 @@ const staffToken = jwt.sign(
   { algorithm: "HS256", expiresIn: "1h" },
 );
 
-const auth = `Bearer ${staffToken}`;
+const auth = [`token=${staffToken}`];
 
 const makeClient = () => ({
   query: vi.fn(),
@@ -61,7 +61,7 @@ describe("POST /partners/:id/users", () => {
       async () =>
         request(app)
           .post("/partners/org-1/users")
-          .set("Authorization", auth)
+          .set("Cookie", auth)
           .send({ email: "second@capgemini.com" }),
     );
 
@@ -88,7 +88,7 @@ describe("POST /partners/:id/users", () => {
       async () =>
         request(app)
           .post("/partners/org-from-path/users")
-          .set("Authorization", auth)
+          .set("Cookie", auth)
           .send({
             email: "new@capgemini.com",
             organisation_id: "attacker-org",
@@ -109,7 +109,7 @@ describe("POST /partners/:id/users", () => {
   it("returns 400 when email is missing", async () => {
     const response = await request(app)
       .post("/partners/org-1/users")
-      .set("Authorization", auth)
+      .set("Cookie", auth)
       .send({});
 
     expect(response.status).toBe(400);
@@ -120,7 +120,7 @@ describe("POST /partners/:id/users", () => {
   it("returns 400 when email is malformed", async () => {
     const response = await request(app)
       .post("/partners/org-1/users")
-      .set("Authorization", auth)
+      .set("Cookie", auth)
       .send({ email: "not-an-email" });
 
     expect(response.status).toBe(400);
@@ -142,7 +142,7 @@ describe("POST /partners/:id/users", () => {
       async () =>
         request(app)
           .post("/partners/missing-org/users")
-          .set("Authorization", auth)
+          .set("Cookie", auth)
           .send({ email: "someone@example.com" }),
     );
 
@@ -166,7 +166,7 @@ describe("POST /partners/:id/users", () => {
       async () =>
         request(app)
           .post("/partners/org-1/users")
-          .set("Authorization", auth)
+          .set("Cookie", auth)
           .send({ email: "taken@capgemini.com" }),
     );
 
@@ -189,7 +189,7 @@ describe("POST /partners/:id/users", () => {
       async () =>
         request(app)
           .post("/partners/org-1/users")
-          .set("Authorization", auth)
+          .set("Cookie", auth)
           .send({ email: "someone@example.com" }),
     );
 

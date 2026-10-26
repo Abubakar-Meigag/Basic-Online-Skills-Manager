@@ -9,8 +9,9 @@ vi.mock("../data/connection", () => ({
   default: { connect: vi.fn() },
 }));
 
-const tokenFor = (user: object) =>
-  `Bearer ${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`;
+const tokenFor = (user: object) => [
+  `token=${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`,
+];
 
 const makeClient = () => ({ query: vi.fn(), release: vi.fn() });
 
@@ -58,7 +59,7 @@ describe("POST /commercial/requestedNewCourses", () => {
       async () =>
         request(app)
           .post("/commercial/requestedNewCourses")
-          .set("Authorization", tokenFor(commercialUser))
+          .set("Cookie", tokenFor(commercialUser))
           .send(validBody),
     );
 
@@ -78,7 +79,7 @@ describe("POST /commercial/requestedNewCourses", () => {
       async () =>
         request(app)
           .post("/commercial/requestedNewCourses")
-          .set("Authorization", tokenFor(commercialUser))
+          .set("Cookie", tokenFor(commercialUser))
           .send({ ...validBody, status: "course_completed" }),
     );
 
@@ -101,7 +102,7 @@ describe("POST /commercial/requestedNewCourses", () => {
     await withMockedQueries(client, Path({ id: "course-1" }), async () =>
       request(app)
         .post("/commercial/requestedNewCourses")
-        .set("Authorization", tokenFor(commercialUser))
+        .set("Cookie", tokenFor(commercialUser))
         .send({ ...validBody, commercial_org_id: "some-other-org" }),
     );
 
@@ -120,7 +121,7 @@ describe("POST /commercial/requestedNewCourses", () => {
 
     const response = await request(app)
       .post("/commercial/requestedNewCourses")
-      .set("Authorization", tokenFor(noOrgUser))
+      .set("Cookie", tokenFor(noOrgUser))
       .send(validBody);
 
     expect(response.status).toBe(403);
@@ -130,7 +131,7 @@ describe("POST /commercial/requestedNewCourses", () => {
   it("returns 400 when a required field is missing", async () => {
     const response = await request(app)
       .post("/commercial/requestedNewCourses")
-      .set("Authorization", tokenFor(commercialUser))
+      .set("Cookie", tokenFor(commercialUser))
       .send({ account_name: "National Highways" });
 
     expect(response.status).toBe(400);
@@ -141,7 +142,7 @@ describe("POST /commercial/requestedNewCourses", () => {
   it("returns 400 when trainee_target is zero or negative", async () => {
     const response = await request(app)
       .post("/commercial/requestedNewCourses")
-      .set("Authorization", tokenFor(commercialUser))
+      .set("Cookie", tokenFor(commercialUser))
       .send({ ...validBody, trainee_target: 0 });
 
     expect(response.status).toBe(400);
@@ -152,7 +153,7 @@ describe("POST /commercial/requestedNewCourses", () => {
   it("returns 400 when trainee_target is not an integer", async () => {
     const response = await request(app)
       .post("/commercial/requestedNewCourses")
-      .set("Authorization", tokenFor(commercialUser))
+      .set("Cookie", tokenFor(commercialUser))
       .send({ ...validBody, trainee_target: 3.5 });
 
     expect(response.status).toBe(400);
@@ -170,7 +171,7 @@ describe("POST /commercial/requestedNewCourses", () => {
       async () =>
         request(app)
           .post("/commercial/requestedNewCourses")
-          .set("Authorization", tokenFor(commercialUser))
+          .set("Cookie", tokenFor(commercialUser))
           .send(validBody),
     );
 
@@ -191,7 +192,7 @@ describe("POST /commercial/requestedNewCourses", () => {
       async () =>
         request(app)
           .post("/commercial/requestedNewCourses")
-          .set("Authorization", tokenFor(commercialUser))
+          .set("Cookie", tokenFor(commercialUser))
           .send(validBody),
     );
 

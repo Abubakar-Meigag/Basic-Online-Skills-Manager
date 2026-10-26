@@ -35,7 +35,7 @@ const staffToken = jwt.sign(
   { algorithm: "HS256", expiresIn: "1h" },
 );
 
-const auth = `Bearer ${staffToken}`;
+const auth = [`token=${staffToken}`];
 
 describe("POST /addPartner", () => {
   afterEach(() => {
@@ -56,7 +56,7 @@ describe("POST /addPartner", () => {
         created_at: "2026-08-06T00:00:00.000Z",
       }),
       async () =>
-        request(app).post("/addPartner").set("Authorization", auth).send({
+        request(app).post("/addPartner").set("Cookie", auth).send({
           organisation_name: "Deloitte",
           type: "commercial",
           email_domain: "deloitte.com",
@@ -75,7 +75,7 @@ describe("POST /addPartner", () => {
       mockClient,
       Path({ id: "org-2", organisation_name: "Deloitte", city: "London" }),
       async () =>
-        request(app).post("/addPartner").set("Authorization", auth).send({
+        request(app).post("/addPartner").set("Cookie", auth).send({
           organisation_name: "Deloitte",
           type: "commercial",
           email_domain: "Deloitte.COM",
@@ -93,7 +93,7 @@ describe("POST /addPartner", () => {
   it("returns 400 when a required field is missing", async () => {
     const response = await request(app)
       .post("/addPartner")
-      .set("Authorization", auth)
+      .set("Cookie", auth)
       .send({
         organisation_name: "Deloitte",
         type: "commercial",
@@ -109,7 +109,7 @@ describe("POST /addPartner", () => {
   it("returns 400 for an invalid type", async () => {
     const response = await request(app)
       .post("/addPartner")
-      .set("Authorization", auth)
+      .set("Cookie", auth)
       .send({
         organisation_name: "Deloitte",
         type: "not_a_real_type",
@@ -131,7 +131,7 @@ describe("POST /addPartner", () => {
         city: "London",
       }),
       async () =>
-        request(app).post("/addPartner").set("Authorization", auth).send({
+        request(app).post("/addPartner").set("Cookie", auth).send({
           organisation_name: "CodeYourFuture",
           type: "cyf_staff",
           email_domain: "codeyourfuture.io",
@@ -145,7 +145,7 @@ describe("POST /addPartner", () => {
   it("returns 400 for a malformed email_domain", async () => {
     const response = await request(app)
       .post("/addPartner")
-      .set("Authorization", auth)
+      .set("Cookie", auth)
       .send({
         organisation_name: "Deloitte",
         type: "commercial",
@@ -167,7 +167,7 @@ describe("POST /addPartner", () => {
         ROLLBACK: undefined, // the controller rolls back before returning 409
       },
       async () =>
-        request(app).post("/addPartner").set("Authorization", auth).send({
+        request(app).post("/addPartner").set("Cookie", auth).send({
           organisation_name: "Capgemini",
           type: "commercial",
           email_domain: "capgemini.com",
@@ -189,7 +189,7 @@ describe("POST /addPartner", () => {
         ROLLBACK: undefined, // the catch block rolls back
       },
       async () =>
-        request(app).post("/addPartner").set("Authorization", auth).send({
+        request(app).post("/addPartner").set("Cookie", auth).send({
           organisation_name: "Deloitte",
           type: "commercial",
           email_domain: "deloitte.com",

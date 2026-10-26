@@ -37,11 +37,9 @@ describe("VerifyMagicLink Component", () => {
     ).toBeInTheDocument();
   });
 
-  it("should verify token, set localStorage, and navigate on success", async () => {
-    // Arrange fake successful backend response
+  it("should verify token and navigate on success", async () => {
     const mockData = {
       message: "Success",
-      token: "mock-jwt-token",
       user: { id: "123", email: "test@example.com", orgType: "admin" },
       redirectRoute: "/dashboard",
     };
@@ -59,20 +57,16 @@ describe("VerifyMagicLink Component", () => {
 
     // Wait for the async effect to complete and check expectations
     await waitFor(() => {
-      // API was called with the correct token string from the URL
       expect(authApi.verifyMagicLink).toHaveBeenCalledWith("valid-token");
 
-      // LocalStorage correctly saved credentials
-      expect(localStorage.getItem("authToken")).toBe("mock-jwt-token");
+      // Keeping user metadata in localStorage
       expect(localStorage.getItem("user")).toBe(JSON.stringify(mockData.user));
 
-      // User was redirected to the backend-provided route
       expect(mockNavigate).toHaveBeenCalledWith("/dashboard");
     });
-  });
+  }); // Assert error output renders in UI
 
   it("should render error message when backend verification fails", async () => {
-    // Arrange backend error rejection
     const mockError = {
       response: { data: { message: "Link has expired." } },
     };
@@ -85,6 +79,11 @@ describe("VerifyMagicLink Component", () => {
     );
 
     // Assert error output renders in UI
-    expect(await screen.findByText("Link has expired.")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: /authentication error/i }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(/verification failed or link has expired/i),
+    ).toBeInTheDocument();
   });
 });
