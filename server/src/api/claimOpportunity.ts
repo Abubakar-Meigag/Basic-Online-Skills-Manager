@@ -1,5 +1,27 @@
 import type { Request, Response } from "express";
 import pool from "../data/connection";
+import { z as zod } from "zod";
+
+const claimCourseSchema = zod.object({
+  start_date: zod
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "start_date must be in YYYY-MM-DD format"),
+  venue_address: zod.string().trim().min(1, "venue_address is required"),
+  contact_name: zod.string().trim().min(1, "contact_name is required"),
+  contact_email: zod
+    .string()
+    .trim()
+    .email("contact_email must be a valid email address"),
+  lunch_arrangement: zod
+    .string()
+    .trim()
+    .min(1, "lunch_arrangement is required"),
+  client_group_description: zod.string().trim().optional(),
+  tech_level: zod.string().trim().optional(),
+  goal: zod.string().trim().optional(),
+  expenses_notes: zod.string().trim().optional(),
+  note: zod.string().trim().optional(),
+});
 
 /**
  * @swagger
@@ -75,12 +97,20 @@ const claimOpportunity = async (req: Request, res: Response) => {
   const organisationId = user.organisationId;
 
   if (!organisationId) {
-    return res.status(400).json({
-      error: "organisationId query param is required",
-    });
+    return res
+      .status(400)
+      .json({ error: "organisationId query param is required" });
   }
 
   const { id } = req.params;
+
+  const parseResult = claimCourseSchema.safeParse(req.body);
+
+  if (!parseResult.success) {
+    return res
+      .status(400)
+      .json({ error: parseResult.error.issues[0]?.message });
+  }
 
   const {
     start_date,
@@ -93,21 +123,8 @@ const claimOpportunity = async (req: Request, res: Response) => {
     lunch_arrangement,
     expenses_notes,
     note,
-  } = req.body;
+  } = parseResult.data;
 
-  // Validate deadline is a real YYYY-MM-DD date.
-  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-  if (!datePattern.test(start_date)) {
-    res.status(400).json({
-      error: "deadline must be in YYYY-MM-DD format",
-    });
-    return;
-  }
-
-  const parsedStartDate = new Date(start_date);
-  // Calculate end date from start date.
-  const end_date = new Date(parsedStartDate);
-  end_date.setDate(parsedStartDate.getDate() + 21);
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -147,27 +164,25 @@ const claimOpportunity = async (req: Request, res: Response) => {
       return;
     }
 
-    // Add details/Assign course to outreach partner
     await client.query(
       `UPDATE courses SET outreach_org_id = $1, 
       status = $2,
       start_date = $3,
-      end_date = $4,
-      venue_address = $5,
-      contact_name = $6,
-      contact_email = $7,
-      client_group_description = $8,
-      tech_level = $9,
-      goal = $10,
-      lunch_arrangement = $11,
-      expenses_notes = $12,
-      note = $13
-      WHERE id = $14`,
+      end_date = $3::date + 21,
+      venue_address = $4,
+      contact_name = $5,
+      contact_email = $6,
+      client_group_description = $7,
+      tech_level = $8,
+      goal = $9,
+      lunch_arrangement = $10,
+      expenses_notes = $11,
+      note = $12
+      WHERE id = $13`,
       [
         organisationId,
         "request_claimed",
         start_date,
-        end_date,
         venue_address,
         contact_name,
         contact_email,

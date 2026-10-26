@@ -1,9 +1,11 @@
 import type { Request, Response } from "express";
 import pool from "../data/connection";
-import { z as zod } from "zod"; 
+import { z as zod } from "zod";
 
 const addUserRequestSchema = zod.object({
-  email: zod.string().email("The provided email address is not in a valid format"),
+  email: zod
+    .string()
+    .email("The provided email address is not in a valid format"),
 });
 
 /**
