@@ -5,17 +5,20 @@ import { z as zod } from "zod";
 const claimCourseSchema = zod.object({
   start_date: zod
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "start_date must be in YYYY-MM-DD format"),
-  venue_address: zod.string().trim().min(1, "venue_address is required"),
-  contact_name: zod.string().trim().min(1, "contact_name is required"),
+    .regex(
+      /^\d{4}-\d{2}-\d{2}$/,
+      "Please provide a valid start date in YYYY-MM-DD format",
+    ),
+  venue_address: zod.string().trim().min(1, "Venue address is required"),
+  contact_name: zod.string().trim().min(1, "Contact name is required"),
   contact_email: zod
     .string()
     .trim()
-    .email("contact_email must be a valid email address"),
+    .email("Please provide a valid contact email address"),
   lunch_arrangement: zod
     .string()
     .trim()
-    .min(1, "lunch_arrangement is required"),
+    .min(1, "Lunch arrangement details are required"),
   client_group_description: zod.string().trim().optional(),
   tech_level: zod.string().trim().optional(),
   goal: zod.string().trim().optional(),
@@ -97,9 +100,9 @@ const claimOpportunity = async (req: Request, res: Response) => {
   const organisationId = user.organisationId;
 
   if (!organisationId) {
-    return res
-      .status(400)
-      .json({ error: "organisationId query param is required" });
+    return res.status(400).json({
+      error: "organisationId query param is required",
+    });
   }
 
   const { id } = req.params;
@@ -125,11 +128,15 @@ const claimOpportunity = async (req: Request, res: Response) => {
     note,
   } = parseResult.data;
 
+  const parsedStartDate = new Date(start_date);
+ 
+  const end_date = new Date(parsedStartDate);
+  end_date.setDate(parsedStartDate.getDate() + 21);
+
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
 
-    // Check if course exist.
     const query = await pool.query(
       `SELECT
         c.*,
@@ -168,21 +175,22 @@ const claimOpportunity = async (req: Request, res: Response) => {
       `UPDATE courses SET outreach_org_id = $1, 
       status = $2,
       start_date = $3,
-      end_date = $3::date + 21,
-      venue_address = $4,
-      contact_name = $5,
-      contact_email = $6,
-      client_group_description = $7,
-      tech_level = $8,
-      goal = $9,
-      lunch_arrangement = $10,
-      expenses_notes = $11,
-      note = $12
-      WHERE id = $13`,
+      end_date = $4,
+      venue_address = $5,
+      contact_name = $6,
+      contact_email = $7,
+      client_group_description = $8,
+      tech_level = $9,
+      goal = $10,
+      lunch_arrangement = $11,
+      expenses_notes = $12,
+      note = $13
+      WHERE id = $14`,
       [
         organisationId,
         "request_claimed",
         start_date,
+        end_date,
         venue_address,
         contact_name,
         contact_email,
@@ -196,7 +204,6 @@ const claimOpportunity = async (req: Request, res: Response) => {
       ],
     );
 
-    // Update audit log
     await client.query(
       `INSERT INTO audit_log (user_id, action, entity_type, entity_id)
        VALUES ($1, $2, $3, $4)`,
