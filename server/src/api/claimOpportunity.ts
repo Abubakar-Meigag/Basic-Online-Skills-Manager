@@ -129,7 +129,7 @@ const claimOpportunity = async (req: Request, res: Response) => {
   } = parseResult.data;
 
   const parsedStartDate = new Date(start_date);
- 
+
   const end_date = new Date(parsedStartDate);
   end_date.setDate(parsedStartDate.getDate() + 21);
 

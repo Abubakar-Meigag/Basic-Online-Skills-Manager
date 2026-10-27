@@ -3,16 +3,19 @@ import pool from "../data/connection";
 import { z as zod } from "zod";
 
 const courseRequestSchema = zod.object({
-  account_name: zod.string().trim().min(1, "account_name is required"),
-  contract_name: zod.string().trim().min(1, "contract_name is required"),
-  city: zod.string().trim().min(1, "city is required"),
+  account_name: zod.string().trim().min(1, "Account name is required"),
+  contract_name: zod.string().trim().min(1, "Contract name is required"),
+  city: zod.string().trim().min(1, "City is required"),
   trainee_target: zod
     .number()
     .int()
-    .positive("trainee_target must be a positive integer"),
+    .positive("Trainee target must be a positive whole number"),
   deadline: zod
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "deadline must be in YYYY-MM-DD format"),
+    .regex(
+      /^\d{4}-\d{2}-\d{2}$/,
+      "Please provide a valid deadline in YYYY-MM-DD format",
+    ),
 });
 
 /**

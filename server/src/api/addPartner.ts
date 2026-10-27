@@ -7,18 +7,18 @@ const addPartnerSchema = zod.object({
   organisation_name: zod
     .string()
     .trim()
-    .min(1, "organisation_name is required"),
+    .min(1, "Organisation name is required"),
   type: zod.nativeEnum(ORGANISATION_TYPE, {
-    message: "type must be a valid organisation type",
+    message: "Please select a valid organisation type",
   }),
   email_domain: zod
     .string()
     .trim()
     .regex(
       /^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i,
-      "email_domain must be a bare domain like 'company.com' (no '@', 'http://', or trailing slash)",
+      "Please enter a valid bare domain like 'company.com' (no '@' or 'http://')",
     ),
-  city: zod.string().trim().min(1, "city is required"),
+  city: zod.string().trim().min(1, "City is required"),
 });
 
 /**

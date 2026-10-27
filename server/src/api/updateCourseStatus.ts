@@ -6,8 +6,7 @@ const updateStatusSchema = zod.object({
   status: zod.enum(
     ["request_open", "request_confirmed", "course_running", "course_completed"],
     {
-      message:
-        "status must be one of: request_open, request_confirmed, course_running, course_completed",
+      message: "Please select a valid course status transition",
     },
   ),
 });
