@@ -1,5 +1,22 @@
 import type { Request, Response } from "express";
 import pool from "../data/connection";
+import { z as zod } from "zod";
+
+const courseRequestSchema = zod.object({
+  account_name: zod.string().trim().min(1, "Account name is required"),
+  contract_name: zod.string().trim().min(1, "Contract name is required"),
+  city: zod.string().trim().min(1, "City is required"),
+  trainee_target: zod
+    .number()
+    .int()
+    .positive("Trainee target must be a positive whole number"),
+  deadline: zod
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}$/,
+      "Please provide a valid deadline in YYYY-MM-DD format",
+    ),
+});
 
 /**
  * @swagger
@@ -53,59 +70,23 @@ import pool from "../data/connection";
  *         description: Internal server error
  */
 const requestNewCourse = async (req: Request, res: Response): Promise<void> => {
-  // checking auth
   const user = (req as any).user;
-
-  const commercial_org_id = user.organisationId;
+  const commercial_org_id = user?.organisationId;
 
   if (!commercial_org_id) {
     res.status(403).json({ error: "User is not linked to an organisation" });
     return;
   }
 
+  const parseResult = courseRequestSchema.safeParse(req.body);
+
+  if (!parseResult.success) {
+    res.status(400).json({ error: parseResult.error.issues[0]?.message });
+    return;
+  }
+
   const { account_name, contract_name, city, trainee_target, deadline } =
-    req.body;
-
-  if (
-    !account_name ||
-    !contract_name ||
-    !city ||
-    trainee_target === undefined ||
-    !deadline
-  ) {
-    res.status(400).json({
-      error:
-        "account_name, contract_name, city, trainee_target, and deadline are all required",
-    });
-    return;
-  }
-
-  if (!Number.isInteger(trainee_target) || trainee_target <= 0) {
-    res.status(400).json({
-      error: "trainee_target must be a positive integer",
-    });
-    return;
-  }
-
-  // Validate deadline is a real YYYY-MM-DD date.
-  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-  if (!datePattern.test(deadline)) {
-    res.status(400).json({
-      error: "deadline must be in YYYY-MM-DD format",
-    });
-    return;
-  }
-
-  const parsedDeadline = new Date(deadline);
-  if (
-    isNaN(parsedDeadline.getTime()) ||
-    parsedDeadline.toISOString().slice(0, 10) !== deadline
-  ) {
-    res.status(400).json({
-      error: "deadline is not a valid calendar date",
-    });
-    return;
-  }
+    parseResult.data;
 
   const client = await pool.connect();
 

@@ -1,12 +1,15 @@
 import type { Request, Response } from "express";
 import pool from "../data/connection";
+import { z as zod } from "zod";
 
-const ALLOWED_STATUSES = [
-  "request_open",
-  "request_confirmed",
-  "course_running",
-  "course_completed",
-];
+const updateStatusSchema = zod.object({
+  status: zod.enum(
+    ["request_open", "request_confirmed", "course_running", "course_completed"],
+    {
+      message: "Please select a valid course status transition",
+    },
+  ),
+});
 
 /**
  * @swagger
@@ -57,6 +60,7 @@ const ALLOWED_STATUSES = [
  *       500:
  *         description: Internal server error
  */
+
 const updateCourseStatus = async (
   req: Request,
   res: Response,
@@ -69,19 +73,15 @@ const updateCourseStatus = async (
   }
 
   const { id } = req.params;
-  const { status } = req.body;
 
-  if (!status) {
-    res.status(400).json({ error: "status is required" });
+  const parseResult = updateStatusSchema.safeParse(req.body);
+
+  if (!parseResult.success) {
+    res.status(400).json({ error: parseResult.error.issues[0]?.message });
     return;
   }
 
-  if (!ALLOWED_STATUSES.includes(status)) {
-    res.status(400).json({
-      error: `status must be one of: ${ALLOWED_STATUSES.join(", ")}`,
-    });
-    return;
-  }
+  const { status } = parseResult.data;
 
   const client = await pool.connect();
   try {
