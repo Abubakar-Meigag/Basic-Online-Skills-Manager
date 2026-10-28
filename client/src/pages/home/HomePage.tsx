@@ -1,11 +1,33 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { OrganizationType } from "../../data/dataType";
 
 export default function HomePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    navigate("/login");
+    const userString = localStorage.getItem("user");
+    const user = userString ? JSON.parse(userString) : null;
+
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    switch (user.orgType) {
+      case OrganizationType.CYF_STAFF:
+        navigate("/cyf-staff/request-pipeline");
+        break;
+      case OrganizationType.COMMERCIAL_PARTNER:
+        navigate("/commercial-partner/requested-courses");
+        break;
+      case OrganizationType.OUTREACH_PARTNER:
+        navigate("/outreach-partner/find-opportunities");
+        break;
+      default:
+        navigate("/login");
+        break;
+    }
   }, [navigate]);
 
   return (
