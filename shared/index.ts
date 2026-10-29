@@ -1,7 +1,7 @@
 export enum OrganizationType {
+  COMMERCIAL_PARTNER = "commercial",
+  OUTREACH_PARTNER = "outreach",
   CYF_STAFF = "cyf_staff",
-  COMMERCIAL = "commercial",
-  OUTREACH = "outreach",
 }
 
 export type CourseStatus =
