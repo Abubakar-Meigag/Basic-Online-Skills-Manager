@@ -5,6 +5,7 @@ import pool from "../data/connection";
 import { OrganizationType } from "../data/dataType";
 import { withMockedQueries } from "./helpers/mockQueries";
 import { JWT_TEST_SECRET } from "./helpers/testSecret";
+import { DatabaseError } from "pg";
 
 const mockClient = vi.hoisted(() => ({ query: vi.fn(), release: vi.fn() }));
 
@@ -17,11 +18,15 @@ vi.mock("../data/connection", () => ({
 
 const Path = (org: Record<string, unknown>) => ({
   BEGIN: undefined,
-  "SELECT id FROM organisations": { rows: [] }, // no existing org
   "INSERT INTO organisations": { rows: [org] },
   "INSERT INTO audit_log": undefined,
   COMMIT: undefined,
 });
+
+const uniqueViolation = Object.assign(
+  new DatabaseError("duplicate key value", 0, "error"),
+  { code: "23505" },
+);
 
 // A valid CYF-staff token
 const staffToken = jwt.sign(
@@ -88,6 +93,7 @@ describe("POST /addPartner", () => {
       String(c[0]).includes("INSERT INTO organisations"),
     );
     expect(insertCall?.[1]).toContain("deloitte.com");
+    expect(insertCall?.[1]).toContain("deloitte");
   });
 
   it("returns 400 when a required field is missing", async () => {
@@ -163,7 +169,7 @@ describe("POST /addPartner", () => {
       mockClient,
       {
         BEGIN: undefined,
-        "SELECT id FROM organisations": { rows: [{ id: "existing-org" }] }, // org already exists
+        "INSERT INTO organisations": uniqueViolation, // org already exists
         ROLLBACK: undefined, // the controller rolls back before returning 409
       },
       async () =>
@@ -185,7 +191,7 @@ describe("POST /addPartner", () => {
       mockClient,
       {
         BEGIN: undefined,
-        "SELECT id FROM organisations": new Error("DB down"),
+        "INSERT INTO organisations": new Error("DB down"),
         ROLLBACK: undefined, // the catch block rolls back
       },
       async () =>
