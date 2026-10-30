@@ -6,27 +6,32 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userString = localStorage.getItem("user");
-    const user = userString ? JSON.parse(userString) : null;
+    try {
+      const userString = localStorage.getItem("user");
+      const user = userString ? JSON.parse(userString) : null;
 
-    if (!user) {
-      navigate("/login");
-      return;
-    }
-
-    switch (user.orgType) {
-      case OrganizationType.CYF_STAFF:
-        navigate("/cyf-staff/request-pipeline");
-        break;
-      case OrganizationType.COMMERCIAL_PARTNER:
-        navigate("/commercial-partner/requested-courses");
-        break;
-      case OrganizationType.OUTREACH_PARTNER:
-        navigate("/outreach-partner/find-opportunities");
-        break;
-      default:
+      if (!user) {
         navigate("/login");
-        break;
+        return;
+      }
+
+      switch (user.orgType) {
+        case OrganizationType.CYF_STAFF:
+          navigate("/cyf-staff/request-pipeline");
+          break;
+        case OrganizationType.COMMERCIAL_PARTNER:
+          navigate("/commercial-partner/requested-courses");
+          break;
+        case OrganizationType.OUTREACH_PARTNER:
+          navigate("/outreach-partner/find-opportunities");
+          break;
+        default:
+          navigate("/login");
+          break;
+      }
+    } catch (error) {
+      console.error("Error parsing user data or navigating:", error);
+      navigate("/login");
     }
   }, [navigate]);
 
