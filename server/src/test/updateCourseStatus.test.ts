@@ -9,11 +9,9 @@ vi.mock("../data/connection", () => ({
   default: { connect: vi.fn() },
 }));
 
-const tokenFor = (user: object) =>
-  `Bearer ${jwt.sign(user, JWT_TEST_SECRET, {
-    algorithm: "HS256",
-    expiresIn: "1h",
-  })}`;
+const tokenFor = (user: object) => [
+  `token=${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`,
+];
 
 const makeClient = () => ({
   query: vi.fn(),
@@ -57,7 +55,7 @@ describe("PATCH /course/:id/status", () => {
       async () =>
         request(app)
           .patch("/course/course-1/status")
-          .set("Authorization", tokenFor(cyfUser))
+          .set("Cookie", tokenFor(cyfUser))
           .send({ status: "request_open" }),
     );
 
@@ -69,7 +67,7 @@ describe("PATCH /course/:id/status", () => {
   it("returns 403 when the caller is not CYF staff", async () => {
     const response = await request(app)
       .patch("/course/course-1/status")
-      .set("Authorization", tokenFor(commercialUser))
+      .set("Cookie", tokenFor(commercialUser))
       .send({ status: "request_open" });
 
     expect(response.status).toBe(403);
@@ -79,7 +77,7 @@ describe("PATCH /course/:id/status", () => {
   it("returns 400 when status is missing", async () => {
     const response = await request(app)
       .patch("/course/course-1/status")
-      .set("Authorization", tokenFor(cyfUser))
+      .set("Cookie", tokenFor(cyfUser))
       .send({});
 
     expect(response.status).toBe(400);
@@ -90,7 +88,7 @@ describe("PATCH /course/:id/status", () => {
   it("returns 400 for a status outside the allowed CYF transitions", async () => {
     const response = await request(app)
       .patch("/course/course-1/status")
-      .set("Authorization", tokenFor(cyfUser))
+      .set("Cookie", tokenFor(cyfUser))
       .send({ status: "request_cancelled" }); // out of scope, not allowed
 
     expect(response.status).toBe(400);
@@ -101,7 +99,7 @@ describe("PATCH /course/:id/status", () => {
   it("returns 400 for request_pending / request_claimed (not CYF actions)", async () => {
     const response = await request(app)
       .patch("/course/course-1/status")
-      .set("Authorization", tokenFor(cyfUser))
+      .set("Cookie", tokenFor(cyfUser))
       .send({ status: "request_claimed" });
 
     expect(response.status).toBe(400);
@@ -123,7 +121,7 @@ describe("PATCH /course/:id/status", () => {
       async () =>
         request(app)
           .patch("/course/missing/status")
-          .set("Authorization", tokenFor(cyfUser))
+          .set("Cookie", tokenFor(cyfUser))
           .send({ status: "request_open" }),
     );
 
@@ -150,7 +148,7 @@ describe("PATCH /course/:id/status", () => {
       async () =>
         request(app)
           .patch("/course/course-1/status")
-          .set("Authorization", tokenFor(cyfUser))
+          .set("Cookie", tokenFor(cyfUser))
           .send({ status: "course_running" }),
     );
 
@@ -182,7 +180,7 @@ describe("PATCH /course/:id/status", () => {
       async () =>
         request(app)
           .patch("/course/course-1/status")
-          .set("Authorization", tokenFor(cyfUser))
+          .set("Cookie", tokenFor(cyfUser))
           .send({ status: "request_open" }),
     );
 

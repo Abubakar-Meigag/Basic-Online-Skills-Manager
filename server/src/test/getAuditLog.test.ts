@@ -21,8 +21,8 @@ const makeToken = (orgType: string) =>
     { algorithm: "HS256", expiresIn: "1h" },
   );
 
-const staffAuth = `Bearer ${makeToken(OrganizationType.CYF_STAFF)}`;
-const outreachAuth = `Bearer ${makeToken(OrganizationType.OUTREACH_PARTNER)}`;
+const staffAuth = [`token=${makeToken(OrganizationType.CYF_STAFF)}`];
+const outreachAuth = [`token=${makeToken(OrganizationType.OUTREACH_PARTNER)}`];
 
 describe("GET /audit-log", () => {
   afterEach(() => {
@@ -55,7 +55,7 @@ describe("GET /audit-log", () => {
 
     const response = await request(app)
       .get("/audit-log")
-      .set("Authorization", staffAuth);
+      .set("Cookie", staffAuth);
 
     expect(response.status).toBe(200);
     expect(Array.isArray(response.body)).toBe(true);
@@ -69,7 +69,7 @@ describe("GET /audit-log", () => {
 
     const response = await request(app)
       .get("/audit-log")
-      .set("Authorization", staffAuth);
+      .set("Cookie", staffAuth);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual([]);
@@ -78,7 +78,7 @@ describe("GET /audit-log", () => {
   it("returns 403 when the caller is not CYF staff", async () => {
     const response = await request(app)
       .get("/audit-log")
-      .set("Authorization", outreachAuth);
+      .set("Cookie", outreachAuth);
 
     expect(response.status).toBe(403);
     expect(pool.query).not.toHaveBeenCalled();
@@ -96,7 +96,7 @@ describe("GET /audit-log", () => {
 
     const response = await request(app)
       .get("/audit-log")
-      .set("Authorization", staffAuth);
+      .set("Cookie", staffAuth);
 
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");

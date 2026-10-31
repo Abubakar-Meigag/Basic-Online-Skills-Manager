@@ -8,8 +8,9 @@ vi.mock("../data/connection", () => ({
   default: { query: vi.fn() },
 }));
 
-const tokenFor = (user: object) =>
-  `Bearer ${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`;
+const tokenFor = (user: object) => [
+  `token=${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`,
+];
 
 const commercialUser = {
   id: "u2",
@@ -21,7 +22,7 @@ const commercialUser = {
 const ROUTE = "/commercial-dashboard";
 
 const getDashboard = () =>
-  request(app).get(ROUTE).set("Authorization", tokenFor(commercialUser));
+  request(app).get(ROUTE).set("Cookie", tokenFor(commercialUser));
 
 describe(`GET ${ROUTE}`, () => {
   afterEach(() => {
@@ -128,10 +129,7 @@ describe(`GET ${ROUTE}`, () => {
   it("returns 403 when the user's org type is not 'commercial'", async () => {
     const response = await request(app)
       .get(ROUTE)
-      .set(
-        "Authorization",
-        tokenFor({ ...commercialUser, orgType: "outreach" }),
-      );
+      .set("Cookie", tokenFor({ ...commercialUser, orgType: "outreach" }));
 
     expect(response.status).toBe(403);
     expect(pool.query).not.toHaveBeenCalled();

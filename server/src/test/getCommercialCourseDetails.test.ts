@@ -8,8 +8,9 @@ vi.mock("../data/connection", () => ({
   default: { query: vi.fn() },
 }));
 
-const tokenFor = (user: object) =>
-  `Bearer ${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`;
+const tokenFor = (user: object) => [
+  `token=${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`,
+];
 
 const CAPGEMINI = "60ea2b0f-e04e-4f9a-ac72-38bae06d98bc";
 
@@ -38,7 +39,7 @@ describe("GET /course-details/commercial/:id", () => {
 
     const response = await request(app)
       .get("/course-details/commercial/course-1")
-      .set("Authorization", tokenFor(commercialUser));
+      .set("Cookie", tokenFor(commercialUser));
 
     expect(response.status).toBe(200);
     expect(response.body.data.id).toBe("course-1");
@@ -57,7 +58,7 @@ describe("GET /course-details/commercial/:id", () => {
 
     const response = await request(app)
       .get("/course-details/commercial/course-1")
-      .set("Authorization", tokenFor(commercialUser));
+      .set("Cookie", tokenFor(commercialUser));
 
     expect(response.status).toBe(403);
     expect(response.body).toHaveProperty("error");
@@ -68,7 +69,7 @@ describe("GET /course-details/commercial/:id", () => {
 
     const response = await request(app)
       .get("/course-details/commercial/missing")
-      .set("Authorization", tokenFor(commercialUser));
+      .set("Cookie", tokenFor(commercialUser));
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty("error");
@@ -79,7 +80,7 @@ describe("GET /course-details/commercial/:id", () => {
 
     const response = await request(app)
       .get("/course-details/commercial/course-1")
-      .set("Authorization", tokenFor(commercialUser));
+      .set("Cookie", tokenFor(commercialUser));
 
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");
@@ -96,10 +97,7 @@ describe("GET /course-details/commercial/:id", () => {
   it("returns 403 for a non-commercial role", async () => {
     const response = await request(app)
       .get("/course-details/commercial/course-1")
-      .set(
-        "Authorization",
-        tokenFor({ ...commercialUser, orgType: "outreach" }),
-      );
+      .set("Cookie", tokenFor({ ...commercialUser, orgType: "outreach" }));
 
     expect(response.status).toBe(403);
   });
