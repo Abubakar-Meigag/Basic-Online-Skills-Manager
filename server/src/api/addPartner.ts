@@ -120,20 +120,14 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
     await client.query("COMMIT");
 
     res.status(201).json({ organisation: newOrg });
-  } catch (error) {
+  } catch (error: unknown) {
     await client.query("ROLLBACK");
 
     // Handle unique constraint violation for organisation_name or email_domain
     if (error instanceof DatabaseError && error.code === PG_UNIQUE_VIOLATION) {
-      res
-        .status(409)
-        .json({
-         
-          error:
-           
-            "An organisation with this name or email domain already exists.",
-       ,
-        });;
+      res.status(409).json({
+        error: "An organisation with this name or email domain already exists.",
+      });
       return;
     }
 
