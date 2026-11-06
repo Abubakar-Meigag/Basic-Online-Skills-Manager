@@ -1,5 +1,12 @@
 import type { Request, Response } from "express";
 import pool from "../data/connection";
+import { z as zod } from "zod";
+
+const updateUserStatusSchema = zod.object({
+  is_active: zod.boolean({
+    message: "is_active must be a boolean",
+  }),
+});
 
 /**
  * @swagger
@@ -38,7 +45,6 @@ import pool from "../data/connection";
  */
 const updateUserStatus = async (req: Request, res: Response): Promise<void> => {
   const { id: targetUserId } = req.params;
-  const { is_active } = req.body;
 
   const performerUserId = (req as any).user?.id;
 
@@ -46,6 +52,15 @@ const updateUserStatus = async (req: Request, res: Response): Promise<void> => {
     res.status(401).json({ error: "Unauthorized: No performer ID found" });
     return;
   }
+
+  const parseResult = updateUserStatusSchema.safeParse(req.body);
+
+  if (!parseResult.success) {
+    res.status(400).json({ error: parseResult.error.issues[0]?.message });
+    return;
+  }
+
+  const { is_active } = parseResult.data;
 
   const client = await pool.connect();
 

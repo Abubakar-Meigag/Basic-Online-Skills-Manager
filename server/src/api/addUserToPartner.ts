@@ -1,5 +1,12 @@
 import type { Request, Response } from "express";
 import pool from "../data/connection";
+import { z as zod } from "zod";
+
+const addUserRequestSchema = zod.object({
+  email: zod
+    .string()
+    .email("The provided email address is not in a valid format"),
+});
 
 /**
  * @swagger
@@ -52,23 +59,18 @@ import pool from "../data/connection";
 const addUserToPartner = async (req: Request, res: Response): Promise<void> => {
   const user = (req as any).user;
   const { id } = req.params;
-  const { email } = req.body;
 
-  // Validation
+  const parseResult = addUserRequestSchema.safeParse(req.body);
+
+  if (!parseResult.success) {
+    res.status(400).json({ error: parseResult.error.issues[0]?.message });
+    return;
+  }
+
+  const { email } = parseResult.data;
+
   if (!user) {
     res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
-
-  if (!email) {
-    res.status(400).json({ error: "email is required" });
-    return;
-  }
-
-  // Basic email format check
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailPattern.test(email)) {
-    res.status(400).json({ error: "email is malformed" });
     return;
   }
 

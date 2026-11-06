@@ -1,5 +1,15 @@
 import { Request, Response } from "express";
+import { z as zod } from "zod";
 import { requestMagicLink, verifyMagicLinkToken } from "./auth.service";
+
+const magicLinkRequestSchema = zod.object({
+  email: zod
+    .string({
+      message: "Please provide a valid email address.",
+    })
+    .trim()
+    .email("Please provide a valid email address."),
+});
 
 /**
  * POST /api/auth/magic-link
@@ -10,19 +20,16 @@ export async function handleRequestMagicLink(
   res: Response,
 ): Promise<Response> {
   try {
-    const { email } = req.body;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const parseResult = magicLinkRequestSchema.safeParse(req.body);
 
-    if (!email || typeof email !== "string" || !emailRegex.test(email.trim())) {
+    if (!parseResult.success) {
       return res.status(400).json({
         message: "Please provide a valid email address.",
       });
     }
 
-    const sanitisedEmail = email
-      .trim()
-      .toLowerCase()
-      .replace(/[\n\r]/g, "_");
+    const { email } = parseResult.data;
+    const sanitisedEmail = email.toLowerCase().replace(/[\n\r]/g, "_");
 
     // Call service layer to query user, store hashed token, and dispatch email/log
     await requestMagicLink(sanitisedEmail);

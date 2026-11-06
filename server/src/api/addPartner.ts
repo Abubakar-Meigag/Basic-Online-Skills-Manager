@@ -1,9 +1,25 @@
 import type { Request, Response } from "express";
 import pool from "../data/connection";
-import { ORGANISATION_TYPE, PARTNER_TYPES } from ".././constants/organisations";
+import { ORGANISATION_TYPE } from "../constants/organisations";
+import { z as zod } from "zod";
 
-const DOMAIN_REGEX =
-  /^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i;
+const addPartnerSchema = zod.object({
+  organisation_name: zod
+    .string()
+    .trim()
+    .min(1, "Organisation name is required"),
+  type: zod.nativeEnum(ORGANISATION_TYPE, {
+    message: "Please select a valid organisation type",
+  }),
+  email_domain: zod
+    .string()
+    .trim()
+    .regex(
+      /^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i,
+      "Please enter a valid bare domain like 'company.com' (no '@' or 'http://')",
+    ),
+  city: zod.string().trim().min(1, "City is required"),
+});
 
 /**
  * @swagger
@@ -49,35 +65,20 @@ const DOMAIN_REGEX =
  */
 const addPartner = async (req: Request, res: Response): Promise<void> => {
   const user = (req as any).user;
-  const { organisation_name, type, email_domain, city } = req.body;
 
-  // Validation
   if (!user) {
     res.status(401).json({ error: "Authentication required." });
     return;
   }
 
-  if (!organisation_name || !type || !email_domain || !city) {
-    res.status(400).json({
-      error: "organisation_name, type, email_domain, and city are all required",
-    });
+  const parseResult = addPartnerSchema.safeParse(req.body);
+
+  if (!parseResult.success) {
+    res.status(400).json({ error: parseResult.error.issues[0]?.message });
     return;
   }
 
-  if (!(PARTNER_TYPES as readonly ORGANISATION_TYPE[]).includes(type)) {
-    res.status(400).json({
-      error: `type must be one of: ${PARTNER_TYPES.join(", ")}`,
-    });
-    return;
-  }
-
-  if (!DOMAIN_REGEX.test(email_domain)) {
-    res.status(400).json({
-      error:
-        "email_domain must be a bare domain like 'company.com' (no '@', 'http://', or trailing slash)",
-    });
-    return;
-  }
+  const { organisation_name, type, email_domain, city } = parseResult.data;
 
   const normalisedDomain = email_domain.toLowerCase();
   const client = await pool.connect();
@@ -85,7 +86,6 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
   try {
     await client.query("BEGIN");
 
-    // Reject if an org with this name or email_domain already exists.
     const existingOrg = await client.query(
       `SELECT id FROM organisations
        WHERE organisation_name = $1 OR email_domain = $2`,
@@ -109,7 +109,6 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
 
     const newOrg = result.rows[0];
 
-    // Audit log record who created this organisation
     await client.query(
       `INSERT INTO audit_log (user_id, action, entity_type, entity_id)
        VALUES ($1, $2, $3, $4)`,
