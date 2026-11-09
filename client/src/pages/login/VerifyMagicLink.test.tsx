@@ -84,7 +84,7 @@ describe("VerifyMagicLink Component", () => {
       await screen.findByRole("heading", { name: /authentication error/i }),
     ).toBeInTheDocument();
     expect(
-      await screen.findByText(/verification failed or link has expired/i),
+      await screen.findByText(/link has expired/i),
     ).toBeInTheDocument();
   });
 });
