@@ -3,12 +3,11 @@ import jwt from "jsonwebtoken";
 import app from "../app";
 import pool from "../data/connection";
 import { OrganizationType } from "../data/dataType";
+import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
   default: { query: vi.fn() },
 }));
-
-process.env.JWT_SECRET = "test-secret";
 
 const staffToken = jwt.sign(
   {
@@ -16,7 +15,7 @@ const staffToken = jwt.sign(
     email: "staff@codeyourfuture.io",
     orgType: OrganizationType.CYF_STAFF,
   },
-  process.env.JWT_SECRET,
+  JWT_TEST_SECRET,
   { algorithm: "HS256", expiresIn: "1h" },
 );
 
@@ -26,10 +25,11 @@ const partnerToken = jwt.sign(
     email: "partner@example.com",
     orgType: OrganizationType.COMMERCIAL_PARTNER,
   },
-  process.env.JWT_SECRET,
+  JWT_TEST_SECRET,
   { algorithm: "HS256", expiresIn: "1h" },
 );
 
+const staffCookie = [`token=${staffToken}`];
 describe("GET /users", () => {
   afterEach(() => {
     vi.clearAllMocks();
@@ -50,7 +50,7 @@ describe("GET /users", () => {
 
     const response = await request(app)
       .get("/users")
-      .set("Authorization", `Bearer ${staffToken}`);
+      .set("Cookie", staffCookie);
 
     expect(response.status).toBe(200);
     expect(Array.isArray(response.body)).toBe(true);
@@ -58,10 +58,11 @@ describe("GET /users", () => {
     expect(response.body[0].email).toBe("trainee@example.com");
   });
 
+  const partnerCookie = [`token=${partnerToken}`];
   it("returns 403 when accessed by a non-staff user", async () => {
     const response = await request(app)
       .get("/users")
-      .set("Authorization", `Bearer ${partnerToken}`);
+      .set("Cookie", partnerCookie);
 
     expect(response.status).toBe(403);
   });
@@ -71,7 +72,7 @@ describe("GET /users", () => {
 
     const response = await request(app)
       .get("/users")
-      .set("Authorization", `Bearer ${staffToken}`);
+      .set("Cookie", staffCookie);
 
     expect(response.status).toBe(500);
   });

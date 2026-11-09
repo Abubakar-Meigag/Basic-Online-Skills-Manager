@@ -1,6 +1,7 @@
 import express from "express";
 import type { Request, Response } from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./lib/swagger";
 import { OrganizationType } from "./data/dataType";
@@ -37,6 +38,7 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // --- Routes ---
@@ -47,7 +49,6 @@ app.get("/", (_req: Request, res: Response) => {
 app.get("/health", (_req: Request, res: Response) => {
   res.json({ ok: true, message: "Server is healthy" });
 });
-
 // Protected routes
 app.get(
   "/course-pipeline",

@@ -11,19 +11,15 @@ export const authorizeRole = (requiredRole: string) => {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const jwtSecret = process.env.JWT_SECRET as string;
 
-    // Finding the Key Card
-    const authHeader = req.headers.authorization;
+    // Read the token form req.cookies.
+    const token = req.cookies?.token;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!token) {
       return res.status(401).json({
         message: "Authentication required. No token found.",
         redirectRoute: "/login",
       });
     }
-
-    // Get the token
-    // Split "Bearer xxxxx" into ["Bearer", "xxxxx"] and take the second part
-    const token = authHeader.split(" ")[1] as string;
 
     // Verify the card's signature against the JWT_SECRET and algorithm.
     try {

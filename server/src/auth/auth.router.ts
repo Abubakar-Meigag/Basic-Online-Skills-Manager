@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   handleRequestMagicLink,
   handleVerifyMagicLink,
+  logout,
 } from "./auth.controller";
 
 const authRouter = Router();
@@ -26,5 +27,7 @@ authRouter.post("/verify", handleVerifyMagicLink);
  * @access  Public
  */
 authRouter.get("/verify", handleVerifyMagicLink);
+
+authRouter.post("/logout", logout);
 
 export default authRouter;
