@@ -1,8 +1,10 @@
 import crypto from "node:crypto";
 import pool from "../data/connection";
 import jwt from "jsonwebtoken";
+import { PG_UNIQUE_VIOLATION } from "@drdgvhbh/postgres-error-codes";
 import { OrganizationType } from "../data/dataType";
 import { sendMagicLinkEmail } from "../lib/email";
+import { DatabaseError } from "pg";
 
 export interface UserPayload {
   id: string;
@@ -31,9 +33,9 @@ export async function requestMagicLink(email: string): Promise<void> {
     return;
   }
 
-  // Generate raw token for email and hashed token for db
-  const rawToken = crypto.randomBytes(32).toString("hex");
-  const hashedToken = hashToken(rawToken);
+  let inserted = false;
+  let attempts = 0;
+  const MAX_ATTEMPTS = 3;
 
   // Expire in 5 min
   const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
@@ -43,10 +45,29 @@ export async function requestMagicLink(email: string): Promise<void> {
     INSERT INTO login_tokens (user_id, token_hash, expires_at, used_at)
     VALUES ($1, $2, $3, $4)
   `;
-  await pool.query(insertQuery, [user.id, hashedToken, expiresAt, null]);
+  while (!inserted && attempts < MAX_ATTEMPTS) {
+    try {
+      // Generate raw token for email and hashed token for db
+      const rawToken = crypto.randomBytes(32).toString("hex");
+      const hashedToken = hashToken(rawToken);
+      await pool.query(insertQuery, [user.id, hashedToken, expiresAt, null]);
+      inserted = true; // Insertion succeeded, break loop
 
-  // Send the email with the rawToken
-  await sendMagicLinkEmail(email, rawToken);
+      // Send the email with the rawToken
+      await sendMagicLinkEmail(email, rawToken);
+    } catch (error: any) {
+      if (error instanceof DatabaseError && error.code === PG_UNIQUE_VIOLATION) {
+        attempts++;
+        if (attempts >= MAX_ATTEMPTS) {
+          throw new Error(
+            "Failed to generate a unique token. Please try again.",
+          );
+        }
+      } else {
+        throw error; // Rethrow other database errors
+      }
+    }
+  }
 }
 
 export async function verifyMagicLinkToken(rawToken: string) {
