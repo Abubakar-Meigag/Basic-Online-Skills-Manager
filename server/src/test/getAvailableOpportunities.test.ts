@@ -24,11 +24,18 @@ const getOpportunities = () =>
   request(app).get("/opportunities").set("Cookie", tokenFor(outreachUser));
 
 describe("GET /opportunities", () => {
+  const mockActiveAuthUser = () => {
+    (pool.query as any).mockResolvedValueOnce({
+      rows: [{ id: outreachUser.id, is_active: true }],
+    });
+  };
+
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   it("returns an empty array when there are no open opportunities", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
     const response = await getOpportunities();
     expect(response.status).toBe(200);
@@ -46,6 +53,7 @@ describe("GET /opportunities", () => {
         commercial_org: "Capgemini",
       },
     ];
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
     const response = await getOpportunities();
     expect(response.status).toBe(200);
@@ -63,6 +71,7 @@ describe("GET /opportunities", () => {
         commercial_org: "Capgemini",
       },
     ];
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
     const response = await getOpportunities();
     expect(response.status).toBe(200);
@@ -70,12 +79,14 @@ describe("GET /opportunities", () => {
   });
 
   it("returns JSON content-type", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
     const response = await getOpportunities();
     expect(response.headers["content-type"]).toMatch(/application\/json/);
   });
 
   it("returns 500 when the query fails", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
     const response = await getOpportunities();
     expect(response.status).toBe(500);

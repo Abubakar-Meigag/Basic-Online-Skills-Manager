@@ -20,11 +20,18 @@ const cyfUser = {
 };
 
 describe("GET /organisations", () => {
+  const mockActiveAuthUser = () => {
+    (pool.query as any).mockResolvedValueOnce({
+      rows: [{ id: cyfUser.id, is_active: true }],
+    });
+  };
+
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   it("returns an empty array when there are no organisations", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
     const response = await request(app)
       .get("/organisations")
@@ -38,6 +45,7 @@ describe("GET /organisations", () => {
       { id: "1", organisation_name: "Capgemini", type: "commercial" },
       { id: "2", organisation_name: "New Beginnings", type: "outreach" },
     ];
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
     const response = await request(app)
       .get("/organisations")
@@ -50,6 +58,7 @@ describe("GET /organisations", () => {
     const mockRows = [
       { id: "1", organisation_name: "Capgemini", type: "commercial" },
     ];
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
     const response = await request(app)
       .get("/organisations")
@@ -61,6 +70,7 @@ describe("GET /organisations", () => {
   });
 
   it("returns JSON content-type", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
     const response = await request(app)
       .get("/organisations")
@@ -69,6 +79,7 @@ describe("GET /organisations", () => {
   });
 
   it("returns 500 when the query fails", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
     const response = await request(app)
       .get("/organisations")

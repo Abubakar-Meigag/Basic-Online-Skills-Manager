@@ -25,6 +25,12 @@ const getDashboard = () =>
   request(app).get(ROUTE).set("Cookie", tokenFor(commercialUser));
 
 describe(`GET ${ROUTE}`, () => {
+  const mockActiveAuthUser = () => {
+    (pool.query as any).mockResolvedValueOnce({
+      rows: [{ id: commercialUser.id, is_active: true }],
+    });
+  };
+
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -45,6 +51,7 @@ describe(`GET ${ROUTE}`, () => {
         outreach_partner: null,
       },
     ];
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
 
     const response = await getDashboard();
@@ -54,6 +61,7 @@ describe(`GET ${ROUTE}`, () => {
   });
 
   it("returns an empty data array when db is empty", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
 
     const response = await getDashboard();
@@ -71,6 +79,7 @@ describe(`GET ${ROUTE}`, () => {
         outreach_partner: "New Beginnings",
       },
     ];
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
 
     const response = await getDashboard();
@@ -84,6 +93,7 @@ describe(`GET ${ROUTE}`, () => {
     const mockRows = [
       { id: "course-1", status: "request_open", outreach_partner: null },
     ];
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
 
     const response = await getDashboard();
@@ -93,16 +103,18 @@ describe(`GET ${ROUTE}`, () => {
   });
 
   it("scopes the query to the organisation id from the token", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
 
     await getDashboard();
 
-    const callArgs = (pool.query as any).mock.calls[0];
+    const callArgs = (pool.query as any).mock.calls[1];
     expect(callArgs[1]).toHaveLength(1);
     expect(callArgs[1][0]).toBe(commercialUser.organisationId);
   });
 
   it("returns JSON content-type", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
 
     const response = await getDashboard();
@@ -111,6 +123,7 @@ describe(`GET ${ROUTE}`, () => {
   });
 
   it("returns 500 when the query fails", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
 
     const response = await getDashboard();

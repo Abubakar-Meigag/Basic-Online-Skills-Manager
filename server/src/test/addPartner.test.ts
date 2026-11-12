@@ -8,10 +8,11 @@ import { JWT_TEST_SECRET } from "./helpers/testSecret";
 import { DatabaseError } from "pg";
 
 const mockClient = vi.hoisted(() => ({ query: vi.fn(), release: vi.fn() }));
+const authQueryMock = vi.hoisted(() => vi.fn());
 
 vi.mock("../data/connection", () => ({
   default: {
-    query: mockClient.query,
+    query: authQueryMock,
     connect: vi.fn().mockResolvedValue(mockClient),
   },
 }));
@@ -46,7 +47,16 @@ describe("POST /addPartner", () => {
   afterEach(() => {
     vi.clearAllMocks();
     mockClient.query.mockReset(); // so a mockImplementation never leaks into the next test
+    (pool.query as any).mockResolvedValue({
+      rows: [{ id: "user-1", is_active: true }],
+    });
     (pool.connect as any).mockResolvedValue(mockClient);
+  });
+
+  beforeEach(() => {
+    (pool.query as any).mockResolvedValue({
+      rows: [{ id: "user-1", is_active: true }],
+    });
   });
 
   it("creates an organisation and returns 201", async () => {
@@ -109,7 +119,7 @@ describe("POST /addPartner", () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("error");
-    expect(pool.query).not.toHaveBeenCalled();
+    expect(pool.connect).not.toHaveBeenCalled();
   });
 
   it("returns 400 for an invalid type", async () => {
@@ -125,7 +135,7 @@ describe("POST /addPartner", () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("error");
-    expect(pool.query).not.toHaveBeenCalled();
+    expect(pool.connect).not.toHaveBeenCalled();
   });
 
   it("accepts cyf_staff as a valid type", async () => {
@@ -161,7 +171,7 @@ describe("POST /addPartner", () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("error");
-    expect(pool.query).not.toHaveBeenCalled();
+    expect(pool.connect).not.toHaveBeenCalled();
   });
 
   it("returns 409 when the organisation name or email_domain already exists", async () => {

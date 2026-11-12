@@ -6,7 +6,7 @@ import { withMockedQueries } from "./helpers/mockQueries";
 import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
-  default: { connect: vi.fn() },
+  default: { connect: vi.fn(), query: vi.fn() },
 }));
 
 const tokenFor = (user: object) => [
@@ -33,6 +33,12 @@ const commercialUser = {
 };
 
 describe("PATCH /course/:id/status", () => {
+  beforeEach(() => {
+    (pool.query as any).mockResolvedValue({
+      rows: [{ id: cyfUser.id, is_active: true }],
+    });
+  });
+
   afterEach(() => {
     vi.clearAllMocks();
   });

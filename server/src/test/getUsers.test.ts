@@ -31,11 +31,18 @@ const partnerToken = jwt.sign(
 
 const staffCookie = [`token=${staffToken}`];
 describe("GET /users", () => {
+  const mockActiveAuthUser = () => {
+    (pool.query as any).mockResolvedValueOnce({
+      rows: [{ id: "user-1", is_active: true }],
+    });
+  };
+
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   it("returns 200 and a list of users with joined organisation names", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({
       rows: [
         {
@@ -68,6 +75,7 @@ describe("GET /users", () => {
   });
 
   it("returns 500 when the database query fails", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockRejectedValueOnce(new Error("Database error"));
 
     const response = await request(app)
@@ -75,5 +83,28 @@ describe("GET /users", () => {
       .set("Cookie", staffCookie);
 
     expect(response.status).toBe(500);
+  });
+
+  it("rejects requests from users who have been deactivated in the database", async () => {
+    const validToken = jwt.sign(
+      {
+        id: "user-deactivated-1",
+        email: "staff@codeyourfuture.io",
+        orgType: OrganizationType.CYF_STAFF,
+        organisationId: "org-1",
+      },
+      JWT_TEST_SECRET,
+      { algorithm: "HS256", expiresIn: "24h" },
+    );
+
+    (pool.query as any).mockResolvedValueOnce({
+      rows: [{ id: "user-deactivated-1", is_active: false }],
+    });
+
+    const response = await request(app)
+      .get("/users")
+      .set("Cookie", [`token=${validToken}`]);
+
+    expect(response.status).toBe(401);
   });
 });

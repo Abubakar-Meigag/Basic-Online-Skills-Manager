@@ -23,11 +23,18 @@ const getPipeline = () =>
   request(app).get("/course-pipeline").set("Cookie", tokenFor(cyfUser));
 
 describe("GET /course-pipeline", () => {
+  const mockActiveAuthUser = () => {
+    (pool.query as any).mockResolvedValueOnce({
+      rows: [{ id: cyfUser.id, is_active: true }],
+    });
+  };
+
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   it("returns all six status keys even when db is empty", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
     const response = await getPipeline();
     expect(response.status).toBe(200);
@@ -42,6 +49,7 @@ describe("GET /course-pipeline", () => {
   });
 
   it("returns every status as an empty array when db is empty", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
     const response = await getPipeline();
     expect(response.status).toBe(200);
@@ -73,6 +81,7 @@ describe("GET /course-pipeline", () => {
       },
     ];
 
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
     const response = await getPipeline();
     expect(response.status).toBe(200);
@@ -91,6 +100,7 @@ describe("GET /course-pipeline", () => {
       },
     ];
 
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
     const response = await getPipeline();
     expect(response.status).toBe(200);
@@ -117,6 +127,7 @@ describe("GET /course-pipeline", () => {
       },
     ];
 
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
     const response = await getPipeline();
     expect(response.status).toBe(200);
@@ -124,12 +135,14 @@ describe("GET /course-pipeline", () => {
   });
 
   it("returns JSON content-type", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
     const response = await getPipeline();
     expect(response.headers["content-type"]).toMatch(/application\/json/);
   });
 
   it("returns 500 when the query fails", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
     const response = await getPipeline();
     expect(response.status).toBe(500);

@@ -7,7 +7,7 @@ import { withMockedQueries } from "./helpers/mockQueries";
 import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
-  default: { connect: vi.fn() },
+  default: { connect: vi.fn(), query: vi.fn() },
 }));
 
 // A valid CYF-staff token
@@ -40,6 +40,12 @@ const Path = (newUser: Record<string, unknown>, orgId: string) => ({
 });
 
 describe("POST /partners/:id/users", () => {
+  beforeEach(() => {
+    (pool.query as any).mockResolvedValue({
+      rows: [{ id: "staff-1", is_active: true }],
+    });
+  });
+
   afterEach(() => {
     vi.clearAllMocks();
   });

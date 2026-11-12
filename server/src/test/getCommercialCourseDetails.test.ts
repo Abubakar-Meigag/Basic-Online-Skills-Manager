@@ -22,6 +22,12 @@ const commercialUser = {
 };
 
 describe("GET /course-details/commercial/:id", () => {
+  const mockActiveAuthUser = () => {
+    (pool.query as any).mockResolvedValueOnce({
+      rows: [{ id: commercialUser.id, is_active: true }],
+    });
+  };
+
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -35,6 +41,7 @@ describe("GET /course-details/commercial/:id", () => {
       commercial_org: "Capgemini",
       outreach_org: null,
     };
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: [mockCourse] });
 
     const response = await request(app)
@@ -54,6 +61,7 @@ describe("GET /course-details/commercial/:id", () => {
       commercial_org: "Deloitte",
       outreach_org: null,
     };
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: [mockCourse] });
 
     const response = await request(app)
@@ -65,6 +73,7 @@ describe("GET /course-details/commercial/:id", () => {
   });
 
   it("returns 404 when the course does not exist", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
 
     const response = await request(app)
@@ -76,6 +85,7 @@ describe("GET /course-details/commercial/:id", () => {
   });
 
   it("returns 500 when the query fails", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
 
     const response = await request(app)

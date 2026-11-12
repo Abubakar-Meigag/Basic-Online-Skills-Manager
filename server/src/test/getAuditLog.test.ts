@@ -25,11 +25,18 @@ const staffAuth = [`token=${makeToken(OrganizationType.CYF_STAFF)}`];
 const outreachAuth = [`token=${makeToken(OrganizationType.OUTREACH_PARTNER)}`];
 
 describe("GET /audit-log", () => {
+  const mockActiveAuthUser = () => {
+    (pool.query as any).mockResolvedValueOnce({
+      rows: [{ id: "user-1", is_active: true }],
+    });
+  };
+
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   it("returns 200 with a flat array of entries, newest first", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({
       rows: [
         {
@@ -65,6 +72,7 @@ describe("GET /audit-log", () => {
   });
 
   it("returns 200 with an empty array when there are no entries", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
 
     const response = await request(app)
@@ -92,6 +100,7 @@ describe("GET /audit-log", () => {
   });
 
   it("returns 500 when the query fails", async () => {
+    mockActiveAuthUser();
     (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
 
     const response = await request(app)

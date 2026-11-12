@@ -7,7 +7,7 @@ import { withMockedQueries } from "./helpers/mockQueries";
 import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
-  default: { connect: vi.fn() },
+  default: { connect: vi.fn(), query: vi.fn() },
 }));
 
 const makeClient = () => ({
@@ -28,6 +28,9 @@ const staffCookie = [`token=${staffToken}`];
 describe("PATCH /users/:id/status", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    (pool.query as any).mockResolvedValue({
+      rows: [{ id: "staff-999", is_active: true }],
+    });
   });
 
   it("successfully updates user status and inserts audit log", async () => {
