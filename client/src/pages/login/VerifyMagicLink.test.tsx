@@ -68,6 +68,7 @@ describe("VerifyMagicLink Component", () => {
 
   it("should render error message when backend verification fails", async () => {
     const mockError = {
+      isAxiosError: true,
       response: { data: { message: "Link has expired." } },
     };
     vi.spyOn(authApi, "verifyMagicLink").mockRejectedValue(mockError);
@@ -83,7 +84,7 @@ describe("VerifyMagicLink Component", () => {
       await screen.findByRole("heading", { name: /authentication error/i }),
     ).toBeInTheDocument();
     expect(
-      await screen.findByText(/verification failed or link has expired/i),
+      await screen.findByText(/link has expired/i),
     ).toBeInTheDocument();
   });
 });
