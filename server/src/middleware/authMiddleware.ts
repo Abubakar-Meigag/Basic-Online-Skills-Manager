@@ -38,17 +38,16 @@ export const authorizeRole = (requiredRole: string) => {
         algorithms: ["HS256"],
       }) as unknown as UserPayload;
 
-      req.user = decoded;
-
-      if (req.user.orgType !== requiredRole) {
-        return res.status(403).json({
-          message: "Access Denied: Redirecting to your dashboard.",
-          redirectRoute: "/",
-        });
-      }
-
       const userResult = await pool.query(
-        "SELECT id, is_active FROM users WHERE id = $1",
+        `SELECT 
+           u.id, 
+           u.email,
+           u.is_active, 
+           org.type AS org_type, 
+           org.id AS organisation_id
+         FROM users u
+         LEFT JOIN organisations org ON u.organisation_id = org.id
+         WHERE u.id = $1`,
         [decoded.id],
       );
 
@@ -58,6 +57,20 @@ export const authorizeRole = (requiredRole: string) => {
         return res.status(401).json({
           message: "User account is inactive or disabled.",
           redirectRoute: "/login",
+        });
+      }
+
+      req.user = {
+        id: dbUser.id,
+        email: dbUser.email,
+        orgType: dbUser.org_type,
+        organisationId: dbUser.organisation_id,
+      };
+
+      if (req.user.orgType !== requiredRole) {
+        return res.status(403).json({
+          message: "Access Denied: Redirecting to your dashboard.",
+          redirectRoute: "/",
         });
       }
 
