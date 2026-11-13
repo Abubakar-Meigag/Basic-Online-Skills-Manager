@@ -2,6 +2,8 @@ import request from "supertest";
 import app from "../app";
 import pool from "../data/connection";
 import jwt from "jsonwebtoken";
+import { OrganizationType } from "../data/dataType";
+import { mockAuthUserLookup } from "./helpers/mockAuth";
 import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
@@ -15,27 +17,29 @@ const tokenFor = (user: object) => [
 const cyfUser = {
   id: "staff-1",
   email: "admin@codeyourfuture.io",
-  orgType: "cyf_staff",
+  orgType: OrganizationType.CYF_STAFF,
   organisationId: "9e27629b-5911-4858-b453-14a5d227afc6",
+};
+
+const activeCyfUser = {
+  id: "staff-1",
+  email: "admin@codeyourfuture.io",
+  is_active: true,
+  org_type: OrganizationType.CYF_STAFF,
+  organisation_id: "9e27629b-5911-4858-b453-14a5d227afc6",
 };
 
 const getPipeline = () =>
   request(app).get("/course-pipeline").set("Cookie", tokenFor(cyfUser));
 
 describe("GET /course-pipeline", () => {
-  const mockActiveAuthUser = () => {
-    (pool.query as any).mockResolvedValueOnce({
-      rows: [{ id: cyfUser.id, is_active: true }],
-    });
-  };
-
-  afterEach(() => {
+  beforeEach(() => {
     vi.clearAllMocks();
+    (pool.query as any).mockReset();
   });
 
   it("returns all six status keys even when db is empty", async () => {
-    mockActiveAuthUser();
-    (pool.query as any).mockResolvedValueOnce({ rows: [] });
+    mockAuthUserLookup(pool, activeCyfUser, { rows: [] });
     const response = await getPipeline();
     expect(response.status).toBe(200);
     expect(Object.keys(response.body).sort()).toEqual([
@@ -49,8 +53,7 @@ describe("GET /course-pipeline", () => {
   });
 
   it("returns every status as an empty array when db is empty", async () => {
-    mockActiveAuthUser();
-    (pool.query as any).mockResolvedValueOnce({ rows: [] });
+    mockAuthUserLookup(pool, activeCyfUser, { rows: [] });
     const response = await getPipeline();
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -81,8 +84,7 @@ describe("GET /course-pipeline", () => {
       },
     ];
 
-    mockActiveAuthUser();
-    (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
+    mockAuthUserLookup(pool, activeCyfUser, { rows: mockRows });
     const response = await getPipeline();
     expect(response.status).toBe(200);
     expect(response.body.request_pending).toEqual([mockRows[0]]);
@@ -100,8 +102,7 @@ describe("GET /course-pipeline", () => {
       },
     ];
 
-    mockActiveAuthUser();
-    (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
+    mockAuthUserLookup(pool, activeCyfUser, { rows: mockRows });
     const response = await getPipeline();
     expect(response.status).toBe(200);
     expect(response.body.request_pending).toHaveLength(1);
@@ -127,23 +128,20 @@ describe("GET /course-pipeline", () => {
       },
     ];
 
-    mockActiveAuthUser();
-    (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
+    mockAuthUserLookup(pool, activeCyfUser, { rows: mockRows });
     const response = await getPipeline();
     expect(response.status).toBe(200);
     expect(response.body.request_pending).toHaveLength(2);
   });
 
   it("returns JSON content-type", async () => {
-    mockActiveAuthUser();
-    (pool.query as any).mockResolvedValueOnce({ rows: [] });
+    mockAuthUserLookup(pool, activeCyfUser, { rows: [] });
     const response = await getPipeline();
     expect(response.headers["content-type"]).toMatch(/application\/json/);
   });
 
   it("returns 500 when the query fails", async () => {
-    mockActiveAuthUser();
-    (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
+    mockAuthUserLookup(pool, activeCyfUser, new Error("DB down"));
     const response = await getPipeline();
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");

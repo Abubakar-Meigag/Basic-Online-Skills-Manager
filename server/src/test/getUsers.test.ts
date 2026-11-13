@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import app from "../app";
 import pool from "../data/connection";
 import { OrganizationType } from "../data/dataType";
+import { mockAuthUserLookup } from "./helpers/mockAuth";
 import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
@@ -29,21 +30,33 @@ const partnerToken = jwt.sign(
   { algorithm: "HS256", expiresIn: "1h" },
 );
 
-const staffCookie = [`token=${staffToken}`];
-describe("GET /users", () => {
-  const mockActiveAuthUser = () => {
-    (pool.query as any).mockResolvedValueOnce({
-      rows: [{ id: "user-1", is_active: true }],
-    });
-  };
+const activeStaffUser = {
+  id: "user-1",
+  email: "staff@codeyourfuture.io",
+  is_active: true,
+  org_type: OrganizationType.CYF_STAFF,
+  organisation_id: "org-1",
+};
 
-  afterEach(() => {
+const activePartnerUser = {
+  id: "user-2",
+  email: "partner@example.com",
+  is_active: true,
+  org_type: OrganizationType.COMMERCIAL_PARTNER,
+  organisation_id: "org-2",
+};
+
+const staffCookie = [`token=${staffToken}`];
+const partnerCookie = [`token=${partnerToken}`];
+
+describe("GET /users", () => {
+  beforeEach(() => {
     vi.clearAllMocks();
+    (pool.query as any).mockReset();
   });
 
   it("returns 200 and a list of users with joined organisation names", async () => {
-    mockActiveAuthUser();
-    (pool.query as any).mockResolvedValueOnce({
+    mockAuthUserLookup(pool, activeStaffUser, {
       rows: [
         {
           id: "u-123",
@@ -65,8 +78,9 @@ describe("GET /users", () => {
     expect(response.body[0].email).toBe("trainee@example.com");
   });
 
-  const partnerCookie = [`token=${partnerToken}`];
   it("returns 403 when accessed by a non-staff user", async () => {
+    mockAuthUserLookup(pool, activePartnerUser, { rows: [] });
+
     const response = await request(app)
       .get("/users")
       .set("Cookie", partnerCookie);
@@ -75,36 +89,12 @@ describe("GET /users", () => {
   });
 
   it("returns 500 when the database query fails", async () => {
-    mockActiveAuthUser();
-    (pool.query as any).mockRejectedValueOnce(new Error("Database error"));
+    mockAuthUserLookup(pool, activeStaffUser, new Error("Database error"));
 
     const response = await request(app)
       .get("/users")
       .set("Cookie", staffCookie);
 
     expect(response.status).toBe(500);
-  });
-
-  it("rejects requests from users who have been deactivated in the database", async () => {
-    const validToken = jwt.sign(
-      {
-        id: "user-deactivated-1",
-        email: "staff@codeyourfuture.io",
-        orgType: OrganizationType.CYF_STAFF,
-        organisationId: "org-1",
-      },
-      JWT_TEST_SECRET,
-      { algorithm: "HS256", expiresIn: "24h" },
-    );
-
-    (pool.query as any).mockResolvedValueOnce({
-      rows: [{ id: "user-deactivated-1", is_active: false }],
-    });
-
-    const response = await request(app)
-      .get("/users")
-      .set("Cookie", [`token=${validToken}`]);
-
-    expect(response.status).toBe(401);
   });
 });

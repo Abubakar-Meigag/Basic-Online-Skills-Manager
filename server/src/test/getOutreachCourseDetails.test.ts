@@ -2,6 +2,8 @@ import request from "supertest";
 import app from "../app";
 import pool from "../data/connection";
 import jwt from "jsonwebtoken";
+import { OrganizationType } from "../data/dataType";
+import { mockAuthUserLookup } from "./helpers/mockAuth";
 import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
@@ -17,19 +19,22 @@ const NEW_BEGINNINGS = "5e51de52-9ea7-4809-ad21-8f4475e3b886";
 const outreachUser = {
   id: "u-outreach",
   email: "partner@newbeginnings.org",
-  orgType: "outreach",
+  orgType: OrganizationType.OUTREACH_PARTNER,
   organisationId: NEW_BEGINNINGS,
 };
 
-describe("GET /course-details/outreach/:id", () => {
-  const mockActiveAuthUser = () => {
-    (pool.query as any).mockResolvedValueOnce({
-      rows: [{ id: outreachUser.id, is_active: true }],
-    });
-  };
+const activeOutreachUser = {
+  id: "u-outreach",
+  email: "partner@newbeginnings.org",
+  is_active: true,
+  org_type: OrganizationType.OUTREACH_PARTNER,
+  organisation_id: NEW_BEGINNINGS,
+};
 
-  afterEach(() => {
+describe("GET /course-details/outreach/:id", () => {
+  beforeEach(() => {
     vi.clearAllMocks();
+    (pool.query as any).mockReset();
   });
 
   it("returns the course when it is an open opportunity", async () => {
@@ -41,8 +46,7 @@ describe("GET /course-details/outreach/:id", () => {
       commercial_org: "Capgemini",
       outreach_org: null,
     };
-    mockActiveAuthUser();
-    (pool.query as any).mockResolvedValueOnce({ rows: [mockCourse] });
+    mockAuthUserLookup(pool, activeOutreachUser, { rows: [mockCourse] });
 
     const response = await request(app)
       .get("/course-details/outreach/course-1")
@@ -61,8 +65,7 @@ describe("GET /course-details/outreach/:id", () => {
       commercial_org: "Capgemini",
       outreach_org: "New Beginnings",
     };
-    mockActiveAuthUser();
-    (pool.query as any).mockResolvedValueOnce({ rows: [mockCourse] });
+    mockAuthUserLookup(pool, activeOutreachUser, { rows: [mockCourse] });
 
     const response = await request(app)
       .get("/course-details/outreach/course-1")
@@ -81,8 +84,7 @@ describe("GET /course-details/outreach/:id", () => {
       commercial_org: "Capgemini",
       outreach_org: "Other Org",
     };
-    mockActiveAuthUser();
-    (pool.query as any).mockResolvedValueOnce({ rows: [mockCourse] });
+    mockAuthUserLookup(pool, activeOutreachUser, { rows: [mockCourse] });
 
     const response = await request(app)
       .get("/course-details/outreach/course-1")
@@ -93,8 +95,7 @@ describe("GET /course-details/outreach/:id", () => {
   });
 
   it("returns 404 when the course does not exist", async () => {
-    mockActiveAuthUser();
-    (pool.query as any).mockResolvedValueOnce({ rows: [] });
+    mockAuthUserLookup(pool, activeOutreachUser, { rows: [] });
 
     const response = await request(app)
       .get("/course-details/outreach/missing")
@@ -105,8 +106,7 @@ describe("GET /course-details/outreach/:id", () => {
   });
 
   it("returns 500 when the query fails", async () => {
-    mockActiveAuthUser();
-    (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
+    mockAuthUserLookup(pool, activeOutreachUser, new Error("DB down"));
 
     const response = await request(app)
       .get("/course-details/outreach/course-1")

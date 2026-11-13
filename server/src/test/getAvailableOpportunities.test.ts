@@ -3,10 +3,14 @@ import app from "../app";
 import pool from "../data/connection";
 import jwt from "jsonwebtoken";
 import { OrganizationType } from "../data/dataType";
+import { mockAuthUserLookup } from "./helpers/mockAuth";
 import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
-  default: { query: vi.fn() },
+  default: {
+    connect: vi.fn(),
+    query: vi.fn(),
+  },
 }));
 
 const tokenFor = (user: object) => [
@@ -20,23 +24,25 @@ const outreachUser = {
   organisationId: "org-outreach-99",
 };
 
+const activeOutreachUser = {
+  id: "user-123",
+  email: "partner@example.com",
+  is_active: true,
+  org_type: OrganizationType.OUTREACH_PARTNER,
+  organisation_id: "org-outreach-99",
+};
+
 const getOpportunities = () =>
   request(app).get("/opportunities").set("Cookie", tokenFor(outreachUser));
 
 describe("GET /opportunities", () => {
-  const mockActiveAuthUser = () => {
-    (pool.query as any).mockResolvedValueOnce({
-      rows: [{ id: outreachUser.id, is_active: true }],
-    });
-  };
-
-  afterEach(() => {
+  beforeEach(() => {
     vi.clearAllMocks();
+    (pool.query as any).mockReset();
   });
 
   it("returns an empty array when there are no open opportunities", async () => {
-    mockActiveAuthUser();
-    (pool.query as any).mockResolvedValueOnce({ rows: [] });
+    mockAuthUserLookup(pool, activeOutreachUser, { rows: [] });
     const response = await getOpportunities();
     expect(response.status).toBe(200);
     expect(response.body).toEqual([]);
@@ -53,8 +59,7 @@ describe("GET /opportunities", () => {
         commercial_org: "Capgemini",
       },
     ];
-    mockActiveAuthUser();
-    (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
+    mockAuthUserLookup(pool, activeOutreachUser, { rows: mockRows });
     const response = await getOpportunities();
     expect(response.status).toBe(200);
     expect(response.body).toEqual(mockRows);
@@ -71,23 +76,20 @@ describe("GET /opportunities", () => {
         commercial_org: "Capgemini",
       },
     ];
-    mockActiveAuthUser();
-    (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
+    mockAuthUserLookup(pool, activeOutreachUser, { rows: mockRows });
     const response = await getOpportunities();
     expect(response.status).toBe(200);
     expect(response.body[0].commercial_org).toBe("Capgemini");
   });
 
   it("returns JSON content-type", async () => {
-    mockActiveAuthUser();
-    (pool.query as any).mockResolvedValueOnce({ rows: [] });
+    mockAuthUserLookup(pool, activeOutreachUser, { rows: [] });
     const response = await getOpportunities();
     expect(response.headers["content-type"]).toMatch(/application\/json/);
   });
 
   it("returns 500 when the query fails", async () => {
-    mockActiveAuthUser();
-    (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
+    mockAuthUserLookup(pool, activeOutreachUser, new Error("DB down"));
     const response = await getOpportunities();
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");
