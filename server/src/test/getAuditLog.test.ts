@@ -3,10 +3,14 @@ import jwt from "jsonwebtoken";
 import app from "../app";
 import pool from "../data/connection";
 import { OrganizationType } from "../data/dataType";
+import { mockAuthUserLookup } from "./helpers/mockAuth";
 import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
-  default: { query: vi.fn() },
+  default: {
+    connect: vi.fn(),
+    query: vi.fn(),
+  },
 }));
 
 const makeToken = (orgType: string) =>
@@ -24,34 +28,51 @@ const makeToken = (orgType: string) =>
 const staffAuth = [`token=${makeToken(OrganizationType.CYF_STAFF)}`];
 const outreachAuth = [`token=${makeToken(OrganizationType.OUTREACH_PARTNER)}`];
 
+const activeStaffUser = {
+  id: "user-1",
+  email: "user@example.com",
+  is_active: true,
+  org_type: OrganizationType.CYF_STAFF,
+  organisation_id: "org-1",
+};
+
+const activeOutreachUser = {
+  ...activeStaffUser,
+  org_type: OrganizationType.OUTREACH_PARTNER,
+  organisation_id: "partner-org-1",
+};
+
 describe("GET /audit-log", () => {
-  afterEach(() => {
+  beforeEach(() => {
     vi.clearAllMocks();
+    mockAuthUserLookup(pool, activeStaffUser);
   });
 
   it("returns 200 with a flat array of entries, newest first", async () => {
-    (pool.query as any).mockResolvedValueOnce({
-      rows: [
-        {
-          id: "al-2",
-          user_id: "user-1",
-          user_email: "admin@codeyourfuture.io",
-          action: "user.created",
-          entity_type: "user",
-          entity_id: "user-9",
-          created_at: "2026-07-22T14:32:00.000Z",
-        },
-        {
-          id: "al-1",
-          user_id: "user-1",
-          user_email: "admin@codeyourfuture.io",
-          action: "create_organisation",
-          entity_type: "organisation",
-          entity_id: "org-3",
-          created_at: "2026-07-13T08:45:00.000Z",
-        },
-      ],
-    });
+    (pool.query as any)
+      .mockResolvedValueOnce({ rows: [activeStaffUser] })
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: "al-2",
+            user_id: "user-1",
+            user_email: "admin@codeyourfuture.io",
+            action: "user.created",
+            entity_type: "user",
+            entity_id: "user-9",
+            created_at: "2026-07-22T14:32:00.000Z",
+          },
+          {
+            id: "al-1",
+            user_id: "user-1",
+            user_email: "admin@codeyourfuture.io",
+            action: "create_organisation",
+            entity_type: "organisation",
+            entity_id: "org-3",
+            created_at: "2026-07-13T08:45:00.000Z",
+          },
+        ],
+      });
 
     const response = await request(app)
       .get("/audit-log")
@@ -65,7 +86,9 @@ describe("GET /audit-log", () => {
   });
 
   it("returns 200 with an empty array when there are no entries", async () => {
-    (pool.query as any).mockResolvedValueOnce({ rows: [] });
+    (pool.query as any)
+      .mockResolvedValueOnce({ rows: [activeStaffUser] })
+      .mockResolvedValueOnce({ rows: [] });
 
     const response = await request(app)
       .get("/audit-log")
@@ -76,12 +99,14 @@ describe("GET /audit-log", () => {
   });
 
   it("returns 403 when the caller is not CYF staff", async () => {
+    (pool.query as any).mockResolvedValueOnce({ rows: [activeOutreachUser] });
+
     const response = await request(app)
       .get("/audit-log")
       .set("Cookie", outreachAuth);
 
     expect(response.status).toBe(403);
-    expect(pool.query).not.toHaveBeenCalled();
+    expect(pool.query).toHaveBeenCalledTimes(1);
   });
 
   it("returns 401 when no token is provided", async () => {
@@ -92,7 +117,9 @@ describe("GET /audit-log", () => {
   });
 
   it("returns 500 when the query fails", async () => {
-    (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
+    (pool.query as any)
+      .mockResolvedValueOnce({ rows: [activeStaffUser] })
+      .mockRejectedValueOnce(new Error("DB down"));
 
     const response = await request(app)
       .get("/audit-log")

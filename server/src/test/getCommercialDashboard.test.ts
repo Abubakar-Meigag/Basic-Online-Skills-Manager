@@ -2,10 +2,15 @@ import request from "supertest";
 import app from "../app";
 import pool from "../data/connection";
 import jwt from "jsonwebtoken";
+import { OrganizationType } from "../data/dataType";
+import { mockAuthUserLookup } from "./helpers/mockAuth";
 import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
-  default: { query: vi.fn() },
+  default: {
+    connect: vi.fn(),
+    query: vi.fn(),
+  },
 }));
 
 const tokenFor = (user: object) => [
@@ -19,14 +24,31 @@ const commercialUser = {
   organisationId: "60ea2b0f-e04e-4f9a-ac72-38bae06d98bc",
 };
 
+const activeCommercialUser = {
+  id: "u2",
+  email: "partner@example.org",
+  is_active: true,
+  org_type: OrganizationType.COMMERCIAL_PARTNER,
+  organisation_id: "60ea2b0f-e04e-4f9a-ac72-38bae06d98bc",
+};
+
+const activeOutreachUser = {
+  id: "u3",
+  email: "outreach@example.org",
+  is_active: true,
+  org_type: OrganizationType.OUTREACH_PARTNER,
+  organisation_id: "org-outreach-1",
+};
+
 const ROUTE = "/commercial-dashboard";
 
 const getDashboard = () =>
   request(app).get(ROUTE).set("Cookie", tokenFor(commercialUser));
 
 describe(`GET ${ROUTE}`, () => {
-  afterEach(() => {
+  beforeEach(() => {
     vi.clearAllMocks();
+    (pool.query as any).mockReset();
   });
 
   it("returns 200 with a data array when db has rows", async () => {
@@ -45,7 +67,7 @@ describe(`GET ${ROUTE}`, () => {
         outreach_partner: null,
       },
     ];
-    (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: mockRows });
 
     const response = await getDashboard();
 
@@ -54,7 +76,7 @@ describe(`GET ${ROUTE}`, () => {
   });
 
   it("returns an empty data array when db is empty", async () => {
-    (pool.query as any).mockResolvedValueOnce({ rows: [] });
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: [] });
 
     const response = await getDashboard();
 
@@ -71,7 +93,7 @@ describe(`GET ${ROUTE}`, () => {
         outreach_partner: "New Beginnings",
       },
     ];
-    (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: mockRows });
 
     const response = await getDashboard();
 
@@ -84,7 +106,7 @@ describe(`GET ${ROUTE}`, () => {
     const mockRows = [
       { id: "course-1", status: "request_open", outreach_partner: null },
     ];
-    (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: mockRows });
 
     const response = await getDashboard();
 
@@ -93,17 +115,22 @@ describe(`GET ${ROUTE}`, () => {
   });
 
   it("scopes the query to the organisation id from the token", async () => {
-    (pool.query as any).mockResolvedValueOnce({ rows: [] });
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: [] });
 
     await getDashboard();
 
-    const callArgs = (pool.query as any).mock.calls[0];
-    expect(callArgs[1]).toHaveLength(1);
-    expect(callArgs[1][0]).toBe(commercialUser.organisationId);
+    const routeCall = (pool.query as any).mock.calls.find(
+      (call: any[]) =>
+        Array.isArray(call[1]) && call[1][0] === commercialUser.organisationId,
+    );
+
+    expect(routeCall).toBeDefined();
+    expect(routeCall[1]).toHaveLength(1);
+    expect(routeCall[1][0]).toBe(commercialUser.organisationId);
   });
 
   it("returns JSON content-type", async () => {
-    (pool.query as any).mockResolvedValueOnce({ rows: [] });
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: [] });
 
     const response = await getDashboard();
 
@@ -111,7 +138,7 @@ describe(`GET ${ROUTE}`, () => {
   });
 
   it("returns 500 when the query fails", async () => {
-    (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
+    mockAuthUserLookup(pool, activeCommercialUser, new Error("DB down"));
 
     const response = await getDashboard();
 
@@ -127,11 +154,13 @@ describe(`GET ${ROUTE}`, () => {
   });
 
   it("returns 403 when the user's org type is not 'commercial'", async () => {
+    mockAuthUserLookup(pool, activeOutreachUser, { rows: [] });
+
     const response = await request(app)
       .get(ROUTE)
       .set("Cookie", tokenFor({ ...commercialUser, orgType: "outreach" }));
 
     expect(response.status).toBe(403);
-    expect(pool.query).not.toHaveBeenCalled();
+    expect(pool.query).toHaveBeenCalledTimes(1);
   });
 });

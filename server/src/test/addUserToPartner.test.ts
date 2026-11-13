@@ -4,10 +4,14 @@ import app from "../app";
 import pool from "../data/connection";
 import { OrganizationType } from "../data/dataType";
 import { withMockedQueries } from "./helpers/mockQueries";
+import { mockAuthUserLookup, mockStaffUser } from "./helpers/mockAuth";
 import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
-  default: { connect: vi.fn() },
+  default: {
+    connect: vi.fn(),
+    query: vi.fn(),
+  },
 }));
 
 // A valid CYF-staff token
@@ -40,8 +44,10 @@ const Path = (newUser: Record<string, unknown>, orgId: string) => ({
 });
 
 describe("POST /partners/:id/users", () => {
-  afterEach(() => {
+  beforeEach(() => {
     vi.clearAllMocks();
+    (pool.query as any).mockReset();
+    mockAuthUserLookup(pool, mockStaffUser);
   });
 
   it("creates a user linked to the org and returns 201", async () => {
