@@ -15,12 +15,7 @@ export const authorizeRole = (requiredRole: string) => {
   ) => {
     const jwtSecret = process.env.JWT_SECRET as string;
 
-    const authHeader = req.headers.authorization;
-    const token =
-      req.cookies?.token ||
-      (authHeader && authHeader.startsWith("Bearer ")
-        ? authHeader.split(" ")[1]
-        : null);
+    const token = req.cookies?.token;
 
     if (!token) {
       return res.status(401).json({
