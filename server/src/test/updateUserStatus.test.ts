@@ -24,7 +24,7 @@ const staffToken = jwt.sign(
   JWT_TEST_SECRET,
   { algorithm: "HS256", expiresIn: "1h" },
 );
-
+const staffCookie = [`token=${staffToken}`];
 describe("PATCH /users/:id/status", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -45,7 +45,7 @@ describe("PATCH /users/:id/status", () => {
       async () =>
         request(app)
           .patch("/users/u-123/status")
-          .set("Authorization", `Bearer ${staffToken}`)
+          .set("Cookie", staffCookie)
           .send({ is_active: false }),
     );
 
@@ -80,7 +80,7 @@ describe("PATCH /users/:id/status", () => {
       async () =>
         request(app)
           .patch("/users/fake-id/status")
-          .set("Authorization", `Bearer ${staffToken}`)
+          .set("Cookie", staffCookie)
           .send({ is_active: false }),
     );
 
@@ -103,7 +103,7 @@ describe("PATCH /users/:id/status", () => {
       async () =>
         request(app)
           .patch("/users/u-123/status")
-          .set("Authorization", `Bearer ${staffToken}`)
+          .set("Cookie", staffCookie)
           .send({ is_active: true }),
     );
 
@@ -120,10 +120,11 @@ describe("PATCH /users/:id/status", () => {
       JWT_TEST_SECRET,
       { algorithm: "HS256" },
     );
+    const malformedCookie = [`token=${malformedToken}`];
 
     const response = await request(app)
       .patch("/users/u-123/status")
-      .set("Authorization", `Bearer ${malformedToken}`)
+      .set("Cookie", malformedCookie)
       .send({ is_active: false });
 
     expect(response.status).toBe(401);
@@ -145,7 +146,7 @@ describe("PATCH /users/:id/status", () => {
       async () =>
         request(app)
           .patch("/users/u-123/status")
-          .set("Authorization", `Bearer ${staffToken}`)
+          .set("Cookie", staffCookie)
           .send({ is_active: true }),
     );
 

@@ -1,6 +1,8 @@
 import type { Request, Response } from "express";
 import pool from "../data/connection";
 import { ORGANISATION_TYPE } from "../constants/organisations";
+import { DatabaseError } from "pg";
+import { PG_UNIQUE_VIOLATION } from "@drdgvhbh/postgres-error-codes";
 import { z as zod } from "zod";
 
 const addPartnerSchema = zod.object({
@@ -78,14 +80,29 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
+  if (typeof organisation_name !== "string") {
+    res.status(400).json({ error: "Organisation name must be a String" });
+    return;
+  }
+
   const { organisation_name, type, email_domain, city } = parseResult.data;
 
   const normalisedDomain = email_domain.toLowerCase();
+  const normalisedOrganistionName = organisation_name.trim().toLowerCase();
+
+  if (!normalisedOrganistionName) {
+    res
+      .status(400)
+      .json({ error: "organisation_name cannot be empty or whitespace" });
+    return;
+  }
+
   const client = await pool.connect();
 
   try {
     await client.query("BEGIN");
 
+    // Reject if an org with this name or email_domain already exists.
     const existingOrg = await client.query(
       `SELECT id FROM organisations
        WHERE organisation_name = $1 OR email_domain = $2`,
@@ -104,7 +121,7 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
       `INSERT INTO organisations (organisation_name, type, email_domain, city)
        VALUES ($1, $2, $3, $4)
        RETURNING id, organisation_name, type, email_domain, city, created_at`,
-      [organisation_name, type, normalisedDomain, city],
+      [normalisedOrganistionName, type, normalisedDomain, city],
     );
 
     const newOrg = result.rows[0];
@@ -118,8 +135,17 @@ const addPartner = async (req: Request, res: Response): Promise<void> => {
     await client.query("COMMIT");
 
     res.status(201).json({ organisation: newOrg });
-  } catch (error) {
+  } catch (error: unknown) {
     await client.query("ROLLBACK");
+
+    // Handle unique constraint violation for organisation_name or email_domain
+    if (error instanceof DatabaseError && error.code === PG_UNIQUE_VIOLATION) {
+      res.status(409).json({
+        error: "An organisation with this name or email domain already exists.",
+      });
+      return;
+    }
+
     console.error("Database error creating organisation:", error);
     res.status(500).json({ error: "Internal Server Error" });
   } finally {

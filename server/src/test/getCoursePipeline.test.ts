@@ -8,8 +8,9 @@ vi.mock("../data/connection", () => ({
   default: { query: vi.fn() },
 }));
 
-const tokenFor = (user: object) =>
-  `Bearer ${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`;
+const tokenFor = (user: object) => [
+  `token=${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`,
+];
 
 const cyfUser = {
   id: "staff-1",
@@ -19,7 +20,7 @@ const cyfUser = {
 };
 
 const getPipeline = () =>
-  request(app).get("/course-pipeline").set("Authorization", tokenFor(cyfUser));
+  request(app).get("/course-pipeline").set("Cookie", tokenFor(cyfUser));
 
 describe("GET /course-pipeline", () => {
   afterEach(() => {

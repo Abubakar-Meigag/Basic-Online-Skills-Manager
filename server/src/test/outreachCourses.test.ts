@@ -18,8 +18,9 @@ vi.mock("../data/connection", () => ({
   },
 }));
 
-const tokenFor = (user: object) =>
-  `Bearer ${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`;
+const tokenFor = (user: object) => [
+  `token=${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`,
+];
 
 const testApp = express();
 testApp.use(express.json());
@@ -84,7 +85,7 @@ describe("GET /outreach/courses", () => {
     const response = await request(app)
       .get("/outreach/courses")
       .set(
-        "Authorization",
+        "Cookie",
         tokenFor({
           id: "user-456",
           orgType: OrganizationType.COMMERCIAL_PARTNER,

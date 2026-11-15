@@ -8,8 +8,9 @@ vi.mock("../data/connection", () => ({
   default: { query: vi.fn() },
 }));
 
-const tokenFor = (user: object) =>
-  `Bearer ${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`;
+const tokenFor = (user: object) => [
+  `token=${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`,
+];
 
 const cyfUser = {
   id: "staff-1",
@@ -27,7 +28,7 @@ describe("GET /organisations", () => {
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
     const response = await request(app)
       .get("/organisations")
-      .set("Authorization", tokenFor(cyfUser));
+      .set("Cookie", tokenFor(cyfUser));
     expect(response.status).toBe(200);
     expect(response.body).toEqual([]);
   });
@@ -40,7 +41,7 @@ describe("GET /organisations", () => {
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
     const response = await request(app)
       .get("/organisations")
-      .set("Authorization", tokenFor(cyfUser));
+      .set("Cookie", tokenFor(cyfUser));
     expect(response.status).toBe(200);
     expect(response.body).toEqual(mockRows);
   });
@@ -52,7 +53,7 @@ describe("GET /organisations", () => {
     (pool.query as any).mockResolvedValueOnce({ rows: mockRows });
     const response = await request(app)
       .get("/organisations")
-      .set("Authorization", tokenFor(cyfUser));
+      .set("Cookie", tokenFor(cyfUser));
     expect(response.status).toBe(200);
     expect(response.body[0]).toHaveProperty("id");
     expect(response.body[0]).toHaveProperty("organisation_name");
@@ -63,7 +64,7 @@ describe("GET /organisations", () => {
     (pool.query as any).mockResolvedValueOnce({ rows: [] });
     const response = await request(app)
       .get("/organisations")
-      .set("Authorization", tokenFor(cyfUser));
+      .set("Cookie", tokenFor(cyfUser));
     expect(response.headers["content-type"]).toMatch(/application\/json/);
   });
 
@@ -71,7 +72,7 @@ describe("GET /organisations", () => {
     (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
     const response = await request(app)
       .get("/organisations")
-      .set("Authorization", tokenFor(cyfUser));
+      .set("Cookie", tokenFor(cyfUser));
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");
   });

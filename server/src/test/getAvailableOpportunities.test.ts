@@ -9,8 +9,9 @@ vi.mock("../data/connection", () => ({
   default: { query: vi.fn() },
 }));
 
-const tokenFor = (user: object) =>
-  `Bearer ${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`;
+const tokenFor = (user: object) => [
+  `token=${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`,
+];
 
 const outreachUser = {
   id: "user-123",
@@ -20,9 +21,7 @@ const outreachUser = {
 };
 
 const getOpportunities = () =>
-  request(app)
-    .get("/opportunities")
-    .set("Authorization", tokenFor(outreachUser));
+  request(app).get("/opportunities").set("Cookie", tokenFor(outreachUser));
 
 describe("GET /opportunities", () => {
   afterEach(() => {
