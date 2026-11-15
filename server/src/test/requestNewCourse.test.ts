@@ -137,7 +137,7 @@ describe("POST /commercial/requestedNewCourses", () => {
       pool,
       {
         ...activeCommercialUser,
-        organisation_id: undefined,
+        organisation_id: null, // Matches real Postgres when a user has no org
       },
       { rows: [] },
     );

@@ -1,5 +1,13 @@
 import { OrganizationType } from "../../data/dataType";
 
+export type MockAuthUser = {
+  id?: string | undefined;
+  email: string;
+  is_active: boolean;
+  org_type: OrganizationType;
+  organisation_id?: string | null | undefined;
+};
+
 export const mockStaffUser = {
   id: "user-1",
   email: "staff@codeyourfuture.io",
@@ -10,7 +18,7 @@ export const mockStaffUser = {
 
 export const mockAuthUserLookup = (
   pool: any,
-  user = mockStaffUser,
+  user: MockAuthUser = mockStaffUser,
   routeResult: any = { rows: [] },
 ) => {
   (pool.query as any).mockImplementation(async (sql: string) => {

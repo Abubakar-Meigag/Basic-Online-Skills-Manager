@@ -2,6 +2,7 @@ import request from "supertest";
 import app from "../app";
 import pool from "../data/connection";
 import jwt from "jsonwebtoken";
+import { OrganizationType } from "../data/dataType";
 import { mockAuthUserLookup } from "./helpers/mockAuth";
 import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
@@ -21,7 +22,7 @@ const CAPGEMINI = "60ea2b0f-e04e-4f9a-ac72-38bae06d98bc";
 const commercialUser = {
   id: "u-commercial",
   email: "partner@capgemini.com",
-  orgType: "commercial",
+  orgType: OrganizationType.COMMERCIAL_PARTNER,
   organisationId: CAPGEMINI,
 };
 
@@ -29,7 +30,7 @@ const activeCommercialUser = {
   id: "u-commercial",
   email: "partner@capgemini.com",
   is_active: true,
-  org_type: "commercial",
+  org_type: OrganizationType.COMMERCIAL_PARTNER,
   organisation_id: CAPGEMINI,
 };
 
@@ -37,7 +38,7 @@ const activeOutreachUser = {
   id: "u-outreach",
   email: "partner@outreach.com",
   is_active: true,
-  org_type: "outreach",
+  org_type: OrganizationType.OUTREACH_PARTNER,
   organisation_id: "org-outreach-1",
 };
 
