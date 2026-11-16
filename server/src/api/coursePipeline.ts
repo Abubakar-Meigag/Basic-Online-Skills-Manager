@@ -1,13 +1,14 @@
 import type { Request, Response } from "express";
+import { CourseStatus } from "@bosm/shared";
 import pool from "../data/connection";
 
 const ACTIVE_STATUS = [
-  "request_pending",
-  "request_open",
-  "request_claimed",
-  "request_confirmed",
-  "course_running",
-  "course_completed",
+  CourseStatus.REQUEST_PENDING,
+  CourseStatus.REQUEST_OPEN,
+  CourseStatus.REQUEST_CLAIMED,
+  CourseStatus.REQUEST_CONFIRMED,
+  CourseStatus.COURSE_RUNNING,
+  CourseStatus.COURSE_COMPLETED,
 ] as const;
 
 /**
