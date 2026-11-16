@@ -43,6 +43,7 @@ describe("claimOpportunity", () => {
         venue_address: "234-244 Stockwell Rd, London",
         contact_name: "John Doe",
         contact_email: "john@example.com",
+        lunch_arrangement: "Provided on site",
       },
     } as any;
 
