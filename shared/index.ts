@@ -4,11 +4,12 @@ export enum OrganizationType {
   CYF_STAFF = "cyf_staff",
 }
 
-export type CourseStatus =
-  | "request_pending"
-  | "request_open"
-  | "request_cancelled"
-  | "request_claimed"
-  | "request_confirmed"
-  | "course_running"
-  | "course_completed";
+export enum CourseStatus {
+  REQUEST_PENDING = "request_pending",
+  REQUEST_OPEN = "request_open",
+  REQUEST_CANCELLED = "request_cancelled",
+  REQUEST_CLAIMED = "request_claimed",
+  REQUEST_CONFIRMED = "request_confirmed",
+  COURSE_RUNNING = "course_running",
+  COURSE_COMPLETED = "course_completed",
+}

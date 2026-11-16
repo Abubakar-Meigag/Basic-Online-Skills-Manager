@@ -1,8 +1,6 @@
-import { OrganizationType } from "@bosm/shared";
-import type { CourseStatus } from "@bosm/shared";
+import { OrganizationType, CourseStatus } from "@bosm/shared";
 
-export { OrganizationType };
-export type { CourseStatus };
+export { OrganizationType, CourseStatus };
 
 export type Organisation = {
   id: string;
