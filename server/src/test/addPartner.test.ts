@@ -4,24 +4,30 @@ import app from "../app";
 import pool from "../data/connection";
 import { OrganizationType } from "../data/dataType";
 import { withMockedQueries } from "./helpers/mockQueries";
+import { mockAuthUserLookup, mockStaffUser } from "./helpers/mockAuth";
 import { JWT_TEST_SECRET } from "./helpers/testSecret";
+import { DatabaseError } from "pg";
 
 const mockClient = vi.hoisted(() => ({ query: vi.fn(), release: vi.fn() }));
 
 vi.mock("../data/connection", () => ({
   default: {
-    query: mockClient.query,
-    connect: vi.fn().mockResolvedValue(mockClient),
+    query: vi.fn(),
+    connect: vi.fn(),
   },
 }));
 
 const Path = (org: Record<string, unknown>) => ({
   BEGIN: undefined,
-  "SELECT id FROM organisations": { rows: [] }, // no existing org
   "INSERT INTO organisations": { rows: [org] },
   "INSERT INTO audit_log": undefined,
   COMMIT: undefined,
 });
+
+const uniqueViolation = Object.assign(
+  new DatabaseError("duplicate key value", 0, "error"),
+  { code: "23505" },
+);
 
 // A valid CYF-staff token
 const staffToken = jwt.sign(
@@ -35,13 +41,15 @@ const staffToken = jwt.sign(
   { algorithm: "HS256", expiresIn: "1h" },
 );
 
-const auth = `Bearer ${staffToken}`;
+const auth = [`token=${staffToken}`];
 
 describe("POST /addPartner", () => {
-  afterEach(() => {
+  beforeEach(() => {
     vi.clearAllMocks();
-    mockClient.query.mockReset(); // so a mockImplementation never leaks into the next test
+    mockClient.query.mockReset();
+    (pool.query as any).mockReset();
     (pool.connect as any).mockResolvedValue(mockClient);
+    mockAuthUserLookup(pool);
   });
 
   it("creates an organisation and returns 201", async () => {
@@ -56,7 +64,7 @@ describe("POST /addPartner", () => {
         created_at: "2026-08-06T00:00:00.000Z",
       }),
       async () =>
-        request(app).post("/addPartner").set("Authorization", auth).send({
+        request(app).post("/addPartner").set("Cookie", auth).send({
           organisation_name: "Deloitte",
           type: "commercial",
           email_domain: "deloitte.com",
@@ -75,7 +83,7 @@ describe("POST /addPartner", () => {
       mockClient,
       Path({ id: "org-2", organisation_name: "Deloitte", city: "London" }),
       async () =>
-        request(app).post("/addPartner").set("Authorization", auth).send({
+        request(app).post("/addPartner").set("Cookie", auth).send({
           organisation_name: "Deloitte",
           type: "commercial",
           email_domain: "Deloitte.COM",
@@ -88,12 +96,13 @@ describe("POST /addPartner", () => {
       String(c[0]).includes("INSERT INTO organisations"),
     );
     expect(insertCall?.[1]).toContain("deloitte.com");
+    expect(insertCall?.[1]).toContain("deloitte");
   });
 
   it("returns 400 when a required field is missing", async () => {
     const response = await request(app)
       .post("/addPartner")
-      .set("Authorization", auth)
+      .set("Cookie", auth)
       .send({
         organisation_name: "Deloitte",
         type: "commercial",
@@ -103,13 +112,12 @@ describe("POST /addPartner", () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("error");
-    expect(pool.query).not.toHaveBeenCalled();
   });
 
   it("returns 400 for an invalid type", async () => {
     const response = await request(app)
       .post("/addPartner")
-      .set("Authorization", auth)
+      .set("Cookie", auth)
       .send({
         organisation_name: "Deloitte",
         type: "not_a_real_type",
@@ -119,7 +127,6 @@ describe("POST /addPartner", () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("error");
-    expect(pool.query).not.toHaveBeenCalled();
   });
 
   it("accepts cyf_staff as a valid type", async () => {
@@ -131,7 +138,7 @@ describe("POST /addPartner", () => {
         city: "London",
       }),
       async () =>
-        request(app).post("/addPartner").set("Authorization", auth).send({
+        request(app).post("/addPartner").set("Cookie", auth).send({
           organisation_name: "CodeYourFuture",
           type: "cyf_staff",
           email_domain: "codeyourfuture.io",
@@ -145,7 +152,7 @@ describe("POST /addPartner", () => {
   it("returns 400 for a malformed email_domain", async () => {
     const response = await request(app)
       .post("/addPartner")
-      .set("Authorization", auth)
+      .set("Cookie", auth)
       .send({
         organisation_name: "Deloitte",
         type: "commercial",
@@ -155,7 +162,6 @@ describe("POST /addPartner", () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("error");
-    expect(pool.query).not.toHaveBeenCalled();
   });
 
   it("returns 409 when the organisation name or email_domain already exists", async () => {
@@ -163,11 +169,11 @@ describe("POST /addPartner", () => {
       mockClient,
       {
         BEGIN: undefined,
-        "SELECT id FROM organisations": { rows: [{ id: "existing-org" }] }, // org already exists
-        ROLLBACK: undefined, // the controller rolls back before returning 409
+        "INSERT INTO organisations": uniqueViolation,
+        ROLLBACK: undefined,
       },
       async () =>
-        request(app).post("/addPartner").set("Authorization", auth).send({
+        request(app).post("/addPartner").set("Cookie", auth).send({
           organisation_name: "Capgemini",
           type: "commercial",
           email_domain: "capgemini.com",
@@ -185,11 +191,11 @@ describe("POST /addPartner", () => {
       mockClient,
       {
         BEGIN: undefined,
-        "SELECT id FROM organisations": new Error("DB down"),
-        ROLLBACK: undefined, // the catch block rolls back
+        "INSERT INTO organisations": new Error("DB down"),
+        ROLLBACK: undefined,
       },
       async () =>
-        request(app).post("/addPartner").set("Authorization", auth).send({
+        request(app).post("/addPartner").set("Cookie", auth).send({
           organisation_name: "Deloitte",
           type: "commercial",
           email_domain: "deloitte.com",

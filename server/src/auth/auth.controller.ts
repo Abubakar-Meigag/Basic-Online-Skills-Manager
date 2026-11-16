@@ -1,5 +1,15 @@
 import { Request, Response } from "express";
+import { z as zod } from "zod";
 import { requestMagicLink, verifyMagicLinkToken } from "./auth.service";
+
+const magicLinkRequestSchema = zod.object({
+  email: zod
+    .string({
+      message: "Please provide a valid email address.",
+    })
+    .trim()
+    .email("Please provide a valid email address."),
+});
 
 /**
  * POST /api/auth/magic-link
@@ -10,19 +20,16 @@ export async function handleRequestMagicLink(
   res: Response,
 ): Promise<Response> {
   try {
-    const { email } = req.body;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const parseResult = magicLinkRequestSchema.safeParse(req.body);
 
-    if (!email || typeof email !== "string" || !emailRegex.test(email.trim())) {
+    if (!parseResult.success) {
       return res.status(400).json({
         message: "Please provide a valid email address.",
       });
     }
 
-    const sanitisedEmail = email
-      .trim()
-      .toLowerCase()
-      .replace(/[\n\r]/g, "_");
+    const { email } = parseResult.data;
+    const sanitisedEmail = email.toLowerCase().replace(/[\n\r]/g, "_");
 
     // Call service layer to query user, store hashed token, and dispatch email/log
     await requestMagicLink(sanitisedEmail);
@@ -56,10 +63,17 @@ export async function handleVerifyMagicLink(
 
     // Call verifyMagicLinkToken to validate token against db and return user details plus route
     const result = await verifyMagicLinkToken(token.trim());
+    const isProduction = process.env.NODE_ENV === "production";
+
+    res.cookie("token", result.token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    });
 
     return res.status(200).json({
       message: "Authentication successful.",
-      token: result.token,
       user: result.user,
       redirectRoute: result.redirectRoute,
     });
@@ -69,4 +83,17 @@ export async function handleVerifyMagicLink(
     // Return 400 with the error.
     return res.status(400).json({ error: error.message || "Invalid token." });
   }
+}
+
+export async function logout(req: Request, res: Response): Promise<void> {
+  // Clear the httpOnly cookie by clearing its value and setting maxAge to 0
+  res.cookie("token", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    expires: new Date(0),
+    maxAge: 0,
+  });
+
+  res.status(200).json({ message: "Logged out successfully" });
 }

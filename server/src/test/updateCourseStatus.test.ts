@@ -2,18 +2,18 @@ import request from "supertest";
 import app from "../app";
 import pool from "../data/connection";
 import jwt from "jsonwebtoken";
+import { OrganizationType } from "../data/dataType";
+import { mockAuthUserLookup } from "./helpers/mockAuth";
 import { withMockedQueries } from "./helpers/mockQueries";
 import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
-  default: { connect: vi.fn() },
+  default: { connect: vi.fn(), query: vi.fn() },
 }));
 
-const tokenFor = (user: object) =>
-  `Bearer ${jwt.sign(user, JWT_TEST_SECRET, {
-    algorithm: "HS256",
-    expiresIn: "1h",
-  })}`;
+const tokenFor = (user: object) => [
+  `token=${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`,
+];
 
 const makeClient = () => ({
   query: vi.fn(),
@@ -23,25 +23,44 @@ const makeClient = () => ({
 const cyfUser = {
   id: "staff-1",
   email: "admin@codeyourfuture.io",
-  orgType: "cyf_staff",
+  orgType: OrganizationType.CYF_STAFF,
   organisationId: "9e27629b-5911-4858-b453-14a5d227afc6",
+};
+
+const activeCyfUser = {
+  id: "staff-1",
+  email: "admin@codeyourfuture.io",
+  is_active: true,
+  org_type: OrganizationType.CYF_STAFF,
+  organisation_id: "9e27629b-5911-4858-b453-14a5d227afc6",
 };
 
 const commercialUser = {
   id: "u2",
   email: "partner@example.org",
-  orgType: "commercial",
+  orgType: OrganizationType.COMMERCIAL_PARTNER,
   organisationId: "60ea2b0f-e04e-4f9a-ac72-38bae06d98bc",
 };
 
+const activeCommercialUser = {
+  id: "u2",
+  email: "partner@example.org",
+  is_active: true,
+  org_type: OrganizationType.COMMERCIAL_PARTNER,
+  organisation_id: "60ea2b0f-e04e-4f9a-ac72-38bae06d98bc",
+};
+
 describe("PATCH /course/:id/status", () => {
-  afterEach(() => {
+  beforeEach(() => {
     vi.clearAllMocks();
+    (pool.connect as any).mockReset();
+    (pool.query as any).mockReset();
   });
 
   it("updates the status and returns 200", async () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
+    mockAuthUserLookup(pool, activeCyfUser, { rows: [] });
 
     const response = await withMockedQueries(
       client,
@@ -57,7 +76,7 @@ describe("PATCH /course/:id/status", () => {
       async () =>
         request(app)
           .patch("/course/course-1/status")
-          .set("Authorization", tokenFor(cyfUser))
+          .set("Cookie", tokenFor(cyfUser))
           .send({ status: "request_open" }),
     );
 
@@ -67,9 +86,11 @@ describe("PATCH /course/:id/status", () => {
   });
 
   it("returns 403 when the caller is not CYF staff", async () => {
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: [] });
+
     const response = await request(app)
       .patch("/course/course-1/status")
-      .set("Authorization", tokenFor(commercialUser))
+      .set("Cookie", tokenFor(commercialUser))
       .send({ status: "request_open" });
 
     expect(response.status).toBe(403);
@@ -77,9 +98,11 @@ describe("PATCH /course/:id/status", () => {
   });
 
   it("returns 400 when status is missing", async () => {
+    mockAuthUserLookup(pool, activeCyfUser, { rows: [] });
+
     const response = await request(app)
       .patch("/course/course-1/status")
-      .set("Authorization", tokenFor(cyfUser))
+      .set("Cookie", tokenFor(cyfUser))
       .send({});
 
     expect(response.status).toBe(400);
@@ -88,9 +111,11 @@ describe("PATCH /course/:id/status", () => {
   });
 
   it("returns 400 for a status outside the allowed CYF transitions", async () => {
+    mockAuthUserLookup(pool, activeCyfUser, { rows: [] });
+
     const response = await request(app)
       .patch("/course/course-1/status")
-      .set("Authorization", tokenFor(cyfUser))
+      .set("Cookie", tokenFor(cyfUser))
       .send({ status: "request_cancelled" }); // out of scope, not allowed
 
     expect(response.status).toBe(400);
@@ -99,9 +124,11 @@ describe("PATCH /course/:id/status", () => {
   });
 
   it("returns 400 for request_pending / request_claimed (not CYF actions)", async () => {
+    mockAuthUserLookup(pool, activeCyfUser, { rows: [] });
+
     const response = await request(app)
       .patch("/course/course-1/status")
-      .set("Authorization", tokenFor(cyfUser))
+      .set("Cookie", tokenFor(cyfUser))
       .send({ status: "request_claimed" });
 
     expect(response.status).toBe(400);
@@ -112,6 +139,7 @@ describe("PATCH /course/:id/status", () => {
   it("returns 404 when the course does not exist", async () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
+    mockAuthUserLookup(pool, activeCyfUser, { rows: [] });
 
     const response = await withMockedQueries(
       client,
@@ -123,7 +151,7 @@ describe("PATCH /course/:id/status", () => {
       async () =>
         request(app)
           .patch("/course/missing/status")
-          .set("Authorization", tokenFor(cyfUser))
+          .set("Cookie", tokenFor(cyfUser))
           .send({ status: "request_open" }),
     );
 
@@ -135,6 +163,7 @@ describe("PATCH /course/:id/status", () => {
   it("writes an audit entry with the acting user and course id", async () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
+    mockAuthUserLookup(pool, activeCyfUser, { rows: [] });
 
     await withMockedQueries(
       client,
@@ -150,7 +179,7 @@ describe("PATCH /course/:id/status", () => {
       async () =>
         request(app)
           .patch("/course/course-1/status")
-          .set("Authorization", tokenFor(cyfUser))
+          .set("Cookie", tokenFor(cyfUser))
           .send({ status: "course_running" }),
     );
 
@@ -171,6 +200,7 @@ describe("PATCH /course/:id/status", () => {
   it("returns 500 and releases the client when a query fails", async () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
+    mockAuthUserLookup(pool, activeCyfUser, { rows: [] });
 
     const response = await withMockedQueries(
       client,
@@ -182,7 +212,7 @@ describe("PATCH /course/:id/status", () => {
       async () =>
         request(app)
           .patch("/course/course-1/status")
-          .set("Authorization", tokenFor(cyfUser))
+          .set("Cookie", tokenFor(cyfUser))
           .send({ status: "request_open" }),
     );
 

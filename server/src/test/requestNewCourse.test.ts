@@ -2,23 +2,34 @@ import request from "supertest";
 import app from "../app";
 import pool from "../data/connection";
 import jwt from "jsonwebtoken";
+import { OrganizationType } from "../data/dataType";
+import { mockAuthUserLookup } from "./helpers/mockAuth";
 import { withMockedQueries } from "./helpers/mockQueries";
 import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
-  default: { connect: vi.fn() },
+  default: { connect: vi.fn(), query: vi.fn() },
 }));
 
-const tokenFor = (user: object) =>
-  `Bearer ${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`;
+const tokenFor = (user: object) => [
+  `token=${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`,
+];
 
 const makeClient = () => ({ query: vi.fn(), release: vi.fn() });
 
 const commercialUser = {
   id: "u2",
   email: "partner@example.org",
-  orgType: "commercial",
+  orgType: OrganizationType.COMMERCIAL_PARTNER,
   organisationId: "60ea2b0f-e04e-4f9a-ac72-38bae06d98bc",
+};
+
+const activeCommercialUser = {
+  id: "u2",
+  email: "partner@example.org",
+  is_active: true,
+  org_type: OrganizationType.COMMERCIAL_PARTNER,
+  organisation_id: "60ea2b0f-e04e-4f9a-ac72-38bae06d98bc",
 };
 
 const validBody = {
@@ -39,13 +50,16 @@ const Path = (course: Record<string, unknown>) => ({
 });
 
 describe("POST /commercial/requestedNewCourses", () => {
-  afterEach(() => {
+  beforeEach(() => {
     vi.clearAllMocks();
+    (pool.connect as any).mockReset();
+    (pool.query as any).mockReset();
   });
 
   it("creates a course request and returns 201", async () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: [] });
 
     const response = await withMockedQueries(
       client,
@@ -58,7 +72,7 @@ describe("POST /commercial/requestedNewCourses", () => {
       async () =>
         request(app)
           .post("/commercial/requestedNewCourses")
-          .set("Authorization", tokenFor(commercialUser))
+          .set("Cookie", tokenFor(commercialUser))
           .send(validBody),
     );
 
@@ -71,6 +85,7 @@ describe("POST /commercial/requestedNewCourses", () => {
   it("forces status to request_pending even if the body sends another status", async () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: [] });
 
     const response = await withMockedQueries(
       client,
@@ -78,7 +93,7 @@ describe("POST /commercial/requestedNewCourses", () => {
       async () =>
         request(app)
           .post("/commercial/requestedNewCourses")
-          .set("Authorization", tokenFor(commercialUser))
+          .set("Cookie", tokenFor(commercialUser))
           .send({ ...validBody, status: "course_completed" }),
     );
 
@@ -97,11 +112,12 @@ describe("POST /commercial/requestedNewCourses", () => {
   it("uses the organisation from the token and ignores one in the body", async () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: [] });
 
     await withMockedQueries(client, Path({ id: "course-1" }), async () =>
       request(app)
         .post("/commercial/requestedNewCourses")
-        .set("Authorization", tokenFor(commercialUser))
+        .set("Cookie", tokenFor(commercialUser))
         .send({ ...validBody, commercial_org_id: "some-other-org" }),
     );
 
@@ -117,20 +133,49 @@ describe("POST /commercial/requestedNewCourses", () => {
 
   it("returns 403 when the user is not linked to an organisation", async () => {
     const { organisationId, ...noOrgUser } = commercialUser;
+    mockAuthUserLookup(
+      pool,
+      {
+        ...activeCommercialUser,
+        organisation_id: null, // Matches real Postgres when a user has no org
+      },
+      { rows: [] },
+    );
 
     const response = await request(app)
       .post("/commercial/requestedNewCourses")
-      .set("Authorization", tokenFor(noOrgUser))
+      .set("Cookie", tokenFor(noOrgUser))
       .send(validBody);
 
     expect(response.status).toBe(403);
     expect(pool.connect).not.toHaveBeenCalled();
   });
 
-  it("returns 400 when a required field is missing", async () => {
+  it("returns 401 when the user is not active in the database", async () => {
+    mockAuthUserLookup(
+      pool,
+      {
+        ...activeCommercialUser,
+        is_active: false,
+      },
+      { rows: [] },
+    );
+
     const response = await request(app)
       .post("/commercial/requestedNewCourses")
-      .set("Authorization", tokenFor(commercialUser))
+      .set("Cookie", tokenFor(commercialUser))
+      .send(validBody);
+
+    expect(response.status).toBe(401);
+    expect(pool.connect).not.toHaveBeenCalled();
+  });
+
+  it("returns 400 when a required field is missing", async () => {
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: [] });
+
+    const response = await request(app)
+      .post("/commercial/requestedNewCourses")
+      .set("Cookie", tokenFor(commercialUser))
       .send({ account_name: "National Highways" });
 
     expect(response.status).toBe(400);
@@ -139,9 +184,11 @@ describe("POST /commercial/requestedNewCourses", () => {
   });
 
   it("returns 400 when trainee_target is zero or negative", async () => {
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: [] });
+
     const response = await request(app)
       .post("/commercial/requestedNewCourses")
-      .set("Authorization", tokenFor(commercialUser))
+      .set("Cookie", tokenFor(commercialUser))
       .send({ ...validBody, trainee_target: 0 });
 
     expect(response.status).toBe(400);
@@ -150,9 +197,11 @@ describe("POST /commercial/requestedNewCourses", () => {
   });
 
   it("returns 400 when trainee_target is not an integer", async () => {
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: [] });
+
     const response = await request(app)
       .post("/commercial/requestedNewCourses")
-      .set("Authorization", tokenFor(commercialUser))
+      .set("Cookie", tokenFor(commercialUser))
       .send({ ...validBody, trainee_target: 3.5 });
 
     expect(response.status).toBe(400);
@@ -163,6 +212,7 @@ describe("POST /commercial/requestedNewCourses", () => {
   it("returns JSON content-type", async () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: [] });
 
     const response = await withMockedQueries(
       client,
@@ -170,7 +220,7 @@ describe("POST /commercial/requestedNewCourses", () => {
       async () =>
         request(app)
           .post("/commercial/requestedNewCourses")
-          .set("Authorization", tokenFor(commercialUser))
+          .set("Cookie", tokenFor(commercialUser))
           .send(validBody),
     );
 
@@ -180,18 +230,19 @@ describe("POST /commercial/requestedNewCourses", () => {
   it("returns 500 and releases the client when the query fails", async () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: [] });
 
     const response = await withMockedQueries(
       client,
       {
         BEGIN: undefined,
-        "INSERT INTO courses": new Error("DB down"), // INSERT throws
-        ROLLBACK: undefined, // the catch block rolls back
+        "INSERT INTO courses": new Error("DB down"),
+        ROLLBACK: undefined,
       },
       async () =>
         request(app)
           .post("/commercial/requestedNewCourses")
-          .set("Authorization", tokenFor(commercialUser))
+          .set("Cookie", tokenFor(commercialUser))
           .send(validBody),
     );
 

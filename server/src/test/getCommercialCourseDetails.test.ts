@@ -2,27 +2,50 @@ import request from "supertest";
 import app from "../app";
 import pool from "../data/connection";
 import jwt from "jsonwebtoken";
+import { OrganizationType } from "../data/dataType";
+import { mockAuthUserLookup } from "./helpers/mockAuth";
 import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
-  default: { query: vi.fn() },
+  default: {
+    connect: vi.fn(),
+    query: vi.fn(),
+  },
 }));
 
-const tokenFor = (user: object) =>
-  `Bearer ${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`;
+const tokenFor = (user: object) => [
+  `token=${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`,
+];
 
 const CAPGEMINI = "60ea2b0f-e04e-4f9a-ac72-38bae06d98bc";
 
 const commercialUser = {
   id: "u-commercial",
   email: "partner@capgemini.com",
-  orgType: "commercial",
+  orgType: OrganizationType.COMMERCIAL_PARTNER,
   organisationId: CAPGEMINI,
 };
 
+const activeCommercialUser = {
+  id: "u-commercial",
+  email: "partner@capgemini.com",
+  is_active: true,
+  org_type: OrganizationType.COMMERCIAL_PARTNER,
+  organisation_id: CAPGEMINI,
+};
+
+const activeOutreachUser = {
+  id: "u-outreach",
+  email: "partner@outreach.com",
+  is_active: true,
+  org_type: OrganizationType.OUTREACH_PARTNER,
+  organisation_id: "org-outreach-1",
+};
+
 describe("GET /course-details/commercial/:id", () => {
-  afterEach(() => {
+  beforeEach(() => {
     vi.clearAllMocks();
+    (pool.query as any).mockReset();
   });
 
   it("returns the course when it belongs to the caller's org", async () => {
@@ -34,11 +57,11 @@ describe("GET /course-details/commercial/:id", () => {
       commercial_org: "Capgemini",
       outreach_org: null,
     };
-    (pool.query as any).mockResolvedValueOnce({ rows: [mockCourse] });
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: [mockCourse] });
 
     const response = await request(app)
       .get("/course-details/commercial/course-1")
-      .set("Authorization", tokenFor(commercialUser));
+      .set("Cookie", tokenFor(commercialUser));
 
     expect(response.status).toBe(200);
     expect(response.body.data.id).toBe("course-1");
@@ -53,33 +76,33 @@ describe("GET /course-details/commercial/:id", () => {
       commercial_org: "Deloitte",
       outreach_org: null,
     };
-    (pool.query as any).mockResolvedValueOnce({ rows: [mockCourse] });
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: [mockCourse] });
 
     const response = await request(app)
       .get("/course-details/commercial/course-1")
-      .set("Authorization", tokenFor(commercialUser));
+      .set("Cookie", tokenFor(commercialUser));
 
     expect(response.status).toBe(403);
     expect(response.body).toHaveProperty("error");
   });
 
   it("returns 404 when the course does not exist", async () => {
-    (pool.query as any).mockResolvedValueOnce({ rows: [] });
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: [] });
 
     const response = await request(app)
       .get("/course-details/commercial/missing")
-      .set("Authorization", tokenFor(commercialUser));
+      .set("Cookie", tokenFor(commercialUser));
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty("error");
   });
 
   it("returns 500 when the query fails", async () => {
-    (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
+    mockAuthUserLookup(pool, activeCommercialUser, new Error("DB down"));
 
     const response = await request(app)
       .get("/course-details/commercial/course-1")
-      .set("Authorization", tokenFor(commercialUser));
+      .set("Cookie", tokenFor(commercialUser));
 
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");
@@ -94,12 +117,11 @@ describe("GET /course-details/commercial/:id", () => {
   });
 
   it("returns 403 for a non-commercial role", async () => {
+    mockAuthUserLookup(pool, activeOutreachUser, { rows: [] });
+
     const response = await request(app)
       .get("/course-details/commercial/course-1")
-      .set(
-        "Authorization",
-        tokenFor({ ...commercialUser, orgType: "outreach" }),
-      );
+      .set("Cookie", tokenFor({ ...commercialUser, orgType: "outreach" }));
 
     expect(response.status).toBe(403);
   });
