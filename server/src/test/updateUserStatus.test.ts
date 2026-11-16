@@ -3,11 +3,12 @@ import jwt from "jsonwebtoken";
 import app from "../app";
 import pool from "../data/connection";
 import { OrganizationType } from "../data/dataType";
+import { mockAuthUserLookup } from "./helpers/mockAuth";
 import { withMockedQueries } from "./helpers/mockQueries";
 import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
-  default: { connect: vi.fn() },
+  default: { connect: vi.fn(), query: vi.fn() },
 }));
 
 const makeClient = () => ({
@@ -24,15 +25,26 @@ const staffToken = jwt.sign(
   JWT_TEST_SECRET,
   { algorithm: "HS256", expiresIn: "1h" },
 );
+const activeStaffUser = {
+  id: "staff-999",
+  email: "staff@codeyourfuture.io",
+  is_active: true,
+  org_type: OrganizationType.CYF_STAFF,
+  organisation_id: "org-1",
+};
+
 const staffCookie = [`token=${staffToken}`];
 describe("PATCH /users/:id/status", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    (pool.connect as any).mockReset();
+    (pool.query as any).mockReset();
   });
 
   it("successfully updates user status and inserts audit log", async () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
+    mockAuthUserLookup(pool, activeStaffUser, { rows: [] });
 
     const response = await withMockedQueries(
       client,
@@ -69,6 +81,7 @@ describe("PATCH /users/:id/status", () => {
   it("returns 404 and rolls back if user does not exist", async () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
+    mockAuthUserLookup(pool, activeStaffUser, { rows: [] });
 
     const response = await withMockedQueries(
       client,
@@ -92,6 +105,7 @@ describe("PATCH /users/:id/status", () => {
   it("returns 500 and rolls back on database error", async () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
+    mockAuthUserLookup(pool, activeStaffUser, { rows: [] });
 
     const response = await withMockedQueries(
       client,
@@ -112,6 +126,15 @@ describe("PATCH /users/:id/status", () => {
   });
 
   it("returns 401 when the performer ID is missing from the token", async () => {
+    mockAuthUserLookup(
+      pool,
+      {
+        ...activeStaffUser,
+        id: undefined,
+      },
+      { rows: [] },
+    );
+
     const malformedToken = jwt.sign(
       {
         email: "staff@codeyourfuture.io",
@@ -134,6 +157,7 @@ describe("PATCH /users/:id/status", () => {
   it("successfully updates a user's status to ACTIVE and returns 200", async () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
+    mockAuthUserLookup(pool, activeStaffUser, { rows: [] });
 
     const response = await withMockedQueries(
       client,

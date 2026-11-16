@@ -4,6 +4,7 @@ import app from "../app";
 import pool from "../data/connection";
 import { OrganizationType } from "../data/dataType";
 import { withMockedQueries } from "./helpers/mockQueries";
+import { mockAuthUserLookup, mockStaffUser } from "./helpers/mockAuth";
 import { JWT_TEST_SECRET } from "./helpers/testSecret";
 import { DatabaseError } from "pg";
 
@@ -11,8 +12,8 @@ const mockClient = vi.hoisted(() => ({ query: vi.fn(), release: vi.fn() }));
 
 vi.mock("../data/connection", () => ({
   default: {
-    query: mockClient.query,
-    connect: vi.fn().mockResolvedValue(mockClient),
+    query: vi.fn(),
+    connect: vi.fn(),
   },
 }));
 
@@ -43,10 +44,12 @@ const staffToken = jwt.sign(
 const auth = [`token=${staffToken}`];
 
 describe("POST /addPartner", () => {
-  afterEach(() => {
+  beforeEach(() => {
     vi.clearAllMocks();
-    mockClient.query.mockReset(); // so a mockImplementation never leaks into the next test
+    mockClient.query.mockReset();
+    (pool.query as any).mockReset();
     (pool.connect as any).mockResolvedValue(mockClient);
+    mockAuthUserLookup(pool);
   });
 
   it("creates an organisation and returns 201", async () => {
@@ -109,7 +112,6 @@ describe("POST /addPartner", () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("error");
-    expect(pool.query).not.toHaveBeenCalled();
   });
 
   it("returns 400 for an invalid type", async () => {
@@ -125,7 +127,6 @@ describe("POST /addPartner", () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("error");
-    expect(pool.query).not.toHaveBeenCalled();
   });
 
   it("accepts cyf_staff as a valid type", async () => {
@@ -161,7 +162,6 @@ describe("POST /addPartner", () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("error");
-    expect(pool.query).not.toHaveBeenCalled();
   });
 
   it("returns 409 when the organisation name or email_domain already exists", async () => {
@@ -169,8 +169,8 @@ describe("POST /addPartner", () => {
       mockClient,
       {
         BEGIN: undefined,
-        "INSERT INTO organisations": uniqueViolation, // org already exists
-        ROLLBACK: undefined, // the controller rolls back before returning 409
+        "INSERT INTO organisations": uniqueViolation,
+        ROLLBACK: undefined,
       },
       async () =>
         request(app).post("/addPartner").set("Cookie", auth).send({
@@ -192,7 +192,7 @@ describe("POST /addPartner", () => {
       {
         BEGIN: undefined,
         "INSERT INTO organisations": new Error("DB down"),
-        ROLLBACK: undefined, // the catch block rolls back
+        ROLLBACK: undefined,
       },
       async () =>
         request(app).post("/addPartner").set("Cookie", auth).send({

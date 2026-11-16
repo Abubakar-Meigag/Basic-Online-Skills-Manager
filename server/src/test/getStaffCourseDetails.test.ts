@@ -2,6 +2,8 @@ import request from "supertest";
 import app from "../app";
 import pool from "../data/connection";
 import jwt from "jsonwebtoken";
+import { OrganizationType } from "../data/dataType";
+import { mockAuthUserLookup } from "./helpers/mockAuth";
 import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
@@ -15,13 +17,22 @@ const tokenFor = (user: object) => [
 const staffUser = {
   id: "staff-1",
   email: "admin@codeyourfuture.io",
-  orgType: "cyf_staff",
+  orgType: OrganizationType.CYF_STAFF,
   organisationId: "9e27629b-5911-4858-b453-14a5d227afc6",
 };
 
+const activeStaffUser = {
+  id: "staff-1",
+  email: "admin@codeyourfuture.io",
+  is_active: true,
+  org_type: OrganizationType.CYF_STAFF,
+  organisation_id: "9e27629b-5911-4858-b453-14a5d227afc6",
+};
+
 describe("GET /course-details/staff/:id", () => {
-  afterEach(() => {
+  beforeEach(() => {
     vi.clearAllMocks();
+    (pool.query as any).mockReset();
   });
 
   it("returns the course for any id (staff can view any course)", async () => {
@@ -33,7 +44,7 @@ describe("GET /course-details/staff/:id", () => {
       commercial_org: "Capgemini",
       outreach_org: null,
     };
-    (pool.query as any).mockResolvedValueOnce({ rows: [mockCourse] });
+    mockAuthUserLookup(pool, activeStaffUser, { rows: [mockCourse] });
 
     const response = await request(app)
       .get("/course-details/staff/course-1")
@@ -45,7 +56,7 @@ describe("GET /course-details/staff/:id", () => {
   });
 
   it("returns 404 when the course does not exist", async () => {
-    (pool.query as any).mockResolvedValueOnce({ rows: [] });
+    mockAuthUserLookup(pool, activeStaffUser, { rows: [] });
 
     const response = await request(app)
       .get("/course-details/staff/missing")
@@ -56,7 +67,7 @@ describe("GET /course-details/staff/:id", () => {
   });
 
   it("returns 500 when the query fails", async () => {
-    (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
+    mockAuthUserLookup(pool, activeStaffUser, new Error("DB down"));
 
     const response = await request(app)
       .get("/course-details/staff/course-1")
