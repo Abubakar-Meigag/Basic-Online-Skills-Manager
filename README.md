@@ -3,7 +3,7 @@
 A portal for CodeYourFuture to coordinate Basic Online Skills courses between
 commercial partners, outreach partners, and CYF staff.
 
-**Live:** https://bosm.trainees.hosting.cyf.academy
+**Live:** https://bosm.hosted.codeyourfuture.io
 
 ## Design & Prototypes
 
