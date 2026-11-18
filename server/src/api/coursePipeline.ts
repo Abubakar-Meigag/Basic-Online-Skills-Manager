@@ -2,14 +2,9 @@ import type { Request, Response } from "express";
 import { CourseStatus } from "@bosm/shared";
 import pool from "../data/connection";
 
-const ACTIVE_STATUS = [
-  CourseStatus.REQUEST_PENDING,
-  CourseStatus.REQUEST_OPEN,
-  CourseStatus.REQUEST_CLAIMED,
-  CourseStatus.REQUEST_CONFIRMED,
-  CourseStatus.COURSE_RUNNING,
-  CourseStatus.COURSE_COMPLETED,
-] as const;
+const ACTIVE_STATUS = Object.values(CourseStatus).filter(
+  (status) => status !== CourseStatus.REQUEST_CANCELLED,
+);
 
 /**
  * @swagger
