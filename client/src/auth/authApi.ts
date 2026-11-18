@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  "https://bosm-backend.hosted.codeyourfuture.io";
+  "https://staging-bosm-backend.grads.hosting.cyf.academy/";
 
 // Create an Axios Instance
 export const api = axios.create({
