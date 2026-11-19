@@ -5,6 +5,11 @@ describe("formatDate", () => {
     vi.unstubAllEnvs();
   });
 
+  it("should format ISO string to DD/MM/YYYY", () => {
+    const result = formatDate("2026-09-30T00:00:00.000Z");
+    expect(result).toBe("30/09/2026");
+  });
+
   it("should use the next day when UTC is past midnight BST", () => {
     vi.stubEnv("TZ", "Europe/London");
     const result = formatDate("2026-09-29T23:00:00.000Z");
