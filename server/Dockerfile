@@ -8,8 +8,8 @@ COPY package*.json ./
 COPY shared/package*.json ./shared/
 COPY server/package*.json ./server/
 
-# Install dependencies across the workspace
-RUN npm ci --ignore-scripts
+# Install only server dependencies
+RUN npm ci --ignore-scripts --workspace=server
 
 # Copy source code for shared package and server
 COPY shared/ ./shared/
@@ -30,7 +30,7 @@ COPY shared/package*.json ./shared/
 COPY server/package*.json ./server/
 
 # Install only production dependencies
-RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
+RUN npm ci --omit=dev --ignore-scripts --workspace=server && npm cache clean --force
 
 # Copy the shared package source (since it exports raw TypeScript)
 COPY shared/ ./shared/

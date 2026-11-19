@@ -3,13 +3,13 @@ FROM node:24-alpine AS builder
 
 WORKDIR /app
 
-# Copy root and workspace manifests
+# Copy workspace manifests first for optimal layer caching
 COPY package*.json ./
 COPY shared/package*.json ./shared/
 COPY client/package*.json ./client/
 
-# Install dependencies
-RUN npm ci --ignore-scripts
+# Install only client dependencies
+RUN npm ci --ignore-scripts --workspace=client
 
 # Copy source code for shared package and client
 COPY shared/ ./shared/
