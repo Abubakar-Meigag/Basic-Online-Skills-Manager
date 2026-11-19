@@ -8,15 +8,15 @@ COPY package*.json ./
 COPY shared/package*.json ./shared/
 COPY server/package*.json ./server/
 
-# Install only server dependencies
-RUN npm ci --ignore-scripts --workspace=server
+# Install dependencies across the workspace
+RUN npm ci --ignore-scripts
 
 # Copy source code for shared package and server
 COPY shared/ ./shared/
 COPY server/ ./server/
 
-# Build the server
-RUN npm run build --workspace=server
+# Build shared first (server imports its compiled output), then the server
+RUN npm run build --workspace=shared && npm run build --workspace=server
 
 
 # Stage 2: Production
@@ -30,12 +30,10 @@ COPY shared/package*.json ./shared/
 COPY server/package*.json ./server/
 
 # Install only production dependencies
-RUN npm ci --omit=dev --ignore-scripts --workspace=server && npm cache clean --force
+RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 
-# Copy the shared package source (since it exports raw TypeScript)
-COPY shared/ ./shared/
-
-# Copy compiled JavaScript from builder stage
+# Copy compiled JavaScript from builder stage (shared and server)
+COPY --from=builder /app/shared/dist ./shared/dist
 COPY --from=builder /app/server/dist ./server/dist
 
 # Set working directory to the server application
