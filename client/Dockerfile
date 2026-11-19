@@ -3,23 +3,31 @@ FROM node:24-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files first (better layer caching)
+# Copy root and workspace manifests
 COPY package*.json ./
+COPY shared/package*.json ./shared/
+COPY client/package*.json ./client/
+
+# Install dependencies
 RUN npm ci --ignore-scripts
 
-# Copy source and build static files
-COPY . .
+# Copy source code for shared package and client
+COPY shared/ ./shared/
+COPY client/ ./client/
+
+# Build the client
+# We need to tell vite to look in the client folder
 ARG VITE_API_BASE_URL
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
-RUN npm run build
+RUN npm run build --workspace=client
 
 # Stage 2: Production
 
 FROM nginx:1.27-alpine AS production
 
 # Copy built static files from builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/client/dist /usr/share/nginx/html
 
 # SPA routing config (all routes -> index.html)
 RUN echo 'server { \
