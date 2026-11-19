@@ -9,7 +9,7 @@ COPY shared/package*.json ./shared/
 COPY client/package*.json ./client/
 
 # Install only client dependencies
-RUN npm ci --ignore-scripts --workspace=client
+RUN npm ci --ignore-scripts 
 
 # Copy source code for shared package and client
 COPY shared/ ./shared/
@@ -20,10 +20,10 @@ COPY client/ ./client/
 ARG VITE_API_BASE_URL
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
-RUN npm run build --workspace=client
+# Build shared first (the client imports its compiled output), then the client
+RUN npm run build --workspace=shared && npm run build --workspace=client
 
 # Stage 2: Production
-
 FROM nginx:1.27-alpine AS production
 
 # Copy built static files from builder stage
