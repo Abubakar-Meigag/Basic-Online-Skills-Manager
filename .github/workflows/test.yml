@@ -1,5 +1,9 @@
 name: Server Tests
-on: [pull_request]
+on:
+  pull_request:
+    branches: [main, staging]
+  push:
+    branches: [staging]
 jobs:
   test:
     runs-on: ubuntu-latest
