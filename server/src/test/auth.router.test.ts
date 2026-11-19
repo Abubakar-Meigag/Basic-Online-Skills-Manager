@@ -8,17 +8,17 @@ vi.mock("../auth/auth.service", () => ({
   verifyMagicLinkToken: vi.fn(),
 }));
 
-describe("Auth Router (/api/auth)", () => {
+describe("Auth Router (/auth)", () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  describe("POST /api/auth/magic-link", () => {
+  describe("POST /auth/magic-link", () => {
     it("returns 200 with generic message for a valid email", async () => {
       (authService.requestMagicLink as any).mockResolvedValueOnce(undefined);
 
       const response = await request(app)
-        .post("/api/auth/magic-link")
+        .post("/auth/magic-link")
         .send({ email: "user@example.com" });
 
       expect(response.status).toBe(200);
@@ -31,12 +31,12 @@ describe("Auth Router (/api/auth)", () => {
     });
 
     it("returns 400 if email is missing or invalid", async () => {
-      const response = await request(app).post("/api/auth/magic-link").send({});
+      const response = await request(app).post("/auth/magic-link").send({});
 
       expect(response.status).toBe(400);
       expect(response.body).toHaveProperty(
-        "error",
-        "A valid email is required.",
+        "message",
+        "Please provide a valid email address.",
       );
       expect(authService.requestMagicLink).not.toHaveBeenCalled();
     });
@@ -47,7 +47,7 @@ describe("Auth Router (/api/auth)", () => {
       );
 
       const response = await request(app)
-        .post("/api/auth/magic-link")
+        .post("/auth/magic-link")
         .send({ email: "user@example.com" });
 
       expect(response.status).toBe(500);
@@ -55,7 +55,7 @@ describe("Auth Router (/api/auth)", () => {
     });
   });
 
-  describe("POST /api/auth/verify", () => {
+  describe("POST /auth/verify", () => {
     it("returns 200 and user payload for valid raw token", async () => {
       const mockResult = {
         user: {
@@ -71,7 +71,7 @@ describe("Auth Router (/api/auth)", () => {
       );
 
       const response = await request(app)
-        .post("/api/auth/verify")
+        .post("/auth/verify")
         .send({ token: "valid-raw-token-123" });
 
       expect(response.status).toBe(200);
@@ -86,7 +86,7 @@ describe("Auth Router (/api/auth)", () => {
     });
 
     it("returns 400 if token is missing", async () => {
-      const response = await request(app).post("/api/auth/verify").send({});
+      const response = await request(app).post("/auth/verify").send({});
 
       expect(response.status).toBe(400);
       expect(response.body).toHaveProperty("error", "Token is required.");
@@ -98,7 +98,7 @@ describe("Auth Router (/api/auth)", () => {
       );
 
       const response = await request(app)
-        .post("/api/auth/verify")
+        .post("/auth/verify")
         .send({ token: "expired-token" });
 
       expect(response.status).toBe(400);
@@ -106,7 +106,7 @@ describe("Auth Router (/api/auth)", () => {
     });
   });
 
-  describe("GET /api/auth/verify", () => {
+  describe("GET /auth/verify", () => {
     it("extracts token from query parameter and verifies successfully", async () => {
       const mockResult = {
         user: {
@@ -122,7 +122,7 @@ describe("Auth Router (/api/auth)", () => {
       );
 
       const response = await request(app).get(
-        "/api/auth/verify?token=query-token-456",
+        "/auth/verify?token=query-token-456",
       );
 
       expect(response.status).toBe(200);

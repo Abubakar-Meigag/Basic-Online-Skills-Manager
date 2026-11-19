@@ -1,35 +1,40 @@
 import request from "supertest";
 import app from "../app";
 import pool from "../data/connection";
+import jwt from "jsonwebtoken";
+import { OrganizationType } from "../data/dataType";
+import { mockAuthUserLookup } from "./helpers/mockAuth";
+import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
   default: { query: vi.fn() },
 }));
 
-let mockUser: Record<string, unknown> | null = null;
-vi.mock("./../middleware/authMiddleware", () => ({
-  authorizeRole: () => (req: any, _res: any, next: any) => {
-    req.user = mockUser;
-    next();
-  },
-}));
+const tokenFor = (user: object) => [
+  `token=${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`,
+];
 
 const NEW_BEGINNINGS = "5e51de52-9ea7-4809-ad21-8f4475e3b886";
 
 const outreachUser = {
   id: "u-outreach",
   email: "partner@newbeginnings.org",
-  orgType: "outreach",
+  orgType: OrganizationType.OUTREACH_PARTNER,
   organisationId: NEW_BEGINNINGS,
+};
+
+const activeOutreachUser = {
+  id: "u-outreach",
+  email: "partner@newbeginnings.org",
+  is_active: true,
+  org_type: OrganizationType.OUTREACH_PARTNER,
+  organisation_id: NEW_BEGINNINGS,
 };
 
 describe("GET /course-details/outreach/:id", () => {
   beforeEach(() => {
-    mockUser = outreachUser;
-  });
-
-  afterEach(() => {
     vi.clearAllMocks();
+    (pool.query as any).mockReset();
   });
 
   it("returns the course when it is an open opportunity", async () => {
@@ -41,11 +46,11 @@ describe("GET /course-details/outreach/:id", () => {
       commercial_org: "Capgemini",
       outreach_org: null,
     };
-    (pool.query as any).mockResolvedValueOnce({ rows: [mockCourse] });
+    mockAuthUserLookup(pool, activeOutreachUser, { rows: [mockCourse] });
 
-    const response = await request(app).get(
-      "/course-details/outreach/course-1",
-    );
+    const response = await request(app)
+      .get("/course-details/outreach/course-1")
+      .set("Cookie", tokenFor(outreachUser));
 
     expect(response.status).toBe(200);
     expect(response.body.data.id).toBe("course-1");
@@ -60,11 +65,11 @@ describe("GET /course-details/outreach/:id", () => {
       commercial_org: "Capgemini",
       outreach_org: "New Beginnings",
     };
-    (pool.query as any).mockResolvedValueOnce({ rows: [mockCourse] });
+    mockAuthUserLookup(pool, activeOutreachUser, { rows: [mockCourse] });
 
-    const response = await request(app).get(
-      "/course-details/outreach/course-1",
-    );
+    const response = await request(app)
+      .get("/course-details/outreach/course-1")
+      .set("Cookie", tokenFor(outreachUser));
 
     expect(response.status).toBe(200);
     expect(response.body.data.id).toBe("course-1");
@@ -79,31 +84,33 @@ describe("GET /course-details/outreach/:id", () => {
       commercial_org: "Capgemini",
       outreach_org: "Other Org",
     };
-    (pool.query as any).mockResolvedValueOnce({ rows: [mockCourse] });
+    mockAuthUserLookup(pool, activeOutreachUser, { rows: [mockCourse] });
 
-    const response = await request(app).get(
-      "/course-details/outreach/course-1",
-    );
+    const response = await request(app)
+      .get("/course-details/outreach/course-1")
+      .set("Cookie", tokenFor(outreachUser));
 
     expect(response.status).toBe(403);
     expect(response.body).toHaveProperty("error");
   });
 
   it("returns 404 when the course does not exist", async () => {
-    (pool.query as any).mockResolvedValueOnce({ rows: [] });
+    mockAuthUserLookup(pool, activeOutreachUser, { rows: [] });
 
-    const response = await request(app).get("/course-details/outreach/missing");
+    const response = await request(app)
+      .get("/course-details/outreach/missing")
+      .set("Cookie", tokenFor(outreachUser));
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty("error");
   });
 
   it("returns 500 when the query fails", async () => {
-    (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
+    mockAuthUserLookup(pool, activeOutreachUser, new Error("DB down"));
 
-    const response = await request(app).get(
-      "/course-details/outreach/course-1",
-    );
+    const response = await request(app)
+      .get("/course-details/outreach/course-1")
+      .set("Cookie", tokenFor(outreachUser));
 
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");

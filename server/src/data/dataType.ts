@@ -1,4 +1,7 @@
-// Types
+import { OrganizationType, CourseStatus } from "@bosm/shared";
+
+export { OrganizationType, CourseStatus };
+
 export type Organisation = {
   id: string;
   organisation_name: string;
@@ -17,20 +20,6 @@ export type User = {
   created_at: string;
   last_login_at: string | null;
 };
-
-export enum OrganizationType {
-  COMMERCIAL_PARTNER = "commercial",
-  OUTREACH_PARTNER = "outreach",
-  CYF_STAFF = "cyf_staff",
-}
-export type CourseStatus =
-  | "request_pending"
-  | "request_open"
-  | "request_cancelled"
-  | "request_claimed"
-  | "request_confirmed"
-  | "course_running"
-  | "course_completed";
 
 export type Course = {
   id: string;

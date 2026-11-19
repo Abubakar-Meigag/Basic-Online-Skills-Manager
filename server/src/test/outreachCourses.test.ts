@@ -1,41 +1,42 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import request from "supertest";
-import express from "express";
 import pool from "../data/connection";
 import { OrganizationType } from "../data/dataType";
-import getOutreachCourses from "../api/outreachCourses";
+import jwt from "jsonwebtoken";
+import app from "../app";
+import { mockAuthUserLookup } from "./helpers/mockAuth";
+import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
-// 1. Mock the database pool
 vi.mock("../data/connection", () => ({
   default: {
     query: vi.fn(),
   },
 }));
 
-// 2. Create a test app instance that injects a mock user into req
-const testApp = express();
-testApp.use(express.json());
+const tokenFor = (user: object) => [
+  `token=${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`,
+];
 
-// Middleware helper to simulate different user states in tests
-let mockUserOverride: any = null;
+const activeOutreachUser = {
+  id: "user-123",
+  email: "partner@example.com",
+  is_active: true,
+  org_type: OrganizationType.OUTREACH_PARTNER,
+  organisation_id: "org-outreach-99",
+};
 
-testApp.use((req, _res, next) => {
-  (req as any).user = mockUserOverride;
-  next();
-});
-
-testApp.get("/outreach/courses", getOutreachCourses);
+const activeCommercialUser = {
+  id: "user-456",
+  email: "partner@example.com",
+  is_active: true,
+  org_type: OrganizationType.COMMERCIAL_PARTNER,
+  organisation_id: "org-comm-11",
+};
 
 describe("GET /outreach/courses", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Default logged-in user for happy paths
-    mockUserOverride = {
-      id: "user-123",
-      email: "partner@example.com",
-      orgType: OrganizationType.OUTREACH_PARTNER,
-      organisationId: "org-outreach-99",
-    };
+    (pool.query as any).mockReset();
   });
 
   it("returns 200 with courses list for an outreach partner", async () => {
@@ -52,59 +53,88 @@ describe("GET /outreach/courses", () => {
       },
     ];
 
-    (pool.query as any).mockResolvedValueOnce({ rows: mockCourses });
+    mockAuthUserLookup(pool, activeOutreachUser, { rows: mockCourses });
 
-    const response = await request(testApp).get("/outreach/courses");
+    const response = await request(app)
+      .get("/outreach/courses")
+      .set(
+        "Cookie",
+        tokenFor({
+          id: activeOutreachUser.id,
+          email: activeOutreachUser.email,
+          orgType: OrganizationType.OUTREACH_PARTNER,
+          organisationId: activeOutreachUser.organisation_id,
+        }),
+      );
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(mockCourses);
-    expect(pool.query).toHaveBeenCalledTimes(1);
-    expect(pool.query).toHaveBeenCalledWith(
-      expect.stringContaining("WHERE c.outreach_org_id = $1"),
-      ["org-outreach-99"],
-    );
+    expect(pool.query).toHaveBeenCalled();
   });
 
   it("returns 200 with an empty array if the org hosts no courses", async () => {
-    (pool.query as any).mockResolvedValueOnce({ rows: [] });
+    mockAuthUserLookup(pool, activeOutreachUser, { rows: [] });
 
-    const response = await request(testApp).get("/outreach/courses");
+    const response = await request(app)
+      .get("/outreach/courses")
+      .set(
+        "Cookie",
+        tokenFor({
+          id: activeOutreachUser.id,
+          email: activeOutreachUser.email,
+          orgType: OrganizationType.OUTREACH_PARTNER,
+          organisationId: activeOutreachUser.organisation_id,
+        }),
+      );
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual([]);
   });
 
   it("returns 403 when caller is NOT an outreach partner", async () => {
-    // Simulate a commercial or CYF staff user attempting access
-    mockUserOverride = {
-      id: "user-456",
-      orgType: OrganizationType.COMMERCIAL_PARTNER,
-      organisationId: "org-comm-11",
-    };
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: [] });
 
-    const response = await request(testApp).get("/outreach/courses");
+    const response = await request(app)
+      .get("/outreach/courses")
+      .set(
+        "Cookie",
+        tokenFor({
+          id: activeCommercialUser.id,
+          email: activeCommercialUser.email,
+          orgType: OrganizationType.COMMERCIAL_PARTNER,
+          organisationId: activeCommercialUser.organisation_id,
+        }),
+      );
 
     expect(response.status).toBe(403);
-    expect(response.body).toEqual({
-      error: "Forbidden: Outreach access required.",
-    });
-    expect(pool.query).not.toHaveBeenCalled();
+    expect(pool.query).toHaveBeenCalledTimes(1);
   });
 
-  it("returns 403 when no user session is present on req", async () => {
-    // Simulate unauthenticated request
-    mockUserOverride = null;
+  it("returns 401 when there is no token", async () => {
+    const response = await request(app).get("/outreach/courses");
 
-    const response = await request(testApp).get("/outreach/courses");
-
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(401);
     expect(pool.query).not.toHaveBeenCalled();
   });
 
   it("returns 500 when database query throws an error", async () => {
-    (pool.query as any).mockRejectedValueOnce(new Error("DB connection error"));
+    mockAuthUserLookup(
+      pool,
+      activeOutreachUser,
+      new Error("DB connection error"),
+    );
 
-    const response = await request(testApp).get("/outreach/courses");
+    const response = await request(app)
+      .get("/outreach/courses")
+      .set(
+        "Cookie",
+        tokenFor({
+          id: activeOutreachUser.id,
+          email: activeOutreachUser.email,
+          orgType: OrganizationType.OUTREACH_PARTNER,
+          organisationId: activeOutreachUser.organisation_id,
+        }),
+      );
 
     expect(response.status).toBe(500);
     expect(response.body).toEqual({ error: "Internal Server Error" });

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { verifyMagicLink } from "../../auth/authApi";
 import axios from "axios";
@@ -17,27 +17,22 @@ export default function VerifyMagicLink() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [error, setError] = useState<string>("");
-
+  const hasExecuted = useRef(false); // Prevents React Strict Mode from burning single-use tokens twice
   useEffect(() => {
+    if (hasExecuted.current) return;
     const token = searchParams.get("token");
     if (!token) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setError("Invalid or missing verification link.");
       return;
     }
+    hasExecuted.current = true; // Guard against react strict mode.
     verifyMagicLink(token)
       .then((data) => {
-        if (
-          typeof data.token !== "string" ||
-          !data.token ||
-          !data.user?.id ||
-          !data.user?.email ||
-          !data.user?.orgType
-        ) {
+        if (!data.user?.id || !data.user?.email || !data.user?.orgType) {
           setError("Invalid session data received. Please try again.");
           return;
         }
-        localStorage.setItem("sessionToken", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
         navigate(data.redirectRoute || "/");
       })

@@ -1,4 +1,5 @@
 import swaggerJsdoc from "swagger-jsdoc";
+import { CourseStatus } from "@bosm/shared";
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -25,15 +26,7 @@ const options: swaggerJsdoc.Options = {
             city: { type: "string" },
             status: {
               type: "string",
-              enum: [
-                "request_pending",
-                "request_open",
-                "request_cancelled",
-                "request_claimed",
-                "request_confirmed",
-                "course_running",
-                "course_completed",
-              ],
+              enum: Object.values(CourseStatus),
             },
           },
         },

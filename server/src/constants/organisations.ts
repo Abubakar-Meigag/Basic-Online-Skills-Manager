@@ -1,13 +1,11 @@
-export enum ORGANISATION_TYPE {
-  CYF_STAFF = "cyf_staff",
-  COMMERCIAL = "commercial",
-  OUTREACH = "outreach",
-}
+import { OrganizationType } from "@bosm/shared";
 
-export type OrganisationType = ORGANISATION_TYPE;
+export const ORGANISATION_TYPE = OrganizationType;
+export type OrganisationType = OrganizationType;
+export type { OrganizationType };
 
-export const PARTNER_TYPES: ORGANISATION_TYPE[] = [
-  ORGANISATION_TYPE.CYF_STAFF,
-  ORGANISATION_TYPE.COMMERCIAL,
-  ORGANISATION_TYPE.OUTREACH,
+export const PARTNER_TYPES: OrganizationType[] = [
+  OrganizationType.CYF_STAFF,
+  OrganizationType.COMMERCIAL_PARTNER,
+  OrganizationType.OUTREACH_PARTNER,
 ];

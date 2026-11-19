@@ -1,7 +1,7 @@
 ## Screenshots
 
 ### Login
-![Magic-link login page](./docs/screenshots/login.png)
+![Magic-link login page](./docs/screenshots/Login.png)
 
 
 --- 
@@ -54,5 +54,5 @@
 ## Swagger BOSM API
 
 ### API documentation
-![Swagger API docs, part 1](./docs/screenshots/swagger2.png)
-![Swagger API docs, part 2](./docs/screenshots/swagger1.png)
+![Swagger API docs, part 1](./docs/screenshots/Swagger2.png)
+![Swagger API docs, part 2](./docs/screenshots/Swagger1.png)
