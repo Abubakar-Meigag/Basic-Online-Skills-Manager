@@ -1,12 +1,13 @@
 import { useState } from "react";
 import type { AxiosError } from "axios";
+import { OrganizationType } from "../../../data/dataType";
 import { api } from "../../../auth/authApi";
 import PageHeader from "../../../components/PageHeader";
 
 const ORG_TYPE_OPTIONS = [
-  { value: "cyf_staff", label: "CYF Staff" },
-  { value: "commercial", label: "Commercial" },
-  { value: "outreach", label: "Outreach" },
+  { value: OrganizationType.CYF_STAFF, label: "CYF Staff" },
+  { value: OrganizationType.COMMERCIAL_PARTNER, label: "Commercial" },
+  { value: OrganizationType.OUTREACH_PARTNER, label: "Outreach" },
 ];
 
 type AddPartnerFormProps = {
@@ -16,7 +17,7 @@ type AddPartnerFormProps = {
 
 type FormState = {
   organisation_name: string;
-  type: string;
+  type: OrganizationType | "";
   email_domain: string;
   city: string;
 };
