@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import LicensesLink from "../../components/LicensesLink";
 
 import { requestMagicLink } from "../../auth/authApi";
 const styles = {
@@ -50,7 +51,7 @@ const styles = {
   expiryBadge:
     "text-xs text-gray-600 font-medium bg-gray-100 px-3.5 py-2 rounded-md mt-2",
 
-  footerWrapper: "w-full py-2",
+  footerWrapper: "w-full py-2 text-center",
 };
 
 export default function MagicLinkLogin() {
@@ -173,7 +174,9 @@ export default function MagicLinkLogin() {
       </main>
 
       {/* Empty footer space to keep card vertically centered */}
-      <footer className={styles.footerWrapper}></footer>
+      <footer className={styles.footerWrapper}>
+        <LicensesLink />
+      </footer>
     </div>
   );
 }
