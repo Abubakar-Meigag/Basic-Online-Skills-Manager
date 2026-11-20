@@ -19,6 +19,9 @@ FROM node:24-alpine AS production
 
 WORKDIR /app
 
+# Used to set the server time zone to UTC
+ENV TZ=UTC 
+
 # Install only production dependencies
 COPY package*.json ./
 RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
