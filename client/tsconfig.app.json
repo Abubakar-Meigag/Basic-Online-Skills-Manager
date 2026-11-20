@@ -4,7 +4,12 @@
     "target": "es2023",
     "lib": ["ES2023", "DOM"],
     "module": "esnext",
-    "types": ["vitest/globals", "@testing-library/jest-dom", "vite/client"],
+    "types": [
+      "vitest/globals",
+      "@testing-library/jest-dom",
+      "vite/client",
+      "node"
+    ],
     "allowArbitraryExtensions": true,
     "skipLibCheck": true,
 
