@@ -22,13 +22,6 @@ describe("Third-Party Licences File Generation", () => {
       "../../dist/third-party-licenses.txt",
     );
 
-    if (!fs.existsSync(licenseFilePath)) {
-      console.warn(
-        "Skipping license file test: dist/third-party-licenses.txt not found. Run 'npm run build' first.",
-      );
-      return;
-    }
-
     const content = fs.readFileSync(licenseFilePath, "utf8");
 
     expect(content.length).toBeGreaterThan(0);

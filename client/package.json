@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
-    "test:run": "vitest run",
+    "test:run": "npm run build && vitest run",
     "format": "npx prettier . --write"
   },
   "engines": {
