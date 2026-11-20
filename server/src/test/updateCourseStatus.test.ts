@@ -1,30 +1,19 @@
 import request from "supertest";
 import app from "../app";
 import pool from "../data/connection";
-
-// Auth is handled by mocking the auth middleware (per tech lead): same `app`,
-// but the middleware is replaced so it injects a controllable req.user.
-//
-// >>> CHANGE THIS to match the real middleware once it's merged: <<<
-//   - the module path in vi.mock(...)      ("../middleware/requireAuth")
-//   - the exported function name           (requireAuth)
-//   - if a separate role guard exists (e.g. requireRole), mock it too.
-//   - confirm the field name is `orgType` (what our JWT signs), not
-//     `organization_type` — mockUser and the handler both use orgType.
+import jwt from "jsonwebtoken";
+import { OrganizationType } from "../data/dataType";
+import { mockAuthUserLookup } from "./helpers/mockAuth";
+import { withMockedQueries } from "./helpers/mockQueries";
+import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
-  default: { connect: vi.fn() },
+  default: { connect: vi.fn(), query: vi.fn() },
 }));
 
-// The user the mocked middleware puts on req.user. Each test sets this.
-let mockUser: Record<string, unknown> | null = null;
-
-vi.mock("../api/middleware/requireAuth", () => ({
-  requireAuth: (req: any, _res: any, next: any) => {
-    req.user = mockUser;
-    next();
-  },
-}));
+const tokenFor = (user: object) => [
+  `token=${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`,
+];
 
 const makeClient = () => ({
   query: vi.fn(),
@@ -34,43 +23,62 @@ const makeClient = () => ({
 const cyfUser = {
   id: "staff-1",
   email: "admin@codeyourfuture.io",
-  orgType: "cyf_staff",
+  orgType: OrganizationType.CYF_STAFF,
   organisationId: "9e27629b-5911-4858-b453-14a5d227afc6",
+};
+
+const activeCyfUser = {
+  id: "staff-1",
+  email: "admin@codeyourfuture.io",
+  is_active: true,
+  org_type: OrganizationType.CYF_STAFF,
+  organisation_id: "9e27629b-5911-4858-b453-14a5d227afc6",
 };
 
 const commercialUser = {
   id: "u2",
   email: "partner@example.org",
-  orgType: "commercial",
+  orgType: OrganizationType.COMMERCIAL_PARTNER,
   organisationId: "60ea2b0f-e04e-4f9a-ac72-38bae06d98bc",
+};
+
+const activeCommercialUser = {
+  id: "u2",
+  email: "partner@example.org",
+  is_active: true,
+  org_type: OrganizationType.COMMERCIAL_PARTNER,
+  organisation_id: "60ea2b0f-e04e-4f9a-ac72-38bae06d98bc",
 };
 
 describe("PATCH /course/:id/status", () => {
   beforeEach(() => {
-    // Default: an authorised CYF staff user. Individual tests override.
-    mockUser = cyfUser;
-  });
-
-  afterEach(() => {
     vi.clearAllMocks();
+    (pool.connect as any).mockReset();
+    (pool.query as any).mockReset();
   });
 
   it("updates the status and returns 200", async () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
+    mockAuthUserLookup(pool, activeCyfUser, { rows: [] });
 
-    client.query
-      .mockResolvedValueOnce(undefined) // BEGIN
-      .mockResolvedValueOnce({ rows: [{ id: "course-1" }] }) // course exists
-      .mockResolvedValueOnce({
-        rows: [{ id: "course-1", status: "request_open" }],
-      }) // UPDATE ... RETURNING
-      .mockResolvedValueOnce(undefined) // audit insert
-      .mockResolvedValueOnce(undefined); // COMMIT
-
-    const response = await request(app)
-      .patch("/course/course-1/status")
-      .send({ status: "request_open" });
+    const response = await withMockedQueries(
+      client,
+      {
+        BEGIN: undefined,
+        "SELECT id FROM courses": { rows: [{ id: "course-1" }] }, // course exists
+        "UPDATE courses": {
+          rows: [{ id: "course-1", status: "request_open" }],
+        },
+        "INSERT INTO audit_log": undefined,
+        COMMIT: undefined,
+      },
+      async () =>
+        request(app)
+          .patch("/course/course-1/status")
+          .set("Cookie", tokenFor(cyfUser))
+          .send({ status: "request_open" }),
+    );
 
     expect(response.status).toBe(200);
     expect(response.body.status).toBe("request_open");
@@ -78,10 +86,11 @@ describe("PATCH /course/:id/status", () => {
   });
 
   it("returns 403 when the caller is not CYF staff", async () => {
-    mockUser = commercialUser;
+    mockAuthUserLookup(pool, activeCommercialUser, { rows: [] });
 
     const response = await request(app)
       .patch("/course/course-1/status")
+      .set("Cookie", tokenFor(commercialUser))
       .send({ status: "request_open" });
 
     expect(response.status).toBe(403);
@@ -89,8 +98,11 @@ describe("PATCH /course/:id/status", () => {
   });
 
   it("returns 400 when status is missing", async () => {
+    mockAuthUserLookup(pool, activeCyfUser, { rows: [] });
+
     const response = await request(app)
       .patch("/course/course-1/status")
+      .set("Cookie", tokenFor(cyfUser))
       .send({});
 
     expect(response.status).toBe(400);
@@ -99,9 +111,12 @@ describe("PATCH /course/:id/status", () => {
   });
 
   it("returns 400 for a status outside the allowed CYF transitions", async () => {
+    mockAuthUserLookup(pool, activeCyfUser, { rows: [] });
+
     const response = await request(app)
       .patch("/course/course-1/status")
-      .send({ status: "request_cancelled" }); // out of scope, not allowed here
+      .set("Cookie", tokenFor(cyfUser))
+      .send({ status: "request_cancelled" }); // out of scope, not allowed
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("error");
@@ -109,8 +124,11 @@ describe("PATCH /course/:id/status", () => {
   });
 
   it("returns 400 for request_pending / request_claimed (not CYF actions)", async () => {
+    mockAuthUserLookup(pool, activeCyfUser, { rows: [] });
+
     const response = await request(app)
       .patch("/course/course-1/status")
+      .set("Cookie", tokenFor(cyfUser))
       .send({ status: "request_claimed" });
 
     expect(response.status).toBe(400);
@@ -121,15 +139,21 @@ describe("PATCH /course/:id/status", () => {
   it("returns 404 when the course does not exist", async () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
+    mockAuthUserLookup(pool, activeCyfUser, { rows: [] });
 
-    client.query
-      .mockResolvedValueOnce(undefined) // BEGIN
-      .mockResolvedValueOnce({ rows: [] }) // course not found
-      .mockResolvedValueOnce(undefined); // ROLLBACK
-
-    const response = await request(app)
-      .patch("/course/missing/status")
-      .send({ status: "request_open" });
+    const response = await withMockedQueries(
+      client,
+      {
+        BEGIN: undefined,
+        "SELECT id FROM courses": { rows: [] }, // course not found
+        ROLLBACK: undefined,
+      },
+      async () =>
+        request(app)
+          .patch("/course/missing/status")
+          .set("Cookie", tokenFor(cyfUser))
+          .send({ status: "request_open" }),
+    );
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty("error");
@@ -139,19 +163,25 @@ describe("PATCH /course/:id/status", () => {
   it("writes an audit entry with the acting user and course id", async () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
+    mockAuthUserLookup(pool, activeCyfUser, { rows: [] });
 
-    client.query
-      .mockResolvedValueOnce(undefined) // BEGIN
-      .mockResolvedValueOnce({ rows: [{ id: "course-1" }] }) // exists
-      .mockResolvedValueOnce({
-        rows: [{ id: "course-1", status: "course_running" }],
-      }) // UPDATE
-      .mockResolvedValueOnce(undefined) // audit
-      .mockResolvedValueOnce(undefined); // COMMIT
-
-    await request(app)
-      .patch("/course/course-1/status")
-      .send({ status: "course_running" });
+    await withMockedQueries(
+      client,
+      {
+        BEGIN: undefined,
+        "SELECT id FROM courses": { rows: [{ id: "course-1" }] }, // exists
+        "UPDATE courses": {
+          rows: [{ id: "course-1", status: "course_running" }],
+        },
+        "INSERT INTO audit_log": undefined,
+        COMMIT: undefined,
+      },
+      async () =>
+        request(app)
+          .patch("/course/course-1/status")
+          .set("Cookie", tokenFor(cyfUser))
+          .send({ status: "course_running" }),
+    );
 
     const auditCall = client.query.mock.calls.find(
       (c: any[]) =>
@@ -170,14 +200,21 @@ describe("PATCH /course/:id/status", () => {
   it("returns 500 and releases the client when a query fails", async () => {
     const client = makeClient();
     (pool.connect as any).mockResolvedValueOnce(client);
+    mockAuthUserLookup(pool, activeCyfUser, { rows: [] });
 
-    client.query
-      .mockResolvedValueOnce(undefined) // BEGIN
-      .mockRejectedValueOnce(new Error("DB down")); // existence check throws
-
-    const response = await request(app)
-      .patch("/course/course-1/status")
-      .send({ status: "request_open" });
+    const response = await withMockedQueries(
+      client,
+      {
+        BEGIN: undefined,
+        "SELECT id FROM courses": new Error("DB down"), // existence check throws
+        ROLLBACK: undefined, // the catch block rolls back
+      },
+      async () =>
+        request(app)
+          .patch("/course/course-1/status")
+          .set("Cookie", tokenFor(cyfUser))
+          .send({ status: "request_open" }),
+    );
 
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");

@@ -1,5 +1,30 @@
 import type { Request, Response } from "express";
 import pool from "../data/connection";
+import { z as zod } from "zod";
+
+const claimCourseSchema = zod.object({
+  start_date: zod
+    .string()
+    .regex(
+      /^\d{4}-\d{2}-\d{2}$/,
+      "Please provide a valid start date in YYYY-MM-DD format",
+    ),
+  venue_address: zod.string().trim().min(1, "Venue address is required"),
+  contact_name: zod.string().trim().min(1, "Contact name is required"),
+  contact_email: zod
+    .string()
+    .trim()
+    .email("Please provide a valid contact email address"),
+  lunch_arrangement: zod
+    .string()
+    .trim()
+    .min(1, "Lunch arrangement details are required"),
+  client_group_description: zod.string().trim().optional(),
+  tech_level: zod.string().trim().optional(),
+  goal: zod.string().trim().optional(),
+  expenses_notes: zod.string().trim().optional(),
+  note: zod.string().trim().optional(),
+});
 
 /**
  * @swagger
@@ -82,6 +107,14 @@ const claimOpportunity = async (req: Request, res: Response) => {
 
   const { id } = req.params;
 
+  const parseResult = claimCourseSchema.safeParse(req.body);
+
+  if (!parseResult.success) {
+    return res
+      .status(400)
+      .json({ error: parseResult.error.issues[0]?.message });
+  }
+
   const {
     start_date,
     venue_address,
@@ -93,26 +126,17 @@ const claimOpportunity = async (req: Request, res: Response) => {
     lunch_arrangement,
     expenses_notes,
     note,
-  } = req.body;
-
-  // Validate deadline is a real YYYY-MM-DD date.
-  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-  if (!datePattern.test(start_date)) {
-    res.status(400).json({
-      error: "deadline must be in YYYY-MM-DD format",
-    });
-    return;
-  }
+  } = parseResult.data;
 
   const parsedStartDate = new Date(start_date);
-  // Calculate end date from start date.
+
   const end_date = new Date(parsedStartDate);
   end_date.setDate(parsedStartDate.getDate() + 21);
+
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
 
-    // Check if course exist.
     const query = await pool.query(
       `SELECT
         c.*,
@@ -147,7 +171,6 @@ const claimOpportunity = async (req: Request, res: Response) => {
       return;
     }
 
-    // Add details/Assign course to outreach partner
     await client.query(
       `UPDATE courses SET outreach_org_id = $1, 
       status = $2,
@@ -181,7 +204,6 @@ const claimOpportunity = async (req: Request, res: Response) => {
       ],
     );
 
-    // Update audit log
     await client.query(
       `INSERT INTO audit_log (user_id, action, entity_type, entity_id)
        VALUES ($1, $2, $3, $4)`,

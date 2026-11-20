@@ -1,0 +1,13 @@
+{
+  "name": "bosm-monorepo",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server",
+    "shared"
+  ],
+  "devDependencies": {
+    "jsdom": "^31.0.1",
+    "typescript": "^7.0.2"
+  }
+}

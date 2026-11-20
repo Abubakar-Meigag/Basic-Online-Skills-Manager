@@ -3,7 +3,7 @@
 A portal for CodeYourFuture to coordinate Basic Online Skills courses between
 commercial partners, outreach partners, and CYF staff.
 
-**Live:** https://bosm.trainees.hosting.cyf.academy
+**Live:** https://bosm.hosted.codeyourfuture.io
 
 ## Design & Prototypes
 
@@ -18,6 +18,10 @@ We used Figma to define our user journeys and dashboard designs for all three ro
 - [`client/`](./client/README.md) — React + TypeScript + Vite frontend
 - [`server/`](./server/README.md) — Node + Express + TypeScript backend
 - [Project structure guide](./STRUCTURE.md)
+
+## Screenshots
+
+See [SCREENSHOTS.md](./SCREENSHOTS.md) for screenshots of the main screens and flows.
 
 ## Contributing
 

@@ -37,12 +37,6 @@ const OutreachDashboard = () => {
         render: (val) => String(val).slice(0, 5),
       },
       {
-        header: "Commercial Partner",
-        accessor: "commercial_org",
-        headerClassName: "text-center",
-        cellClassName: "text-center text-slate-600",
-      },
-      {
         header: "Location",
         accessor: "city",
         headerClassName: "text-center",

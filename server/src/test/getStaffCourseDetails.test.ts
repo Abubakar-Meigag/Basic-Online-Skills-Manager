@@ -1,33 +1,38 @@
 import request from "supertest";
 import app from "../app";
 import pool from "../data/connection";
+import jwt from "jsonwebtoken";
+import { OrganizationType } from "../data/dataType";
+import { mockAuthUserLookup } from "./helpers/mockAuth";
+import { JWT_TEST_SECRET } from "./helpers/testSecret";
 
 vi.mock("../data/connection", () => ({
   default: { query: vi.fn() },
 }));
 
-let mockUser: Record<string, unknown> | null = null;
-vi.mock("./../middleware/authMiddleware", () => ({
-  authorizeRole: () => (req: any, _res: any, next: any) => {
-    req.user = mockUser;
-    next();
-  },
-}));
+const tokenFor = (user: object) => [
+  `token=${jwt.sign(user, JWT_TEST_SECRET, { algorithm: "HS256", expiresIn: "1h" })}`,
+];
 
 const staffUser = {
   id: "staff-1",
   email: "admin@codeyourfuture.io",
-  orgType: "cyf_staff",
+  orgType: OrganizationType.CYF_STAFF,
   organisationId: "9e27629b-5911-4858-b453-14a5d227afc6",
+};
+
+const activeStaffUser = {
+  id: "staff-1",
+  email: "admin@codeyourfuture.io",
+  is_active: true,
+  org_type: OrganizationType.CYF_STAFF,
+  organisation_id: "9e27629b-5911-4858-b453-14a5d227afc6",
 };
 
 describe("GET /course-details/staff/:id", () => {
   beforeEach(() => {
-    mockUser = staffUser;
-  });
-
-  afterEach(() => {
     vi.clearAllMocks();
+    (pool.query as any).mockReset();
   });
 
   it("returns the course for any id (staff can view any course)", async () => {
@@ -39,9 +44,11 @@ describe("GET /course-details/staff/:id", () => {
       commercial_org: "Capgemini",
       outreach_org: null,
     };
-    (pool.query as any).mockResolvedValueOnce({ rows: [mockCourse] });
+    mockAuthUserLookup(pool, activeStaffUser, { rows: [mockCourse] });
 
-    const response = await request(app).get("/course-details/staff/course-1");
+    const response = await request(app)
+      .get("/course-details/staff/course-1")
+      .set("Cookie", tokenFor(staffUser));
 
     expect(response.status).toBe(200);
     expect(response.body.data.id).toBe("course-1");
@@ -49,18 +56,22 @@ describe("GET /course-details/staff/:id", () => {
   });
 
   it("returns 404 when the course does not exist", async () => {
-    (pool.query as any).mockResolvedValueOnce({ rows: [] });
+    mockAuthUserLookup(pool, activeStaffUser, { rows: [] });
 
-    const response = await request(app).get("/course-details/staff/missing");
+    const response = await request(app)
+      .get("/course-details/staff/missing")
+      .set("Cookie", tokenFor(staffUser));
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty("error");
   });
 
   it("returns 500 when the query fails", async () => {
-    (pool.query as any).mockRejectedValueOnce(new Error("DB down"));
+    mockAuthUserLookup(pool, activeStaffUser, new Error("DB down"));
 
-    const response = await request(app).get("/course-details/staff/course-1");
+    const response = await request(app)
+      .get("/course-details/staff/course-1")
+      .set("Cookie", tokenFor(staffUser));
 
     expect(response.status).toBe(500);
     expect(response.body).toHaveProperty("error");
