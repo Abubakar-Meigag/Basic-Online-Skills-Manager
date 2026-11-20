@@ -24,6 +24,9 @@ FROM node:24-alpine AS production
 
 WORKDIR /app
 
+# Used for setting the server time zone to UTC
+ENV TZ=UTC 
+
 # Copy root manifests and sub-package manifests
 COPY package*.json ./
 COPY shared/package*.json ./shared/
