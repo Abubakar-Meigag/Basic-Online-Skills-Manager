@@ -173,7 +173,7 @@ export default function MagicLinkLogin() {
         </div>
       </main>
 
-      {/* Empty footer space to keep card vertically centered */}
+      {/* Footer containing attributions and page links */}
       <footer className={styles.footerWrapper}>
         <LicencesLink />
       </footer>
