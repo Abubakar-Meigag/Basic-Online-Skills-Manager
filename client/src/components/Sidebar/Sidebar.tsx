@@ -3,7 +3,7 @@ import CYFLogo from "../../assets/CYF-logo.png";
 import { navLinks } from "../../lib/constants/navLinks";
 import { logoutUser } from "../../auth/authApi";
 import { OrganizationType } from "../../data/dataType";
-import LicensesLink from "../LicensesLink";
+import LicencesLink from "../LicencesLink";
 import "./Sidebar.css";
 
 const rolePathMap: Record<OrganizationType, string> = {
@@ -72,7 +72,7 @@ const Sidebar = () => {
 
       <div className="mt-auto">
         <div className="px-5 py-3">
-          <LicensesLink />
+          <LicencesLink />
         </div>
 
         <div className="p-5 border-t border-[#E3E3E3]">

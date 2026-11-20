@@ -6,7 +6,7 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
-    license: { fileName: "third-party-licenses.txt" },
+    license: { fileName: "third-party-licences.txt" },
   },
   test: {
     environment: "jsdom",

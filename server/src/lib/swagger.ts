@@ -8,7 +8,7 @@ const options: swaggerJsdoc.Options = {
       title: "BOSM API",
       version: "1.0.0",
       description:
-        "API for Basic Online Skills course management. \n\n Review our [Third-Party Open-Source Licences](/third-party-licenses.txt).",
+        "API for Basic Online Skills course management. \n\n Review our [Third-Party Open-Source Licences](/third-party-licences.txt).",
     },
     servers: [{ url: "http://localhost:3000", description: "Local dev" }],
     components: {

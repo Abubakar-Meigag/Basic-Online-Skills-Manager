@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import LicensesLink from "../../components/LicensesLink";
+import LicencesLink from "../../components/LicencesLink";
 
 import { requestMagicLink } from "../../auth/authApi";
 const styles = {
@@ -175,7 +175,7 @@ export default function MagicLinkLogin() {
 
       {/* Empty footer space to keep card vertically centered */}
       <footer className={styles.footerWrapper}>
-        <LicensesLink />
+        <LicencesLink />
       </footer>
     </div>
   );
