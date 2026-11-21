@@ -4,6 +4,7 @@ import { navLinks } from "../../lib/constants/navLinks";
 import { logoutUser } from "../../auth/authApi";
 import { OrganizationType } from "../../data/dataType";
 import LicencesLink from "../LicencesLink";
+import PrivacyLink from "../PrivacyLink";
 import "./Sidebar.css";
 
 const rolePathMap: Record<OrganizationType, string> = {
@@ -71,8 +72,9 @@ const Sidebar = () => {
       </nav>
 
       <div className="mt-auto">
-        <div className="px-5 py-3">
+        <div className="px-5 py-3 flex items-center gap-4">
           <LicencesLink />
+          <PrivacyLink />
         </div>
 
         <div className="p-5 border-t border-[#E3E3E3]">
