@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
-
+import LicencesLink from "../../components/LicencesLink";
+import PrivacyLink from "../../components/PrivacyLink";
 import { requestMagicLink } from "../../auth/authApi";
+
 const styles = {
   pageWrapper:
     "min-h-screen bg-gray-50 flex flex-col justify-between p-6 md:p-10",
@@ -50,7 +52,7 @@ const styles = {
   expiryBadge:
     "text-xs text-gray-600 font-medium bg-gray-100 px-3.5 py-2 rounded-md mt-2",
 
-  footerWrapper: "w-full py-2",
+  footerWrapper: "w-full py-2 flex items-center justify-center gap-4",
 };
 
 export default function MagicLinkLogin() {
@@ -172,8 +174,11 @@ export default function MagicLinkLogin() {
         </div>
       </main>
 
-      {/* Empty footer space to keep card vertically centered */}
-      <footer className={styles.footerWrapper}></footer>
+      {/* Footer containing attributions and page links */}
+      <footer className={styles.footerWrapper}>
+        <LicencesLink />
+        <PrivacyLink />
+      </footer>
     </div>
   );
 }
