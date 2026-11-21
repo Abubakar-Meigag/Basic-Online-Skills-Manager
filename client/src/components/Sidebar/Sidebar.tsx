@@ -3,6 +3,7 @@ import CYFLogo from "../../assets/CYF-logo.png";
 import { navLinks } from "../../lib/constants/navLinks";
 import { logoutUser } from "../../auth/authApi";
 import { OrganizationType } from "../../data/dataType";
+import LicencesLink from "../LicencesLink";
 import "./Sidebar.css";
 
 const rolePathMap: Record<OrganizationType, string> = {
@@ -69,23 +70,29 @@ const Sidebar = () => {
         </ul>
       </nav>
 
-      <div className="mt-auto p-5 border-t border-[#E3E3E3]">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-sm font-semibold text-red-700">
-            {userInitial}
-          </div>
+      <div className="mt-auto">
+        <div className="px-5 py-3">
+          <LicencesLink />
+        </div>
 
-          <div className="flex flex-col">
-            <span className="text-sm font-semibold email-truncate">
-              {userEmail}
-            </span>
-            <button
-              type="button"
-              className="text-xs text-gray-500 hover:underline cursor-pointer bg-transparent border-none p-0"
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
+        <div className="p-5 border-t border-[#E3E3E3]">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-sm font-semibold text-red-700">
+              {userInitial}
+            </div>
+
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold email-truncate">
+                {userEmail}
+              </span>
+              <button
+                type="button"
+                className="text-xs text-gray-500 hover:underline cursor-pointer bg-transparent border-none p-0"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </div>
